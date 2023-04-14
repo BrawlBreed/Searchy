@@ -46,8 +46,8 @@ function ReportModal(props) {
 
         // cleanup function
         return () => {
-            Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
-            Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+            Keyboard.removeAllListeners("keyboardDidShow", _keyboardDidShow);
+            Keyboard.removeAllListeners("keyboardDidHide", _keyboardDidHide);
         };
     }, []);
     function _keyboardDidShow() {

@@ -1,26 +1,27 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
-import React, { useContext } from 'react';
-import UserContext from '../context/user';
-import { AccountScreens, AddScreens, ChatScreens, HomeScreens, SellScreens } from '../screens';
-import { colors, scale } from '../utilities';
-import { StackOptions, tabIcon, tabOptions, TopBarOptions } from './screenOptions';
+ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+ //import { createMaterialTopTabNavigator  } from '@react-navigation/material-top-tabs';
+ import { NavigationContainer } from '@react-navigation/native';
+ import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+ import React, { useContext } from 'react';
+ import UserContext from '../context/user';
+ import { AccountScreens, AddScreens, ChatScreens, HomeScreens, SellScreens } from '../screens';
+ import { colors, scale } from '../utilities';
+ import { StackOptions, tabIcon, tabOptions, TopBarOptions } from './screenOptions';
+import { Text } from 'react-native';
 
 
-const Tabs = createBottomTabNavigator()
-const MainStack = createStackNavigator()
-const HomeStack = createStackNavigator()
-const AccountStack = createStackNavigator()
-const EditAccountStack = createStackNavigator()
-const ChatStack = createStackNavigator()
-const AddStack = createStackNavigator()
-const SellStack = createStackNavigator()
-const FilterStack = createStackNavigator()
-const AccountTOP = createMaterialTopTabNavigator()
-const ChatTOP = createMaterialTopTabNavigator()
-const AdsTOP = createMaterialTopTabNavigator()
+ const Tabs = createBottomTabNavigator()
+ const MainStack = createStackNavigator()
+ const HomeStack = createStackNavigator()
+ const AccountStack = createStackNavigator()
+ const EditAccountStack = createStackNavigator()
+ const ChatStack = createStackNavigator()
+ const AddStack = createStackNavigator()
+ const SellStack = createStackNavigator()
+ const FilterStack = createStackNavigator()
+ const AccountTOP = createBottomTabNavigator()
+ const ChatTOP = createBottomTabNavigator()
+ const AdsTOP = createBottomTabNavigator()
 
 function NetworkTabs() {
     return (
@@ -170,6 +171,7 @@ function BottomTabs() {
 function AppContainer() {
     const { isLoggedIn } = useContext(UserContext)
     return (
+        
         <NavigationContainer>
             <MainStack.Navigator initialRouteName='BottomTabs' headerMode='screen' >
                 <MainStack.Screen name='BottomTabs' component={BottomTabs} options={{ headerShown: false }} />
