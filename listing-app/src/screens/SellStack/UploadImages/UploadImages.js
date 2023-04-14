@@ -23,11 +23,11 @@ function UploadImages() {
 
     async function PickImage() {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
             quality: 1
         })
-        if (!result.cancelled) {
-            setImage(result.uri)
+        if (!result.canceled) {
+            setImage(result.assets)
         }
     }
     async function CaptureImage() {
@@ -61,7 +61,7 @@ function UploadImages() {
             quality: 1
         })
         if (!result.cancelled) {
-            setImage(result.uri)
+            setImage(result.assets)
         }
     }
     return (
