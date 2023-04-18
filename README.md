@@ -1,4 +1,4 @@
-# OLO Mobile App
+# OLO Mobile App UI
 
 OLO is a listing UI theme solution designed specifically for iOS and Android platforms. With its sleek and modern design, OLO provides a complete UI theme solution that is perfect for any listing company application.
 
