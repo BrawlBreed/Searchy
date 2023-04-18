@@ -38,6 +38,11 @@ Find the link for the complete documentation of the OLO UI app [here](https://li
 
 ## Get the Latest News
 
+- [Facebook](https://www.facebook.com/ninjascodeofficial)
+- [Twitter](https://twitter.com/ninjascode1)
+- [Instagram](https://www.instagram.com/ninjascodeofficial/)
+- [LinkedIn](https://www.linkedin.com/company/14512538)
+
 ## Reporting an issue
 
 [Github Issues](https://github.com/Ninjas-Code-official/rn-olxclone/issues) are used to track todos, bugs, feature requests, and more.
