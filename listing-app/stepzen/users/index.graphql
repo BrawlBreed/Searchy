@@ -1,0 +1,54 @@
+type User {
+  _id: String
+  avatar: String
+  description: String
+  callingCode: Int
+  createdAt: Date
+  email: String
+  followers: [String]
+  following: [String]
+  isActive: Boolean
+  likes: [String]
+  name: String
+  notificationToken: String
+  phone: Int
+  showPhone: Boolean
+}
+
+type UserList { 
+  name: ID,
+  value: User
+}
+
+type Query {
+  getUserById(user: ID): User
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$user.json"
+    )
+  getUsers: [UserList]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    )
+}
+
+# type Mutation {
+#   Login(
+#     callingCode: Int
+#     createdAt: Date
+#     email: String
+#     followers: [String]
+#     following: [String]
+#     isActive: Boolean
+#     likes: [String]
+#     name: String
+#     notificationToken: String
+#     phone: Int
+#     showPhone: Boolean
+#   ): User
+#     @rest(
+#       endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users.json",
+#       method: "POST",
+#       bodySerializer: "json"
+#     )
+# }

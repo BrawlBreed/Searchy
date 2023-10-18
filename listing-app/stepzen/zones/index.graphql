@@ -1,0 +1,24 @@
+type Zone {
+  _id: String
+  description: String
+  location: Address
+  title: String
+}
+
+type ZonesList {
+  name: ID
+  value: Zone
+}
+
+type Query {
+  getZoneById(zone: String): Zone
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/zones/$zone.json"
+  )
+  getZones: [ZonesList]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/zones.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    ) 
+}
+ 

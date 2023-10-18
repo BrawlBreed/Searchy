@@ -1,22 +1,19 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TextDefault } from '../../../components';
 import styles from './styles';
 
-const SubCategory = [
-    { id: '0', title: 'Tablets' },
-    { id: '1', title: 'Accessories' },
-    { id: '2', title: 'Mobile Phones' }
-]
-
-function SubCategories() {
+function SubCategories({ route }) {
     const navigation = useNavigation()
-    const route = useRoute()
+    const [subCategories, setSubCategories] = useState([])
     const headerTitle = route?.params?.headerTitle ?? null
 
-
+    useEffect(() => { 
+        console.log(route.params.subCategories)
+        setSubCategories(route.params.subCategories) 
+    }, [])
     useLayoutEffect(() => {
         navigation.setOptions({
             title: headerTitle
@@ -26,7 +23,7 @@ function SubCategories() {
         <SafeAreaView edges={['bottom']} style={[styles.flex, styles.safeAreaview]}>
             <View style={[styles.flex, styles.container]}>
                 <FlatList
-                    data={SubCategory}
+                    data={subCategories}
                     style={styles.flatList}
                     contentContainerStyle={styles.categoryContainer}
                     showsHorizontalScrollIndicator={false}
@@ -35,10 +32,10 @@ function SubCategories() {
                         <TouchableOpacity
                             activeOpacity={0.5}
                             style={styles.categoryRow}
-                            onPress={() => navigation.navigate('SellingForm')}
+                            onPress={() => navigation.navigate('SellingForm', { types: item.value})}
                         >
                             <TextDefault light H5 style={styles.fontText}>
-                                {item.title}
+                                {item.value.title}
                             </TextDefault>
                         </TouchableOpacity>
                     )}
@@ -48,4 +45,4 @@ function SubCategories() {
     );
 }
 
-export default React.memo(SubCategories)
+export default SubCategories

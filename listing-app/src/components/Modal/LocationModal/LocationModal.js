@@ -1,17 +1,52 @@
 import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, Modal, TextInput, TouchableOpacity, View, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { alignment, colors, scale } from '../../../utilities';
 import ModalHeader from '../../Header/ModalHeader/ModalHeader';
 import { TextDefault } from '../../Text';
 import styles from './styles';
-
-const STATE = ['All in Pakistan', 'Azad Kashmir', 'Balochistan', 'Islamabad Capital territory', 'Khybar Pakhtunkha', 'Northen Area', 'Punjab', 'Sindh']
+import { getZones } from '../../../apollo/server';
+import { useQuery } from '@apollo/client';
+import { setZoneId, setCurrentCoordinates } from '../../../store/reducers/AddItem/addItemSlice';
+import { useDispatch } from 'react-redux';
 
 function LocationModal(props) {
-    const inset = useSafeAreaInsets()
-    const loading = false
+    const [input, setInput] = useState('') 
+    const [coordinates, setCoordinates] = useState({})
+    const [currentLocation, setCurrentLocation] = useState('')
+    const [zones, setZones] = useState()
+    const { loading, error, data } = useQuery(getZones, {
+        variables: {},
+      })
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(setCurrentCoordinates(coordinates))
+        dispatch(setZoneId(currentLocation))
+    }, [currentLocation, coordinates])
+
+    useEffect(() => {
+        fetch('https://geolocation-db.com/json/')
+        .then(response => response.json())
+        .then(data => {
+            setCoordinates({
+                latitude: data.latitude, 
+                longitude: data.longitude
+            })
+            setCurrentLocation(data.city)
+        })
+        .catch(error => console.log(error))  
+        if(!data) return
+        if(data.getZones) setZones(data.getZones)
+
+    }, [data])
+
+    useEffect(() => {
+        setZones(data?.getZones.filter((item) => {
+            return item.value.title.toLowerCase().includes(input.toLowerCase())
+        }))
+    }, [input])
 
     function btnLocation(title) {
         props.setFilters(title)
@@ -30,7 +65,7 @@ function LocationModal(props) {
                     behavior={Platform.OS === 'ios' ? 'padding' : null}
                 >
                     <View style={[styles.flex, styles.mainContainer]}>
-                        <ModalHeader closeModal={props.onModalToggle} title={'Location'} />
+                        <ModalHeader closeModal={props.onModalToggle} title={'Местоположение'} />
                         <View style={styles.body}>
                             <View style={styles.headerContents}>
                                 <View style={styles.closeBtn}>
@@ -48,36 +83,38 @@ function LocationModal(props) {
                                     <TextInput
                                         style={styles.inputAddress}
                                         placeholderTextColor={colors.fontSecondColor}
-                                        placeholder={'Search city, area or neighbour'}
+                                        placeholder={'Търси градове, местности и др.'}
+                                        onChangeText={setInput}
+                                        value={input}
                                     />
                                 </View>
-                                <TouchableOpacity style={styles.currentLocation} onPress={() => btnLocation('E11/2')}>
+                                <TouchableOpacity style={styles.currentLocation} onPress={() => btnLocation(currentLocation)}>
                                     <MaterialCommunityIcons name="target" size={scale(25)} color={colors.spinnerColor} />
                                     <View style={alignment.PLsmall}>
                                         <TextDefault textColor={colors.spinnerColor} H5 bold>
-                                            {'Use current location'}
+                                            {'Текущо местоположение'}
                                         </TextDefault>
                                         <TextDefault numberOfLines={1} textColor={colors.fontMainColor} light small style={{ ...alignment.MTxSmall, width: '85%' }}>
-                                            {loading ? 'Fetching location...' : 'E11/2'}
+                                            {loading ? 'Обработване на локацията...' : props.locationText}
                                         </TextDefault>
                                     </View>
                                 </TouchableOpacity>
                             </View>
                             <TextDefault textColor={colors.fontSecondColor} uppercase style={styles.title}>
-                                {'Choose State'}
+                                {'Избери град'}
                             </TextDefault>
                         </View>
                         <FlatList
                             contentContainerStyle={alignment.PBlarge}
                             showsVerticalScrollIndicator={false}
-                            data={STATE}
+                            data={zones}
                             keyExtractor={(item, index) => index.toString()}
-                            renderItem={({ item, index }) => (
+                            renderItem={({ item: {value, name}, index }) => (
                                 <TouchableOpacity
                                     style={styles.stateBtn}
-                                    onPress={() => btnLocation(item)} >
+                                    onPress={() => btnLocation(value.title)} >
                                     <TextDefault style={styles.flex} >
-                                        {item}
+                                        {value.title}
                                     </TextDefault>
                                     <Entypo name="chevron-small-right" size={scale(20)} color={colors.fontMainColor} />
                                 </TouchableOpacity>
@@ -88,4 +125,4 @@ function LocationModal(props) {
         </Modal >
     )
 }
-export default React.memo(LocationModal)
+export default LocationModal

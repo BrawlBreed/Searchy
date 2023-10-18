@@ -93,7 +93,7 @@ function ChatTabs() {
 }
 
 function SellTabs() {
-    return (
+    return ( 
         <SellStack.Navigator initialRouteName='Home' screenOptions={StackOptions()}>
             <SellStack.Screen name='Home' component={SellScreens.MainSell} />
             <SellStack.Screen name='Categories' component={SellScreens.Categories} options={{ title: 'Choose a category' }} />

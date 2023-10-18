@@ -1,12 +1,13 @@
 import { useNavigation } from '@react-navigation/native'
-import React, { useLayoutEffect } from 'react'
+import React, { useEffect, useLayoutEffect } from 'react'
 import { Image, View } from 'react-native'
 import { EmptyButton, RightButton, TextDefault } from '../../../components'
 import { alignment, colors } from '../../../utilities'
 import styles from './styles'
 
-function UserProfile() {
+function UserProfile({ route }) {
     const navigation = useNavigation()
+    const { avatar, createdAt, email, followers, following, isActive, name, description } = route.params
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -30,7 +31,7 @@ function UserProfile() {
                         <View style={styles.profileInfo}>
                             <View style={styles.follower}>
                                 <TextDefault textColor={colors.fontMainColor} H3 bold>
-                                    {'4'}
+                                    {followers ? followers.length : '0'}
                                 </TextDefault>
                                 <TextDefault textColor={colors.fontSecondColor} light uppercase>
                                     {'Followers'}
@@ -38,7 +39,7 @@ function UserProfile() {
                             </View>
                             <View style={styles.follower}>
                                 <TextDefault textColor={colors.fontMainColor} H3 bold>
-                                    {'0'}
+                                    {following ? following.length : '0'}
                                 </TextDefault>
                                 <TextDefault textColor={colors.fontSecondColor} light uppercase>
                                     {'Following'}
@@ -52,10 +53,16 @@ function UserProfile() {
                     </View>
                 </View>
                 <TextDefault H4 bold style={[alignment.MBxSmall, alignment.PLsmall, alignment.MTlarge]}>
-                    {'Muhammad Saad Javed'}
+                    {name}
                 </TextDefault>
                 <TextDefault textColor={colors.fontSecondColor} bold style={[alignment.MBxSmall, alignment.PLsmall]} uppercase>
-                    {'Member since Jun 2019'}
+                    {`Член от ${createdAt}`}
+                </TextDefault>
+                <TextDefault textColor={colors.fontSecondColor} bold style={[alignment.MBxSmall, alignment.PLsmall, alignment.MTlarge]} uppercase>
+                    Описание
+                </TextDefault>
+                <TextDefault textColor={colors.black} style={[alignment.MBxSmall, alignment.PLsmall]}>
+                    { description ? description : 'Няма описание' }
                 </TextDefault>
             </View>
         </View >

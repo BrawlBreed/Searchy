@@ -10,11 +10,14 @@ import { colors } from './src/utilities';
 //import { AppLoading } from 'expo';
 import AppLoading from 'expo-app-loading';
 import * as SplashScreen from 'expo-splash-screen';
+import { ApolloProvider } from '@apollo/client';
+import { client } from './src/apollo';
+import store from './src/store/store';
+import { Provider } from 'react-redux';
 LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
 LogBox.ignoreAllLogs();//Ignore all log notifications
 
 export default function App() {
-
   const [fontsLoaded] = useFonts({
     Thin: Roboto_100Thin,
     Light: Roboto_300Light,
@@ -31,11 +34,15 @@ export default function App() {
   }
   else {
     return (
-      <UserProvider>
-        <AppContainer />
-        <StatusBar style="dark" backgroundColor={colors.buttonbackground} />
-        <FlashMessage position="top" />
-      </UserProvider>
+      <Provider store={store}>
+        <ApolloProvider client={client}>
+          <UserProvider>
+            <AppContainer />
+            <StatusBar style="dark" backgroundColor={colors.buttonbackground} />
+            <FlashMessage position="top" />
+          </UserProvider>
+        </ApolloProvider>
+      </Provider>
     )
   }
 } 

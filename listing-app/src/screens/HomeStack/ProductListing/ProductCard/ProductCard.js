@@ -1,6 +1,6 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, TouchableOpacity, View } from 'react-native'
 import { TextDefault } from '../../../../components'
 import { colors, scale } from '../../../../utilities'
@@ -9,10 +9,15 @@ import styles from '../styles'
 function ProductCard(props) {
     const [isLike, isLikeSetter] = useState(false)
     const navigation = useNavigation()
+    
+    useEffect(() => {
+        console.log(props)
+    }, [])
+
     return (
         <TouchableOpacity
             style={styles.searchCard}
-            onPress={() => navigation.navigate('ProductDescription')}>
+            onPress={() => navigation.navigate('ProductDescription', { ...props })}>
             <Image
                 source={props.image}
                 style={styles.imgResponsive}
@@ -58,4 +63,4 @@ function ProductCard(props) {
     )
 }
 
-export default React.memo(ProductCard)
+export default ProductCard

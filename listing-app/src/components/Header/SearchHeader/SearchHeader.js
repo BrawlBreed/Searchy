@@ -6,8 +6,6 @@ import { TextInput } from 'react-native-gesture-handler'
 import { colors, scale } from '../../../utilities'
 import styles from './styles'
 
-const location = 'E11/2 Islamabad'
-
 function SearchHeader(props) {
     const navigation = useNavigation()
     return (
@@ -27,7 +25,7 @@ function SearchHeader(props) {
                 <TextInput
                     style={styles.inputText}
                     placeholderTextColor={colors.fontSecondColor}
-                    placeholder={props.searchCategory + ' in ' + location}
+                    placeholder={`Резултати от търсенето:  ${props.searchCategory}`}
                 />
             </View>
         </View>

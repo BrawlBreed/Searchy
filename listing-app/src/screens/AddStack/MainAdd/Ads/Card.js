@@ -20,7 +20,7 @@ function Card(props) {
         if (deleteBox)
             setDeletebox(false)
         else
-            navigation.navigate('ProductDescription')
+            navigation.navigate('ProductDescription', { ...props })
     }
 
     function adOptions() {

@@ -8,32 +8,50 @@ import { alignment, colors, scale } from '../../../utilities'
 import { SimpleLineIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as Device from 'expo-device';
+import {
+    setId,    
+    setCreatedAt,
+    setZoneId,
+    setAddressId,
+    setUserId,
+    changeImages,
+} from '../../../store/reducers/AddItem/addItemSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import Slider from '../../HomeStack/ProductDescription/Slider'
+import color from '../../../components/Text/TextDefault/styles'
+import { ScrollView } from 'react-native-gesture-handler'
 
 function UploadImages() {
     const navigation = useNavigation()
-    const [image, setImage] = useState(null)
+    const { images } = useSelector(state => state.addItem)
+    const dispatch = useDispatch()
+
     useEffect(() => {
         navigation.setOptions({
-            title: 'Upload your photos'
-        })
+            title: 'Качи снимки',
+        }) 
     }, [])
 
     useEffect(() => {
-    }, [])
+        
+    }, [images])
 
     async function PickImage() {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            quality: 1
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 1,
+            allowsMultipleSelection: true
+            
         })
         if (!result.canceled) {
-            setImage(result.assets)
+            const imagesArr = result.assets.map((item) => item.uri)
+            dispatch(changeImages(imagesArr))
         }
     }
     async function CaptureImage() {
         if (!Device.isDevice) {
             FlashMessage({
-                message: 'Camers is not working on simulator!',
+                message: 'Камерата не работи на симулатора',
                 type: 'warning'
             })
             return
@@ -51,7 +69,7 @@ function UploadImages() {
         if (checkStatusRoll !== 'granted') {
             const { status: CameraRollStatus } = await ImagePicker.requestCameraRollPermissionsAsync()
             if (CameraRollStatus !== 'granted') {
-                alert('Sorry, we need camera roll permission to make this work!')
+                alert('За съжаление имаме нужда от разрешение за камерата!')
                 return
             }
         }
@@ -60,7 +78,7 @@ function UploadImages() {
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             quality: 1
         })
-        if (!result.cancelled) {
+        if (result.assets) {
             setImage(result.assets)
         }
     }
@@ -68,38 +86,42 @@ function UploadImages() {
         <SafeAreaView edges={['bottom']} style={[styles.flex, styles.safeAreaview]}>
             <View style={[styles.flex, styles.mainContainer]}>
                 <View style={styles.imgContainer}>
-                    <View style={styles.imgResponsive}>
-                        <Image style={styles.img}
-                            source={require('../../../assets/images/emptyView/photo-album.png')} />
-                    </View>
-                    <TextDefault H5 center>
-                        {'Uploading more photos increases your chance of closing a deal'}
-                    </TextDefault>
+                    {images.length ? 
+                    <Slider images={images} remover={true} /> : 
+                    <>
+                        <View style={styles.imgResponsive}>
+                            <Image style={styles.img}
+                                source={require('../../../assets/images/emptyView/photo-album.png')} />
+                        </View>
+                        <TextDefault H5 center>
+                            {'Добавянето на повечето снимки подобрява шансовете за продажба'}
+                        </TextDefault>
+                    </>}
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn} onPress={CaptureImage}>
                             <SimpleLineIcons name='camera' size={scale(35)} color={colors.buttonText} />
                             <TextDefault textColor={colors.buttonText} bold uppercase>
-                                {'Take a picture'}
+                                {'Снимай сега'}
                             </TextDefault>
                         </TouchableOpacity>
                         <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn} onPress={PickImage}>
                             <SimpleLineIcons name='folder-alt' size={scale(35)} color={colors.buttonText} />
                             <TextDefault textColor={colors.buttonText} bold uppercase>
-                                {'Folders'}
+                                {'Избери от галерията'}
                             </TextDefault>
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={styles.buttonView}>
+                <View style={[styles.buttonView]}>
                     <EmptyButton
-                        disabled={!image}
-                        title='Next'
+                        disabled={!images.length}
+                        title='Следваща стъпка'
                         onPress={() => {
-                            navigation.navigate('Price')
+                            images.length && navigation.navigate('LocationConfirm')
                         }} />
                 </View>
             </View>
         </SafeAreaView>
     )
 }
-export default React.memo(UploadImages)
+export default UploadImages

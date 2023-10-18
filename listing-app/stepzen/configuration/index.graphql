@@ -1,0 +1,13 @@
+type Configuration {
+  _id: String
+  currency: String
+  currencySymbol: String
+  itemPrefix: String
+}
+
+type Query {
+  getConfiguration: Configuration
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/configuration.json"
+    )
+}

@@ -1,20 +1,21 @@
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, scale } from '../../../utilities';
 import { TextDefault } from '../../Text';
 import styles from './styles';
 
-const CATEGORY = ['Mobile', 'Vehicle', 'Property For Sale']
+const CATEGORY = ['Мобилни Устройства', 'Недвижими Имоти', 'Коли', 'Телевизори', 'Мебели']
 
 function SearchModal(props) {
+    const [ input, setInput ] = useState('')
     const inset = useSafeAreaInsets()
     const navigation = useNavigation()
 
-    function navigate(item) {
-        navigation.navigate('ProductListing', { search: item ?? 'View All' })
+    function navigate(input) {
+        navigation.navigate('ProductListing', { search: input ?? 'View All', input: input ?? null })
         props.onModalToggle()
     }
 
@@ -37,10 +38,12 @@ function SearchModal(props) {
                         <TextInput
                             style={styles.inputText}
                             placeholderTextColor={colors.fontSecondColor}
-                            placeholder={'Find Cars, Mobile, Phone and more...'}
+                            placeholder={'Мобилен Телефон, Недвижим Имот и др.'}
+                            value={input}
+                            onChangeText={setInput}
                         />
                         <TouchableOpacity
-                            onPress={() => navigate()}
+                            onPress={() => navigate(input)}
                             style={styles.searchBtn} >
                             <Ionicons
                                 name="ios-search"
@@ -48,24 +51,6 @@ function SearchModal(props) {
                                 color={colors.white}
                             />
                         </TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.headerContents}>
-                    <View style={styles.closeBtn}>
-                        <TouchableOpacity
-                            onPress={() => navigate()}
-                            style={styles.backBtn}>
-                            <SimpleLineIcons
-                                name="location-pin"
-                                size={scale(17)}
-                                color={colors.headerText}
-                            />
-                        </TouchableOpacity>
-                        <TextInput
-                            style={styles.inputAddress}
-                            placeholderTextColor={colors.fontSecondColor}
-                            placeholder={'Search city, area or neighbour'}
-                        />
                     </View>
                 </View>
             </View >
@@ -110,4 +95,4 @@ function SearchModal(props) {
         </Modal >
     )
 }
-export default React.memo(SearchModal)
+export default SearchModal

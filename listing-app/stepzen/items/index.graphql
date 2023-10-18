@@ -1,0 +1,93 @@
+type Coordinates{
+  latitude: Float
+  longitude: Float
+}
+type Address {
+  address: String
+  coordinates: Coordinates
+}
+
+type Item {
+  _id: String
+  condition: String
+  createdAt: Date
+  description: String
+  images: [String]
+  itemId: String
+  likesCount: Int
+  price: Float
+  status: String
+  title: String
+  subCategoryId: String
+  subCategory: SubCategory
+    @materializer(
+      query: "getSubCategoryById",
+      arguments: [{ name: "subCategory", field: "subCategoryId"}]
+    )
+  userId: String
+  user: User
+    @materializer(
+      query: "getUserById",
+      arguments: [{ name: "user", field: "userId"}]
+    )
+  address: Address
+  zoneId: String
+  zone: Zone
+    @materializer(
+      query: "getZoneById",
+      arguments: [{ name: "zone", field: "zoneId"}]
+    )
+}
+
+type ItemList {
+  name: ID
+  value: Item
+}
+
+type Query {
+  getItemById(id: String!): Item
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    )
+  getItems: [ItemList]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    )
+  nearByItems(zone: String): [ItemList]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    )
+}
+
+input AddressInput {
+  address: String!
+  coordinates: CoordinatesInput!
+}
+
+input CoordinatesInput {
+  latitude: Float!
+  longitude: Float!
+}
+
+type Mutation { 
+  addItem(
+    condition: String!,
+    createdAt: String!,
+    description: String!,
+    images: [String]!,
+    price: Float!,
+    status: String!,
+    subCategoryId: String!,
+    title: String!,
+    userId: String!,
+    zoneId: String!,
+    address: AddressInput!,
+    likesCount: Int = 0
+  ): JSON
+  @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
+      method: POST,
+  )
+}

@@ -1,6 +1,6 @@
 import { FontAwesome, SimpleLineIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import { TextDefault } from '../../../../components';
 import { colors, scale } from '../../../../utilities';
@@ -8,11 +8,12 @@ import styles from '../styles';
 
 function Card(props) {
     const navigation = useNavigation()
-    const [isLike, isLikeSetter] = useState(false)
+    const [isLike, isLikeSetter] = useState(false) 
+
     return (
         <TouchableOpacity activeOpacity={1}
             style={styles.productCardContainer}
-            onPress={() => navigation.navigate('ProductDescription')}>
+            onPress={() => navigation.navigate('ProductDescription', { ...props })}>
             <View style={styles.topCardContainer}>
                 <Image
                     source={props.image}

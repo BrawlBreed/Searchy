@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { DisconnectButton, TextDefault } from '../../../components'
 import { alignment, colors, scale } from '../../../utilities'
 import styles from './styles'
+import { useSelector } from 'react-redux'
 
 
 function AdPosting() {

@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     },
     filterBtn: {
         borderWidth: scale(1),
-        width: scale(65),
+        width: scale(80),
         borderColor: colors.buttonbackground,
         flexDirection: 'row',
         justifyContent: "space-between",

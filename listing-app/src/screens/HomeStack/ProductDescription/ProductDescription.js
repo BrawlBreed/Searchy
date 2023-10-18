@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import React, { useContext, useLayoutEffect, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react'
 import { View, TouchableOpacity, ScrollView, Image, Linking, Share } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { FlashMessage, LeftButton, ReportModal, RightButton, TextDefault } from '../../../components'
@@ -11,19 +11,15 @@ import { BorderlessButton } from 'react-native-gesture-handler'
 import UserContext from '../../../context/user'
 import * as Device from 'expo-device';
 import Slider from './Slider'
+import MapView, { Marker } from 'react-native-maps'
 
-const IMG_LIST = [
-    require('../../../assets/images/products/cycle.jpg'),
-    require('../../../assets/images/products/cycle(1).jpg'),
-    require('../../../assets/images/products/nord.jpg'),
-]
-
-
-function ProductDescription() {
+function ProductDescription({ route }) { 
     const navigation = useNavigation()
     const [isLike, isLikeSetter] = useState(false)
     const [reportModal, setReportModal] = useState(false);
     const { isLoggedIn } = useContext(UserContext)
+
+    const { title, price, id, description, location, images, user, createdAt, condition, subCategory, address } = route.params
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -39,7 +35,7 @@ function ProductDescription() {
             const result = await Share.share({
                 title: 'App link',
                 message:
-                    'Install this app and enjoy your friend community',
+                    'Изтегли приложението от тук: ',
             });
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {
@@ -62,12 +58,12 @@ function ProductDescription() {
         else if (!Device.isDevice)
             FlashMessage({ message: 'This function is not working on Simulator/Emulator', type: 'warning' })
         else {
-            let phoneNumber = '';
+            let phoneNumber = user.phone;
             if (Platform.OS === 'android') {
-                phoneNumber = 'tel:${1234567890}';
+                phoneNumber = `tel:${user.phone}`;
             }
             else {
-                phoneNumber = 'telprompt:${1234567890}';
+                phoneNumber = `telprompt:${user.phone}`;
             }
 
             Linking.openURL(phoneNumber);
@@ -78,7 +74,7 @@ function ProductDescription() {
         if (!isLoggedIn)
             navigation.navigate('Registration')
         else {
-            let url = `sms:1234567890${Platform.OS === "ios" ? "&" : "?"}body=${"This is sample text"}`
+            let url = `sms:${user.phone}${Platform.OS === "ios" ? "&" : "?"}body=${"This is sample text"}`
 
             Linking.openURL(url);
         }
@@ -94,12 +90,12 @@ function ProductDescription() {
                 <ReportModal visible={reportModal} onModalToggle={toggleModal} />
 
                 <View style={styles.swiperContainer}>
-                    <Slider IMG_LIST={IMG_LIST} />
+                    <Slider images={images} />
                 </View>
                 <View style={styles.priceContainer}>
                     <View style={styles.priceRow}>
                         <TextDefault H4 bold>
-                            {'Rs 20,000'}
+                            {price} лв.
                         </TextDefault>
                         <TouchableOpacity activeOpacity={0} onPress={() => isLikeSetter(prev => !prev)}>
                             {isLike ? <FontAwesome name="heart" size={scale(20)} color="black" /> :
@@ -108,72 +104,89 @@ function ProductDescription() {
                         </TouchableOpacity>
                     </View>
                     <TextDefault>
-                        {'Japanese 28 inches cycle'}
+                        {title}
                     </TextDefault>
                     <View style={styles.locationRow}>
                         <MaterialIcons name='location-on' size={scale(15)} color={colors.headerText} />
                         <TextDefault numberOfLines={1} style={styles.locationText}>
-                            {'Peshawar Road, Rawalpindi, Punjab'}
+                            {location}
                         </TextDefault>
                         <TextDefault numberOfLines={1} uppercase>
-                            {'09 SEP'}
+                            {createdAt}
                         </TextDefault>
                     </View>
+                    <MapView initialRegion={{
+                            latitude: address.coordinates.latitude,
+                            longitude: address.coordinates.longitude,
+                            latitudeDelta: 0.005,
+                            longitudeDelta: 0.005
+                        }}
+                            style={{width: '100%', height: 200, flexGrow: 1}}
+                        >
+                            {address.coordinates.latitude && address.coordinates.longitude &&
+                                <Marker
+                                    coordinate={{ latitude: address.coordinates.latitude, longitude: address.coordinates.longitude }}
+                                    title='Местоположение'
+                                    description={location}
+                                    identifier='местоположение'
+                                />}
+                        </MapView>
+
                 </View>
                 <View style={styles.conditionContainer}>
                     <TextDefault bold H5 style={alignment.MBsmall}>
-                        {'Detail'}
+                        {'Детайли'}
                     </TextDefault>
                     <View style={styles.row}>
                         <TextDefault uppercase light style={{ ...alignment.MBsmall, width: '35%' }}>
-                            {'Condition'}
+                            {'Състояние'}
                         </TextDefault>
                         <TextDefault bold style={alignment.MBsmall}>
-                            {'Used'}
+                            {condition.toLowerCase() === 'new' ? 'Ново' : 'Използвано'}
                         </TextDefault>
                     </View>
                     <View style={styles.row}>
                         <TextDefault uppercase light style={{ ...alignment.MBsmall, width: '35%' }}>
-                            {'type'}
+                            {'Вид'}
                         </TextDefault>
                         <TextDefault bold style={alignment.MBsmall}>
-                            {'Audio-Video'}
+                            {subCategory.title}
                         </TextDefault>
                     </View>
                 </View>
                 <View style={styles.conditionContainer}>
                     <TextDefault bold H5 style={alignment.MBsmall}>
-                        {'Description'}
+                        {'Описание'}
                     </TextDefault>
                     <TextDefault >
-                        {"Condition Iike new \nShimano gears \nEach and Everything smoothly functional \nFor more details contact"}
+                        {description}
                     </TextDefault>
                 </View>
-                <BorderlessButton
+                <TouchableOpacity
                     borderless={false}
                     style={styles.profileContainer}
-                    onPress={() => navigation.navigate('UserProfile')}>
+                    onPress={() => navigation.navigate('UserProfile', { ...user })}>
                     <View style={styles.imageResponsive}>
                         <Image
                             style={styles.image}
-                            source={require('../../../assets/images/avatar.png')} />
+                            source={user.avatar}/>
                     </View>
                     <View style={styles.profileInfo}>
                         <TextDefault bold>
-                            {'Fatim'}
+                            {user.name}
                         </TextDefault>
                         <TextDefault light small>
-                            {'Member since Jan 2020'}
+                            {`Член от ${user.createdAt}`}
                         </TextDefault>
                         <TextDefault textColor={colors.spinnerColor} bold style={alignment.MTxSmall}>
-                            {'SEE Profile'}
+                            {'Виж профил'}
                         </TextDefault>
                     </View>
                     <Entypo name='chevron-small-right' size={scale(20)} color={colors.buttonbackground} />
-                </BorderlessButton>
+                </TouchableOpacity>
                 <View style={styles.profileContainer}>
                     <TextDefault >
-                        {'AD ID:10232142312'}
+                        {`ID на офертата:${id}`}
                     </TextDefault>
                     <TouchableOpacity activeOpacity={0.7} onPress={() => toggleModal()}>
                         <TextDefault textColor={colors.spinnerColor} uppercase bold>
@@ -203,7 +216,7 @@ function ProductDescription() {
                 >
                     <SimpleLineIcons name='bubble' size={scale(20)} color={colors.white} />
                     <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
-                        {'Chat'}
+                        {'Чат'}
                     </TextDefault>
                 </TouchableOpacity>
 
@@ -214,7 +227,7 @@ function ProductDescription() {
                 >
                     <SimpleLineIcons name='envelope' size={scale(20)} color={colors.white} />
                     <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
-                        {'SMS'}
+                        {'Съобщение'}
                     </TextDefault>
                 </TouchableOpacity>
 
@@ -225,7 +238,7 @@ function ProductDescription() {
                 >
                     <SimpleLineIcons name='phone' size={scale(20)} color={colors.white} />
                     <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
-                        {'CALL'}
+                        {'Обади се'}
                     </TextDefault>
                 </TouchableOpacity>
             </View>
@@ -233,4 +246,4 @@ function ProductDescription() {
     )
 }
 
-export default React.memo(ProductDescription)
+export default ProductDescription

@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center",
         justifyContent: "space-between",
+        marginBottom: 20,
         ...alignment.PTxSmall
     },
     locationText: {

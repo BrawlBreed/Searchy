@@ -34,9 +34,9 @@ function MainHeader(props) {
                         style={styles.searchBar}
                         light
                     >
-                        {'Find Cars, Mobile Phone and more...'}
+                        {'Мобилен Телефон, Недвижим Имот и др...'}
                     </TextDefault>
-                </TouchableOpacity>
+                </TouchableOpacity> 
                 <BorderlessButton style={styles.bellBtn}
                     onPress={() => navigation.navigate('Notifications')}>
                     <FontAwesome name="bell-o" size={scale(18)} color={colors.headerText} />
@@ -46,4 +46,4 @@ function MainHeader(props) {
     )
 
 }
-export default React.memo(MainHeader)
+export default MainHeader

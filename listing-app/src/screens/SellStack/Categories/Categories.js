@@ -1,11 +1,13 @@
 import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { FlatList, Image, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TextDefault } from '../../../components';
 import { alignment, colors, scale } from '../../../utilities';
 import styles from './styles';
+import useCategories from '../../../hooks/useCategories';
+import useSubCategories from '../../../hooks/useSubCategories';
 
 
 const category = [
@@ -21,6 +23,7 @@ const category = [
 
 function Categories() {
     const navigation = useNavigation()
+    const { loading, error, subCategories } = useSubCategories()
 
     function emptyView() {
         return (
@@ -30,7 +33,7 @@ function Categories() {
                     source={require('../../../assets/images/emptyView/noData.png')}
                 />
                 <TextDefault H5 center bold style={alignment.MTlarge}>
-                    {'No category found.'}
+                    {'Не намерихме нищо..'}
                 </TextDefault>
             </View>
         )
@@ -40,7 +43,7 @@ function Categories() {
         <SafeAreaView edges={['bottom']} style={[styles.flex, styles.safeAreaview]}>
             <View style={[styles.flex, styles.container]}>
                 <FlatList
-                    data={category}
+                    data={subCategories}
                     style={styles.flatList}
                     contentContainerStyle={styles.categoryContainer}
                     ListEmptyComponent={emptyView}
@@ -74,4 +77,4 @@ function Categories() {
     );
 }
 
-export default React.memo(Categories)
+export default Categories
