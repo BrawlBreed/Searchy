@@ -5,27 +5,30 @@ import { TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { EmptyButton, LocationModal, TextDefault } from '../../../components'
 import { alignment, colors, scale } from '../../../utilities'
-import { setZoneId, setCurrentCoordinates } from '../../../store/reducers/AddItem/addItemSlice'
+import { setZoneId, setCurrentCoordinates, setAddress } from '../../../store/reducers/Item/addItemSlice'
 import styles from './styles'
 import MapView, { Marker } from 'react-native-maps'
 import { useDispatch, useSelector } from 'react-redux'
 import { GEOAPIFY_API_KEY } from '../../../../Constants'
-import AddItem from '../../../hooks/addItem'
 
 function LocationConfirm() {
     const navigation = useNavigation()
     const [modalVisible, setModalVisible] = useState(false);
     const [filters, setFilters] = useState('')
     const [ input, setInput ] = useState('')
+    const state = useSelector(state => state.addItem)
     const { coordinates } = useSelector(state => state.addItem.address)
     const dispatch = useDispatch()
-    const b = AddItem()
 
     useEffect(() => {
         navigation.setOptions({
             title: 'Изберете местоположение'
         })
     }, [])
+
+    useEffect(() => {
+        dispatch(setAddress(input))
+    }, [input])
 
     useEffect(() => {
         fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${Number(coordinates.latitude)}&lon=${Number(coordinates.longitude)}&apiKey=${GEOAPIFY_API_KEY}`)
@@ -54,35 +57,30 @@ function LocationConfirm() {
                         <TextDefault light style={[alignment.PLxSmall, alignment.MTxSmall]}>
                             {filters ? filters : 'Предложения'}
                         </TextDefault>
-
                     </View>
                     <Entypo name="chevron-small-right" size={scale(20)} color={colors.buttonbackground} />
                 </TouchableOpacity>
                 <View style={{ height: '70%', width: '100%'}}>
                     <MapView initialRegion={{
-                            latitude: String(coordinates.latitude),
-                            longitude: String(coordinates.longitude),
+                            latitude: coordinates.latitude,
+                            longitude: coordinates.longitude,
                             latitudeDelta: 0.005,
                             longitudeDelta: 0.005
                         }}
-                        region={{
-                            
+                        onDoublePress={(e) => {
+                            dispatch(setCurrentCoordinates({
+                                latitude: e.nativeEvent.coordinate.latitude,
+                                longitude: e.nativeEvent.coordinate.longitude 
+                            }))
                         }}
-                            onDoublePress={(e) => {
-                                dispatch(setCurrentCoordinates({
-                                    latitude: e.nativeEvent.coordinate.latitude,
-                                    longitude: e.nativeEvent.coordinate.longitude 
-                                }))
-                            }}
-                            style={{width: 'auto', height: 200, flexGrow: 1}}
+                        style={{width: 'auto', height: 200, flexGrow: 1}}
                         >
-                        {coordinates.longitude && coordinates.latitude &&
                             <Marker
                                 coordinate={{ latitude: coordinates.latitude, longitude: coordinates.longitude }}
                                 title='Местоположение'
                                 description={''}
                                 identifier='местоположение'
-                            />}
+                            />
                     </MapView>
                     <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                         <Entypo size={20} style={{ margin: 5}} name='map' />

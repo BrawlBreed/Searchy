@@ -6,5 +6,6 @@ import UploadImage from './UploadImages/UploadImages'
 import Price from './Price/Price'
 import LocationConfirm from './LocationConfirm/LocationConfirm'
 import AdPosting from './AdPosting/AdPosting'
+import AdPosted from './AdPosting/AdPosted'
 
-export { MainSell, Categories, SubCategories, SellingFrom, UploadImage, Price, LocationConfirm, AdPosting }
+export { MainSell, Categories, SubCategories, SellingFrom, UploadImage, Price, LocationConfirm, AdPosting, AdPosted}

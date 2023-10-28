@@ -9,17 +9,10 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as Device from 'expo-device';
 import {
-    setId,    
-    setCreatedAt,
-    setZoneId,
-    setAddressId,
-    setUserId,
-    changeImages,
-} from '../../../store/reducers/AddItem/addItemSlice'
+    changeImages
+} from '../../../store/reducers/Item/addItemSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import Slider from '../../HomeStack/ProductDescription/Slider'
-import color from '../../../components/Text/TextDefault/styles'
-import { ScrollView } from 'react-native-gesture-handler'
 
 function UploadImages() {
     const navigation = useNavigation()

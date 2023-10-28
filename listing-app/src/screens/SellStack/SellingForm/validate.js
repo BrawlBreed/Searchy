@@ -17,7 +17,7 @@ export function validateSellingForm(fields, errors){
     else{
         errors.description = ''
     }
-    if(!fields.price){
+    if(!fields.price ){
         errors.price = 'Цената е задължителна'
     }
     else if(fields.price < 0){

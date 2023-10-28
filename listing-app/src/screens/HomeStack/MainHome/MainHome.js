@@ -6,29 +6,43 @@ import { LocationModal, MainHeader, TextDefault } from '../../../components';
 import SearchModal from '../../../components/Modal/SearchModal/SearchModal';
 import { alignment, colors } from '../../../utilities';
 import Card from './Card/Card';
-import styles from './styles';
+import styles from './styles'; 
 import useMainHome from '../../../hooks/useMainHome';
 import useCategories from '../../../hooks/useCategories';
+import { setZone } from '../../../store/reducers/Item/addItemSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import likeItem from '../../../hooks/likeItem';
 
 const COLORS = ['#ffd54d', '#6df8f3', '#ff7a7a', '#d5b09f', '#eccbcb']
 
 function MainHome() {
-  const inset = useSafeAreaInsets()
   const navigation = useNavigation()
-  const [filters, setFilters] = useState('zoneId1')
   const [modalVisible, setModalVisible] = useState(false);
   const [searchVisible, setSerachVisible] = useState(false);
-  const { loading, error, items } = useMainHome('zoneId1');
-
-  useEffect(() => {
-    console.log(error)
-  }, [error])
+  const { zone } = useSelector(state => state.addItem)
+  const dispatch = useDispatch()
+  const { loading, error, items } = useMainHome(zone.zone);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      header: () => <MainHeader onModalToggle={toggleModal} toggleSearch={toggleSearch} locationText={filters} />
+      header: () => <MainHeader onModalToggle={toggleModal} toggleSearch={toggleSearch} locationText={zone.zone} />
     })
-  }, [navigation, filters])
+  }, [navigation, zone.zone])
+
+  useEffect(() => {
+    fetch('https://geolocation-db.com/json/')
+      .then(response => response.json())
+      .then((data) => {
+        dispatch(setZone({
+          zone: data.city,
+          coordinates: {
+            latitude: data.latitude,
+            longitude: data.longitude
+          }
+        }))
+      })
+      .catch(error => console.log(error))  
+  }, [])
 
   function toggleModal() {
     setModalVisible(prev => !prev)
@@ -140,8 +154,7 @@ function MainHome() {
             />
 
             {/* Modal */}
-            <LocationModal visible={modalVisible} onModalToggle={toggleModal}
-              setFilters={setFilters} />
+            <LocationModal visible={modalVisible} onModalToggle={toggleModal}/>
             <SearchModal visible={searchVisible} onModalToggle={toggleSearch} />
           </View>
     }

@@ -13,10 +13,13 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
         status
         title
         images
+        zoneId
         zone {
-          _id
-          description
-          title
+          zone
+          coordinates {
+            longitude 
+            latitude
+          }
         }
         subCategory {
           _id
@@ -138,15 +141,14 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
     }
   }`
 
-  export const getZones = gql`  query getZones {
+  export const getZones = gql`query getZones {
     getZones {
       name
       value {
-        _id
-        description
-        title
-        location {
-          coordinates
+        zone
+        coordinates {
+          latitude
+          longitude
         }
       }
     }

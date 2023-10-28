@@ -12,7 +12,6 @@ const useItems = (searchSubCategory, searchCategory, searchInput) => {
   useEffect(() => {
     if(!data) return
     if(data.getItems.length){
-      console.log(data.getItems)
       const items = data.getItems.map(({ name, value }) => ({
         id: name,
         title: value.title,

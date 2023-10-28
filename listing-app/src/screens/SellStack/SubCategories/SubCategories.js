@@ -11,7 +11,6 @@ function SubCategories({ route }) {
     const headerTitle = route?.params?.headerTitle ?? null
 
     useEffect(() => { 
-        console.log(route.params.subCategories)
         setSubCategories(route.params.subCategories) 
     }, [])
     useLayoutEffect(() => {

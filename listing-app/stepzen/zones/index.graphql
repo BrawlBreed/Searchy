@@ -1,8 +1,6 @@
 type Zone {
-  _id: String
-  description: String
-  location: Address
-  title: String
+  zone: String,
+  coordinates: Coordinates
 }
 
 type ZonesList {
@@ -21,4 +19,14 @@ type Query {
       transforms: [{ pathpattern: [], editor: "objectToArray"}]
     ) 
 }
- 
+
+type Mutation { 
+  addZone(
+    zone: String!
+    coordinates: CoordinatesInput!
+  ): JSON
+  @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/zones.json",
+      method: POST,
+  )
+}

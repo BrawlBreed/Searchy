@@ -12,7 +12,7 @@ import {
     changePrice,
     changeCondition,
     setSubCategoryId,
-   } from '../../../store/reducers/AddItem/addItemSlice'
+   } from '../../../store/reducers/Item/addItemSlice'
 import { validateSellingForm } from './validate'
 
 const CONDITIONS = [
@@ -151,7 +151,7 @@ function SellingForm({ route }) {
                                             const numericText = text.replace(/[^0-9]/g, '');
                                             dispatch(changePrice(numericText));
                                           }}
-                                        value={price}
+                                        value={String(price)}
                                         placeholderTextColor={colors.fontSecondColor}
                                         placeholder={'Цена на обявата'}
                                     />
@@ -194,7 +194,7 @@ function SellingForm({ route }) {
                         </View>
                         <View style={styles.buttonView}>
                             <EmptyButton
-                                title='Next'
+                                title='Следваща стъпка'
                                 onPress={() => handleSubmit()} />
                         </View>
                     </View>

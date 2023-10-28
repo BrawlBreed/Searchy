@@ -5,7 +5,7 @@ import Swiper from 'react-native-swiper';
 import styles from './style';
 import { TextDefault } from '../../../components';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { removeImage } from '../../../store/reducers/AddItem/addItemSlice';
+import { removeImage } from '../../../store/reducers/Item/addItemSlice';
 import { useDispatch } from 'react-redux';
 
 function Slider(props) {  

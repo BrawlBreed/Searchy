@@ -5,33 +5,37 @@ import { Image, TouchableOpacity, View } from 'react-native';
 import { TextDefault } from '../../../../components';
 import { colors, scale } from '../../../../utilities';
 import styles from '../styles';
-
+import likeItem from '../../../../hooks/likeItem';
+ 
 function Card(props) {
     const navigation = useNavigation()
-    const [isLike, isLikeSetter] = useState(false) 
+    const [isLike, isLikeSetter] = useState(null) 
+
+    const { mutateFunction } = likeItem({name: props.id, likesCount: props.likesCount + isLike})
+
+    useEffect(() => {
+        if(isLike === true) {
+            mutateFunction()
+        }else if(isLike === false) {
+            mutateFunction()
+        }
+    }, [isLike])
 
     return (
         <TouchableOpacity activeOpacity={1}
             style={styles.productCardContainer}
-            onPress={() => navigation.navigate('ProductDescription', { ...props })}>
+            onPress={() => navigation.navigate('ProductDescription', { ...props, isLike, isLikeSetter })}>
             <View style={styles.topCardContainer}>
                 <Image
-                    source={props.image}
+                    source={{ uri: '' }}
                     resizeMode="cover"
                     style={styles.imgResponsive}
                 />
-                <TouchableOpacity activeOpacity={0}
-                    onPress={() => isLikeSetter(prev => !prev)}
-                    style={styles.heartContainer}>
-                    {isLike ? <FontAwesome name="heart" size={scale(18)} color={colors.black} /> :
-                        <FontAwesome name="heart-o" size={scale(18)} color={colors.horizontalLine} />
-                    }
-                </TouchableOpacity>
             </View>
             <View style={styles.botCardContainer}>
                 <View>
                     <TextDefault textColor={colors.fontMainColor} H5 bolder>
-                        {props.price}
+                        {props.price} лв.
                     </TextDefault>
                     <TextDefault textColor={colors.fontSecondColor} numberOfLines={1}>
                         {props.title}
@@ -41,11 +45,11 @@ function Card(props) {
                     <SimpleLineIcons name="location-pin" size={scale(15)} color={colors.buttonbackground} />
                     <TextDefault textColor={colors.fontSecondColor} numberOfLines={1} light small style={styles.locationText}>
                         {props.location}
-                    </TextDefault>
+                    </TextDefault>  
                 </View>
             </View>
         </TouchableOpacity>
     )
 }
 
-export default React.memo(Card)
+export default Card

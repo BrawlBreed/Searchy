@@ -10,7 +10,7 @@ import styles from './styles'
 
 function MainHeader(props) {
     const inset = useSafeAreaInsets()
-    const navigation = useNavigation()
+    const navigation = useNavigation() 
     return (
         <View style={[styles.headerBackground, { paddingTop: inset.top }]} >
             <TouchableOpacity

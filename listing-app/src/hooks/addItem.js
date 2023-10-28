@@ -1,20 +1,13 @@
-// Single component
 import { gql, useMutation } from '@apollo/client';
-import { addItem } from '../apollo/server';
 import { useEffect, useState } from 'react';
 import { setCreatedAt } from '../store/reducers/AddItem/addItemSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
-const AddItem = () => {
+const addItem = () => {
     const item = useSelector(state => state.addItem)
-    const { title, description, price, condition, images, createdAt, subCategoryId, zoneId, address, userId } = item
+    const { title, description, price, condition, images, createdAt, subCategoryId, zone, address, userId } = item
     const dispatch = useDispatch()
-
-    useEffect(() => {
-        dispatch(setCreatedAt(new Date().toISOString()))
-
-        console.log(item.address.coordinates)
-    },[])
+    dispatch(setCreatedAt(new Date().toISOString()))
 
     const [mutateFunction, { data, loading, error }] = useMutation(gql`
         mutation MyMutation(
@@ -54,7 +47,7 @@ const AddItem = () => {
             subCategoryId,
             title,
             userId,
-            zoneId,
+            zoneId: zone.zone,
             address: {
                 address: address.address,
                 coordinates: {
@@ -65,17 +58,7 @@ const AddItem = () => {
         },
     })
 
-    useEffect(() => {
-        if(createdAt){
-            mutateFunction()
-        }
-    }, [item])
+    return { mutateFunction, data, loading, error }
+}
 
-    useEffect(() => {
-        console.log(error)
-    }, [error])
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Something went wrong...</p>;
-  }
-
-export default AddItem    
+export default addItem    

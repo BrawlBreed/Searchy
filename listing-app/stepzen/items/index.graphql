@@ -10,7 +10,7 @@ type Address {
 type Item {
   _id: String
   condition: String
-  createdAt: Date
+  createdAt: String
   description: String
   images: [String]
   itemId: String
@@ -89,5 +89,10 @@ type Mutation {
   @rest(
       endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
       method: POST,
+  )
+  likeItem(name: String!, likesCount: Int!): JSON 
+  @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$name.json",
+      method: PATCH
   )
 }

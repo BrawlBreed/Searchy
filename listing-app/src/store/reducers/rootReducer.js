@@ -1,6 +1,8 @@
 import { combineReducers } from "redux";
-import addItemSlice from "./AddItem/addItemSlice";
+import addItemSlice from "./Item/addItemSlice";
+import userSlice from "./User/userSlice";
 
 export const rootReducer = combineReducers({
-    addItem: addItemSlice
+    addItem: addItemSlice,
+    user: userSlice
 })

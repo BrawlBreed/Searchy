@@ -10,10 +10,6 @@ function ProductCard(props) {
     const [isLike, isLikeSetter] = useState(false)
     const navigation = useNavigation()
     
-    useEffect(() => {
-        console.log(props)
-    }, [])
-
     return (
         <TouchableOpacity
             style={styles.searchCard}

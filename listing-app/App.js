@@ -4,7 +4,6 @@ import React from 'react';
 import { Text } from 'react-native';
 import FlashMessage from 'react-native-flash-message';
 import { LogBox } from 'react-native';
-import { UserProvider } from './src/context/user';
 import AppContainer from './src/routes';
 import { colors } from './src/utilities';
 //import { AppLoading } from 'expo';
@@ -36,11 +35,9 @@ export default function App() {
     return (
       <Provider store={store}>
         <ApolloProvider client={client}>
-          <UserProvider>
-            <AppContainer />
-            <StatusBar style="dark" backgroundColor={colors.buttonbackground} />
-            <FlashMessage position="top" />
-          </UserProvider>
+          <AppContainer />
+          <StatusBar style="dark" backgroundColor={colors.buttonbackground} />
+          <FlashMessage position="top" />
         </ApolloProvider>
       </Provider>
     )

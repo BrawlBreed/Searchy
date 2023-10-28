@@ -32,6 +32,32 @@ type Query {
     )
 }
 
+input NotificationsInput {
+  recommendations: Boolean,
+  specialOffers: Boolean,
+}
+
+type Mutation {
+  register(
+    avatar: String
+    description: String
+    callingCode: Int
+    createdAt: Date
+    email: String
+    followers: [String]
+    following: [String]
+    isActive: Boolean
+    likes: [String]
+    name: String
+    notifications: NotificationsInput
+    phone: Int
+    showPhone: Boolean
+  ): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users.json",
+      method: POST,
+    )
+}
 # type Mutation {
 #   Login(
 #     callingCode: Int

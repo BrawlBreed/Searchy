@@ -2,12 +2,11 @@
  //import { createMaterialTopTabNavigator  } from '@react-navigation/material-top-tabs';
  import { NavigationContainer } from '@react-navigation/native';
  import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
- import React, { useContext } from 'react';
- import UserContext from '../context/user';
+ import React from 'react';
  import { AccountScreens, AddScreens, ChatScreens, HomeScreens, SellScreens } from '../screens';
  import { colors, scale } from '../utilities';
  import { StackOptions, tabIcon, tabOptions, TopBarOptions } from './screenOptions';
-import { Text } from 'react-native';
+import { useSelector } from 'react-redux';
 
 
  const Tabs = createBottomTabNavigator()
@@ -103,6 +102,7 @@ function SellTabs() {
             <SellStack.Screen name='Price' component={SellScreens.Price} />
             <SellStack.Screen name='LocationConfirm' component={SellScreens.LocationConfirm} />
             <SellStack.Screen name='AdPosting' component={SellScreens.AdPosting} />
+            <SellStack.Screen name='AdPosted' component={SellScreens.AdPosted} />
         </SellStack.Navigator>
     )
 }
@@ -151,7 +151,8 @@ function AccountTabs() {
 
 
 function BottomTabs() {
-    const { isLoggedIn } = useContext(UserContext)
+    const user = useSelector(state => state.user)
+    const { isLoggedIn } = user
     return (
         <Tabs.Navigator initialRouteName='Home' backBehavior='history' tabBarOptions={tabOptions()}
             screenOptions={({ route }) => tabIcon(route)}>
@@ -169,7 +170,8 @@ function BottomTabs() {
 }
 
 function AppContainer() {
-    const { isLoggedIn } = useContext(UserContext)
+    const user = useSelector(state => state.user)
+    const { isLoggedIn } = user
     return (
         
         <NavigationContainer>

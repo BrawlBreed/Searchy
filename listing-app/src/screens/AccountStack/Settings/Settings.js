@@ -5,11 +5,10 @@ import { DeactivateModal, TextDefault } from '../../../components'
 import { alignment, colors, scale } from '../../../utilities'
 import { Entypo } from '@expo/vector-icons'
 import { StackActions, useNavigation } from '@react-navigation/native'
-import UserContext from '../../../context/user'
 
 function Settings() {
     const navigation = useNavigation()
-    const { logout } = useContext(UserContext)
+    // const { logout } = useSelector(state => state.user)
     const [modalVisible, setModalVisible] = useState(false)
 
     function onModalToggle() {
@@ -44,7 +43,7 @@ function Settings() {
             </TouchableOpacity>
             <TouchableOpacity style={styles.smallContainer}
                 onPress={() => {
-                    logout()
+                    // logout()
                     navigation.dispatch(StackActions.popToTop())
                 }}>
                 <TextDefault bold H5 style={[alignment.PLlarge, styles.flex]}>
@@ -53,7 +52,7 @@ function Settings() {
             </TouchableOpacity>
             <TouchableOpacity style={styles.smallContainer}
                 onPress={() => {
-                    logout()
+                    // logout()
                     navigation.dispatch(StackActions.popToTop())
                 }}
             >

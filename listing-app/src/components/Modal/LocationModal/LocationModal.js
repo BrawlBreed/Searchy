@@ -6,24 +6,27 @@ import { alignment, colors, scale } from '../../../utilities';
 import ModalHeader from '../../Header/ModalHeader/ModalHeader';
 import { TextDefault } from '../../Text';
 import styles from './styles';
-import { getZones } from '../../../apollo/server';
-import { useQuery } from '@apollo/client';
-import { setZoneId, setCurrentCoordinates } from '../../../store/reducers/AddItem/addItemSlice';
+import addZone from '../../../hooks/addZone';
+import { setZone, setCurrentCoordinates } from '../../../store/reducers/Item/addItemSlice';
 import { useDispatch } from 'react-redux';
 
 function LocationModal(props) {
     const [input, setInput] = useState('') 
-    const [coordinates, setCoordinates] = useState({})
+    const [coordinates, setCoordinates] = useState({
+        latitude: 0,
+        longitude: 0 
+    })
     const [currentLocation, setCurrentLocation] = useState('')
     const [zones, setZones] = useState()
-    const { loading, error, data } = useQuery(getZones, {
-        variables: {},
-      })
     const dispatch = useDispatch()
+    const { data, loading, error } = addZone()
 
     useEffect(() => {
         dispatch(setCurrentCoordinates(coordinates))
-        dispatch(setZoneId(currentLocation))
+        dispatch(setZone({
+            zone: currentLocation,
+            coordinates: coordinates
+        }))
     }, [currentLocation, coordinates])
 
     useEffect(() => {
@@ -44,12 +47,15 @@ function LocationModal(props) {
 
     useEffect(() => {
         setZones(data?.getZones.filter((item) => {
-            return item.value.title.toLowerCase().includes(input.toLowerCase())
+            return item.value.zone.toLowerCase().includes(input.toLowerCase())
         }))
     }, [input])
 
-    function btnLocation(title) {
-        props.setFilters(title)
+    function btnLocation(zone) {
+        dispatch(setZone({
+            zone: zone.zone,
+            coordinates: zone.coordinates
+        }))
         props.onModalToggle()
     }
     return (
@@ -88,7 +94,10 @@ function LocationModal(props) {
                                         value={input}
                                     />
                                 </View>
-                                <TouchableOpacity style={styles.currentLocation} onPress={() => btnLocation(currentLocation)}>
+                                <TouchableOpacity style={styles.currentLocation} onPress={() => btnLocation({
+                                    zone: currentLocation,
+                                    coordinates: coordinates
+                                })}>
                                     <MaterialCommunityIcons name="target" size={scale(25)} color={colors.spinnerColor} />
                                     <View style={alignment.PLsmall}>
                                         <TextDefault textColor={colors.spinnerColor} H5 bold>
@@ -112,9 +121,9 @@ function LocationModal(props) {
                             renderItem={({ item: {value, name}, index }) => (
                                 <TouchableOpacity
                                     style={styles.stateBtn}
-                                    onPress={() => btnLocation(value.title)} >
+                                    onPress={() => btnLocation(value)} >
                                     <TextDefault style={styles.flex} >
-                                        {value.title}
+                                        {value.zone}
                                     </TextDefault>
                                     <Entypo name="chevron-small-right" size={scale(20)} color={colors.fontMainColor} />
                                 </TouchableOpacity>

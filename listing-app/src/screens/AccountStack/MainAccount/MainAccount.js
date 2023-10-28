@@ -3,13 +3,13 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import { EmptyButton, TextDefault } from '../../../components';
-import UserContext from '../../../context/user';
 import { alignment, colors, scale } from '../../../utilities';
 import styles from './styles';
+import { useSelector } from 'react-redux';
 
 function MainAccount() {
     const navigation = useNavigation()
-    const { isLoggedIn } = useContext(UserContext)
+    const { isLoggedIn } = useSelector(state => state.user)
 
     return (
         <View style={[styles.flex, styles.container]}>

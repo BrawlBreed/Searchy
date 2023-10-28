@@ -8,19 +8,28 @@ import styles from './style'
 import { FontAwesome, MaterialIcons, Entypo, SimpleLineIcons } from '@expo/vector-icons'
 import Swiper from 'react-native-swiper'
 import { BorderlessButton } from 'react-native-gesture-handler'
-import UserContext from '../../../context/user'
 import * as Device from 'expo-device';
 import Slider from './Slider'
 import MapView, { Marker } from 'react-native-maps'
+import likeItem from '../../../hooks/likeItem'
+import { useSelector } from 'react-redux'
 
-function ProductDescription({ route }) { 
+function ProductDescription({ route, preview }) { 
+    const { title, price, likesCount, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address } = route ? route.params : preview
+    const [isLike, isLikeSetter] = useState(isLike)
     const navigation = useNavigation()
-    const [isLike, isLikeSetter] = useState(false)
+    const { isLoggedIn } = useSelector(state => state.user)
     const [reportModal, setReportModal] = useState(false);
-    const { isLoggedIn } = useContext(UserContext)
+    const { mutateFunction } = likeItem({name: id, likesCount: likesCount + isLike})
 
-    const { title, price, id, description, location, images, user, createdAt, condition, subCategory, address } = route.params
-
+    useEffect(() => {
+        if(isLike === true) {
+            mutateFunction()
+        }else if(isLike === false) {
+            mutateFunction() 
+        }
+    }, [isLike])
+    
     useLayoutEffect(() => {
         navigation.setOptions({
             header: () => null
@@ -97,11 +106,18 @@ function ProductDescription({ route }) {
                         <TextDefault H4 bold>
                             {price} лв.
                         </TextDefault>
-                        <TouchableOpacity activeOpacity={0} onPress={() => isLikeSetter(prev => !prev)}>
-                            {isLike ? <FontAwesome name="heart" size={scale(20)} color="black" /> :
+                        { route && (
+                            <TouchableOpacity activeOpacity={0} onPress={() => isLikeSetter(prev => !prev)}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            {isLike ? 
+                                <FontAwesome name="heart" size={scale(20)} color="black" /> :
                                 <FontAwesome name="heart-o" size={scale(20)} color="black" />
                             }
+                            <TextDefault style={{ marginLeft: 5 }}>{isLike ? likesCount + 1 : likesCount}</TextDefault>
+                            </View>
                         </TouchableOpacity>
+                        )}
+                        
                     </View>
                     <TextDefault>
                         {title}
@@ -109,10 +125,10 @@ function ProductDescription({ route }) {
                     <View style={styles.locationRow}>
                         <MaterialIcons name='location-on' size={scale(15)} color={colors.headerText} />
                         <TextDefault numberOfLines={1} style={styles.locationText}>
-                            {location}
+                            {route ? location : address.address}
                         </TextDefault>
                         <TextDefault numberOfLines={1} uppercase>
-                            {createdAt}
+                            {createdAt.split('T')[0]}
                         </TextDefault>
                     </View>
                     <MapView initialRegion={{
@@ -150,7 +166,7 @@ function ProductDescription({ route }) {
                             {'Вид'}
                         </TextDefault>
                         <TextDefault bold style={alignment.MBsmall}>
-                            {subCategory.title}
+                            {route ? subCategory.title : subCategoryId}
                         </TextDefault>
                     </View>
                 </View>
@@ -162,39 +178,42 @@ function ProductDescription({ route }) {
                         {description}
                     </TextDefault>
                 </View>
-                <TouchableOpacity
-                    borderless={false}
-                    style={styles.profileContainer}
-                    onPress={() => navigation.navigate('UserProfile', { ...user })}>
-                    <View style={styles.imageResponsive}>
-                        <Image
-                            style={styles.image}
-                            source={user.avatar}/>
-                    </View>
-                    <View style={styles.profileInfo}>
-                        <TextDefault bold>
-                            {user.name}
-                        </TextDefault>
-                        <TextDefault light small>
-                            {`Член от ${user.createdAt}`}
-                        </TextDefault>
-                        <TextDefault textColor={colors.spinnerColor} bold style={alignment.MTxSmall}>
-                            {'Виж профил'}
-                        </TextDefault>
-                    </View>
-                    <Entypo name='chevron-small-right' size={scale(20)} color={colors.buttonbackground} />
-                </TouchableOpacity>
-                <View style={styles.profileContainer}>
-                    <TextDefault >
-                        {`ID на офертата:${id}`}
-                    </TextDefault>
-                    <TouchableOpacity activeOpacity={0.7} onPress={() => toggleModal()}>
-                        <TextDefault textColor={colors.spinnerColor} uppercase bold>
-                            {'Report This AD'}
-
-                        </TextDefault>
-                    </TouchableOpacity>
-                </View>
+                { route && (
+                    <>
+                        <TouchableOpacity
+                            borderless={false}
+                            style={styles.profileContainer}
+                            onPress={() => navigation.navigate('UserProfile', { ...user })}>
+                            <View style={styles.imageResponsive}>
+                                <Image
+                                    style={styles.image}
+                                    source={user.avatar}/>
+                            </View>
+                            <View style={styles.profileInfo}>
+                                <TextDefault bold>
+                                    {user.name}
+                                </TextDefault>
+                                <TextDefault light small>
+                                    {`Член от ${user.createdAt}`}
+                                </TextDefault>
+                                <TextDefault textColor={colors.spinnerColor} bold style={alignment.MTxSmall}>
+                                    {'Виж профил'}
+                                </TextDefault>
+                            </View>
+                            <Entypo name='chevron-small-right' size={scale(20)} color={colors.buttonbackground} />
+                        </TouchableOpacity>
+                        <View style={styles.profileContainer}>
+                            <TextDefault >
+                                {`ID на офертата:${id}`}
+                            </TextDefault>
+                            <TouchableOpacity activeOpacity={0.7} onPress={() => toggleModal()}>
+                                <TextDefault textColor={colors.spinnerColor} uppercase bold>
+                                    {'Report This AD'}
+                                </TextDefault>
+                            </TouchableOpacity>
+                        </View>
+                    </>
+                )}
 
 
                 {/* Header */}
@@ -208,40 +227,42 @@ function ProductDescription({ route }) {
                 </View>
             </ScrollView>
             {/* Footer */}
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.button}
-                    onPress={() => navigation.navigate('Chat', { screen: 'LiveChat', initial: false })}
-                >
-                    <SimpleLineIcons name='bubble' size={scale(20)} color={colors.white} />
-                    <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
-                        {'Чат'}
-                    </TextDefault>
-                </TouchableOpacity>
+            { route && (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={styles.button}
+                        onPress={() => navigation.navigate('Chat', { screen: 'LiveChat', initial: false })}
+                    >
+                        <SimpleLineIcons name='bubble' size={scale(20)} color={colors.white} />
+                        <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
+                            {'Чат'}
+                        </TextDefault>
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.button}
-                    onPress={Sms}
-                >
-                    <SimpleLineIcons name='envelope' size={scale(20)} color={colors.white} />
-                    <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
-                        {'Съобщение'}
-                    </TextDefault>
-                </TouchableOpacity>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={styles.button}
+                        onPress={Sms}
+                    >
+                        <SimpleLineIcons name='envelope' size={scale(20)} color={colors.white} />
+                        <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
+                            {'Съобщение'}
+                        </TextDefault>
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.button}
-                    onPress={dialCall}
-                >
-                    <SimpleLineIcons name='phone' size={scale(20)} color={colors.white} />
-                    <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
-                        {'Обади се'}
-                    </TextDefault>
-                </TouchableOpacity>
-            </View>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={styles.button}
+                        onPress={dialCall}
+                    >
+                        <SimpleLineIcons name='phone' size={scale(20)} color={colors.white} />
+                        <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
+                            {'Обади се'}
+                        </TextDefault>
+                    </TouchableOpacity>
+                </View>
+            )}
         </SafeAreaView >
     )
 }
