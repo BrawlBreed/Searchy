@@ -10,6 +10,8 @@ import EditEmail from './EditEmail/EditEmail'
 import Privacy from './Privacy/Privacy'
 import Notifications from './Notifications/Notifications'
 import Registration from './Registration/Registration'
+import Entry from './FormPages/Entry'
+import ForgotPassword from './FormPages/ForgotPassword'
 import HelpBrowser from './HelpBrowser/HelpBrowser'
 
-export { MainAccount, Help, Settings, Followers, Following, Profile, EditProfile, EditPhone, EditEmail, Privacy, Notifications, Registration, HelpBrowser }
+export { MainAccount, Help, Settings, Entry, ForgotPassword, Followers, Following, Profile, EditProfile, EditPhone, EditEmail, Privacy, Notifications, Registration, HelpBrowser }

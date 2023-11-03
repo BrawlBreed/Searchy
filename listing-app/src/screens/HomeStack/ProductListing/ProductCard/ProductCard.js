@@ -15,7 +15,7 @@ function ProductCard(props) {
             style={styles.searchCard}
             onPress={() => navigation.navigate('ProductDescription', { ...props })}>
             <Image
-                source={props.image}
+                source={{ uri: props.images[0] }}
                 style={styles.imgResponsive}
             />
             <View style={[styles.flex, styles.descriptionContainer]}>
@@ -28,12 +28,12 @@ function ProductCard(props) {
                         </View>
                     ) : (<View />)
                     }
-                    <TouchableOpacity style={styles.likeContainer}
+                    {/* <TouchableOpacity style={styles.likeContainer}
                         onPress={() => isLikeSetter(prev => !prev)}>
                         {isLike ? <FontAwesome name="heart" size={scale(20)} color="black" /> :
                             <FontAwesome name="heart-o" size={scale(20)} color="black" />
                         }
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
                 <View style={[styles.flex, styles.infoContainer]}>
                     <View>

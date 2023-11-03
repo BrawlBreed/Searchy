@@ -12,6 +12,7 @@ import useCategories from '../../../hooks/useCategories';
 import { setZone } from '../../../store/reducers/Item/addItemSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import likeItem from '../../../hooks/likeItem';
+import { checkUserAuth } from '../../../store/reducers/User/userSlice';
 
 const COLORS = ['#ffd54d', '#6df8f3', '#ff7a7a', '#d5b09f', '#eccbcb']
 
@@ -19,15 +20,24 @@ function MainHome() {
   const navigation = useNavigation()
   const [modalVisible, setModalVisible] = useState(false);
   const [searchVisible, setSerachVisible] = useState(false);
-  const { zone } = useSelector(state => state.addItem)
+  const { zone, userId } = useSelector(state => state.addItem)
+  const { isLoggedIn } = useSelector(state => state.user)
   const dispatch = useDispatch()
   const { loading, error, items } = useMainHome(zone.zone);
 
+  useEffect(() => {
+    dispatch(checkUserAuth())
+  }, [])
+  
   useLayoutEffect(() => {
     navigation.setOptions({
       header: () => <MainHeader onModalToggle={toggleModal} toggleSearch={toggleSearch} locationText={zone.zone} />
     })
   }, [navigation, zone.zone])
+
+  useEffect(() => {
+    console.log(userId, isLoggedIn)
+  }), [userId]
 
   useEffect(() => {
     fetch('https://geolocation-db.com/json/')
@@ -134,7 +144,7 @@ function MainHome() {
   return (
     <>
     {
-      loading ? <TextDefault>"Loading..."</TextDefault> :
+      loading ? <TextDefault>Loading...</TextDefault> :
       error ? <TextDefault center>Грешка!</TextDefault> :
       items.length === 0 ? emptyView() : 
         <View style={[styles.flex, styles.container]}>

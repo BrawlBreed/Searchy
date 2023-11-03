@@ -3,7 +3,7 @@ import { StackActions, useNavigation } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 import { Image, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { DisconnectButton, TextDefault } from '../../../components'
+import { EmptyButton, TextDefault } from '../../../components'
 import { alignment, colors, scale } from '../../../utilities'
 import styles from './styles'
 import { useDispatch, useSelector } from 'react-redux'
@@ -13,6 +13,7 @@ import { uploadImages } from '../../../firebase'
 
 
 function AdPosting() {
+    const [ active , setActive ] = useState(true)
     const [error, setError] = useState('')
     const navigation = useNavigation()
     const item = useSelector(state => state.addItem)
@@ -21,19 +22,21 @@ function AdPosting() {
     useEffect(() => {
         navigation.setOptions({
             headerShown: false
-        })
+        }) 
     }, [])
 
     async function NavigateScreen() {
+        setActive(false)
         const imageArr = await uploadImages(item.images, item.userId + '/' + item.title)
         if(imageArr){
-            setError('')
+            setError('') 
             dispatch(changeImages(imageArr))
             dispatch(setCreatedAt())
             navigation.dispatch(StackActions.popToTop())
             navigation.navigate('AdPosted')
         }else{
             setError('Нещо се обърка, моля опитайте по-късно!')
+            setActive(true)
         }
     }
 
@@ -58,10 +61,12 @@ function AdPosting() {
                             </>
                         )}
                     </View>
-                    <DisconnectButton
+                    <EmptyButton
                         title='Публикуване'
-                        onPress={NavigateScreen}
+                        onPress={() => active && NavigateScreen()}
+                        disabled={!active}
                     />
+
                 </View>
             </View>
         </SafeAreaView>

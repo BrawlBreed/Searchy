@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     },
     logoContainer: {
         height: height * 0.5,
-        backgroundColor: colors.headerbackground,
+        backgroundColor: colors.themeBackground,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -37,7 +37,8 @@ const styles = StyleSheet.create({
     imgResponsive: {
         flex: 1,
         width: undefined,
-        height: undefined
+        height: undefined,
+        transform: [{ scale: 1.4 }]
     }
 })
 export default styles

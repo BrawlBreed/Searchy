@@ -46,7 +46,7 @@ function Categories() {
                     data={subCategories}
                     style={styles.flatList}
                     contentContainerStyle={styles.categoryContainer}
-                    ListEmptyComponent={emptyView}
+                    ListEmptyComponent={loading ? <View><Text>Loading...</Text></View> : emptyView}
                     showsHorizontalScrollIndicator={false}
                     ItemSeparatorComponent={() => <View style={styles.spacer} />}
                     renderItem={({ item }) => (

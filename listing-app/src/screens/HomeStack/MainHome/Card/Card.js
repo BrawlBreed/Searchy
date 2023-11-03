@@ -27,7 +27,7 @@ function Card(props) {
             onPress={() => navigation.navigate('ProductDescription', { ...props, isLike, isLikeSetter })}>
             <View style={styles.topCardContainer}>
                 <Image
-                    source={{ uri: '' }}
+                    source={{ uri: props.images[0] }}
                     resizeMode="cover"
                     style={styles.imgResponsive}
                 />

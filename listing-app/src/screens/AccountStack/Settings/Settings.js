@@ -5,9 +5,12 @@ import { DeactivateModal, TextDefault } from '../../../components'
 import { alignment, colors, scale } from '../../../utilities'
 import { Entypo } from '@expo/vector-icons'
 import { StackActions, useNavigation } from '@react-navigation/native'
+import { logout } from '../../../firebase'
+import { useDispatch } from 'react-redux'
 
 function Settings() {
     const navigation = useNavigation()
+    const dispatch = useDispatch()
     // const { logout } = useSelector(state => state.user)
     const [modalVisible, setModalVisible] = useState(false)
 
@@ -43,14 +46,14 @@ function Settings() {
             </TouchableOpacity>
             <TouchableOpacity style={styles.smallContainer}
                 onPress={() => {
-                    // logout()
+                    logout(dispatch)
                     navigation.dispatch(StackActions.popToTop())
                 }}>
                 <TextDefault bold H5 style={[alignment.PLlarge, styles.flex]}>
-                    {'Logout'}
+                    {'Изход'}
                 </TextDefault>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.smallContainer}
+            {/* <TouchableOpacity style={styles.smallContainer}
                 onPress={() => {
                     // logout()
                     navigation.dispatch(StackActions.popToTop())
@@ -59,11 +62,11 @@ function Settings() {
                 <TextDefault bold H5 style={[alignment.PLlarge, styles.flex]}>
                     {'Logout from all devices'}
                 </TextDefault>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity style={styles.smallContainer}
                 onPress={onModalToggle}>
                 <TextDefault bold H5 style={[alignment.PLlarge, styles.flex]}>
-                    {'Deactivate account and delete my data'}
+                    {'Деактивиране на профил'}
                 </TextDefault>
             </TouchableOpacity>
 

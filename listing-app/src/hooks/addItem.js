@@ -1,6 +1,6 @@
 import { gql, useMutation } from '@apollo/client';
 import { useEffect, useState } from 'react';
-import { setCreatedAt } from '../store/reducers/AddItem/addItemSlice';
+import { setCreatedAt } from '../store/reducers/Item/addItemSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const addItem = () => {

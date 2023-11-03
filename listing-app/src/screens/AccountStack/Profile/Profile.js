@@ -66,7 +66,7 @@ function Profile() {
                 <TextDefault H4 bold style={[alignment.MBxSmall, alignment.PLsmall, alignment.MTsmall]}>
                     {'Muhammad Saad Javed'}
                 </TextDefault>
-            </View>
+            </View> 
         </View>
     )
 }

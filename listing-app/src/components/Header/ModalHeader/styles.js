@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.headerbackground,
         justifyContent: 'center',
         alignItems: 'center',
-        borderBottomColor: colors.horizontalLine
+        borderBottomColor: colors.horizontalLine,
     },
     headerContents: {
         width: '100%',
@@ -24,7 +24,8 @@ const styles = StyleSheet.create({
         width: "15%"
     },
     title: {
-        width: "70%"
+        width: "70%",
+        marginLeft: "20%",
     }
 })
 

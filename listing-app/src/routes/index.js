@@ -56,7 +56,7 @@ function FilterScreen() {
     return (
         <FilterStack.Navigator initialRouteName='FilterModal' headerMode='screen' screenOptions={StackOptions()}>
             <FilterStack.Screen name='FilterModal' component={HomeScreens.FilterModal} />
-            <FilterStack.Screen name='Categories' component={HomeScreens.Categories} />
+            <FilterStack.Screen name='Categories' component={HomeScreens.Categories} options={{ title: 'Категории'}} />
             <FilterStack.Screen name='SubCategories' component={HomeScreens.SubCategories} />
         </FilterStack.Navigator>
     )
@@ -66,7 +66,7 @@ function HomeTabs() {
     return (
         <HomeStack.Navigator initialRouteName='Main' headerMode='screen' screenOptions={StackOptions()}>
             <HomeStack.Screen name='Main' component={HomeScreens.MainHome} />
-            <HomeStack.Screen name='Categories' component={HomeScreens.Categories} />
+            <HomeStack.Screen name='Categories' component={HomeScreens.Categories} options={{ title: 'Категории'}} />
             <HomeStack.Screen name='SubCategories' component={HomeScreens.SubCategories} />
             <HomeStack.Screen name='ProductListing' component={HomeScreens.ProductListing} />
             <HomeStack.Screen name='Notifications' component={HomeScreens.Notifications} />
@@ -97,7 +97,7 @@ function SellTabs() {
             <SellStack.Screen name='Home' component={SellScreens.MainSell} />
             <SellStack.Screen name='Categories' component={SellScreens.Categories} options={{ title: 'Choose a category' }} />
             <SellStack.Screen name='SubCategories' component={SellScreens.SubCategories} />
-            <SellStack.Screen name='SellingForm' component={SellScreens.SellingFrom} options={{ title: 'Include some details' }} />
+            <SellStack.Screen name='SellingForm' component={SellScreens.SellingFrom} options={{ title: 'Повече информация' }} />
             <SellStack.Screen name='UploadImage' component={SellScreens.UploadImage} />
             <SellStack.Screen name='Price' component={SellScreens.Price} />
             <SellStack.Screen name='LocationConfirm' component={SellScreens.LocationConfirm} />
@@ -178,6 +178,8 @@ function AppContainer() {
             <MainStack.Navigator initialRouteName='BottomTabs' headerMode='screen' >
                 <MainStack.Screen name='BottomTabs' component={BottomTabs} options={{ headerShown: false }} />
                 <MainStack.Screen name='Registration' component={AccountScreens.Registration} options={{ headerShown: false }} />
+                <MainStack.Screen name='Entry' component={AccountScreens.Entry} options={{ headerShown: false }}/>
+                <MainStack.Screen name='ForgotPassword' component={AccountScreens.ForgotPassword}  options={{ headerShown: false }}/>
                 <MainStack.Screen name='FilterModal' component={FilterScreen} options={{
                     headerShown: false,
                     ...TransitionPresets.ModalSlideFromBottomIOS

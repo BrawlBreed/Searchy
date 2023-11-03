@@ -7,7 +7,7 @@ import ModalHeader from '../../Header/ModalHeader/ModalHeader';
 import { TextDefault } from '../../Text';
 import styles from './styles';
 import addZone from '../../../hooks/addZone';
-import { setZone, setCurrentCoordinates } from '../../../store/reducers/Item/addItemSlice';
+import { setZone, setCurrentCoordinates, setZoneId } from '../../../store/reducers/Item/addItemSlice';
 import { useDispatch } from 'react-redux';
 
 function LocationModal(props) {
@@ -42,7 +42,6 @@ function LocationModal(props) {
         .catch(error => console.log(error))  
         if(!data) return
         if(data.getZones) setZones(data.getZones)
-
     }, [data])
 
     useEffect(() => {
@@ -52,6 +51,7 @@ function LocationModal(props) {
     }, [input])
 
     function btnLocation(zone) {
+        dispatch(setZoneId(zone.name))
         dispatch(setZone({
             zone: zone.zone,
             coordinates: zone.coordinates

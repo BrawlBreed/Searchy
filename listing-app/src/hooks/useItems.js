@@ -10,9 +10,10 @@ const useItems = (searchSubCategory, searchCategory, searchInput) => {
   })
 
   useEffect(() => {
+    console.log(data, error)
     if(!data) return
     if(data.getItems.length){
-      const items = data.getItems.map(({ name, value }) => ({
+      const itemList = data.getItems.map(({ name, value }) => ({
         id: name,
         title: value.title,
         price: value.price, 
@@ -27,7 +28,7 @@ const useItems = (searchSubCategory, searchCategory, searchInput) => {
         else return item.subCategory.title.toLowerCase().includes(searchSubCategory.toLowerCase())
       })
 
-      setItems(items)
+      setItems(itemList)
     }
   }, [data])
 

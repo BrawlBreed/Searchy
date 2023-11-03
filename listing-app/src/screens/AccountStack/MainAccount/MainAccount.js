@@ -23,7 +23,7 @@ function MainAccount() {
                 </View>
                 <View style={[styles.flex, styles.profileInfo]}>
                     <TextDefault H4 bold style={alignment.MBmedium}>
-                        {isLoggedIn ? 'Muhammad Saad Javed' : 'Log in'}
+                        {isLoggedIn ? 'Muhammad Saad Javed' : 'Гост'}
                     </TextDefault>
                     <TouchableOpacity
                         activeOpacity={0.5}
@@ -36,7 +36,7 @@ function MainAccount() {
                         }
                     >
                         <TextDefault textColor={colors.spinnerColor} H5 bold>
-                            {isLoggedIn ? 'View and edit profile' : 'Log in to your account'}
+                            {isLoggedIn ? 'Редактирай профил' : 'Влез в профил'}
                         </TextDefault>
                     </TouchableOpacity>
                 </View>
@@ -67,7 +67,7 @@ function MainAccount() {
                     <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />
                 </TouchableOpacity>
             </>
-            }
+            } 
             <TouchableOpacity style={styles.smallContainer} onPress={() => navigation.navigate('Help')}>
                 <Ionicons name="ios-help-circle-outline" size={scale(22)} color={colors.buttonbackground} />
                 <View style={[styles.flex]}>
@@ -82,7 +82,7 @@ function MainAccount() {
             </TouchableOpacity>
             {!isLoggedIn && <View style={styles.loginBtn}>
                 <EmptyButton
-                    title='Login or register'
+                    title='Вход'
                     onPress={() => navigation.navigate('Registration')} />
             </View>}
         </View >
