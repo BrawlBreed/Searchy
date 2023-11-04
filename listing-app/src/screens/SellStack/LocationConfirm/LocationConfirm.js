@@ -6,10 +6,9 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { EmptyButton, LocationModal, TextDefault } from '../../../components'
 import { alignment, colors, scale } from '../../../utilities'
 import { setZoneId, setCurrentCoordinates, setAddress } from '../../../store/reducers/Item/addItemSlice'
-import styles from './styles'
+import styles from './styles' 
 import MapView, { Marker } from 'react-native-maps'
 import { useDispatch, useSelector } from 'react-redux'
-import { GEOAPIFY_API_KEY } from '../../../../Constants'
 
 function LocationConfirm() {
     const navigation = useNavigation()
@@ -31,7 +30,7 @@ function LocationConfirm() {
     }, [input])
 
     useEffect(() => {
-        fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${Number(coordinates.latitude)}&lon=${Number(coordinates.longitude)}&apiKey=${GEOAPIFY_API_KEY}`)
+        fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${Number(coordinates.latitude)}&lon=${Number(coordinates.longitude)}&apiKey=91d42f0a0fef4305bdc90e6da2b237c9`)
         .then(response => response.json())
         .then(result => {
             if (result.features.length) {

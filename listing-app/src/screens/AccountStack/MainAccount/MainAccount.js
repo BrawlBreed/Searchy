@@ -6,8 +6,10 @@ import { EmptyButton, TextDefault } from '../../../components';
 import { alignment, colors, scale } from '../../../utilities';
 import styles from './styles';
 import { useSelector } from 'react-redux';
+import { useUser } from '../../../hooks/useUser';
 
 function MainAccount() {
+    const { data, error, loading } = useUser(userId)
     const navigation = useNavigation()
     const { isLoggedIn } = useSelector(state => state.user)
 
@@ -23,7 +25,7 @@ function MainAccount() {
                 </View>
                 <View style={[styles.flex, styles.profileInfo]}>
                     <TextDefault H4 bold style={alignment.MBmedium}>
-                        {isLoggedIn ? 'Muhammad Saad Javed' : 'Гост'}
+                        {isLoggedIn ? ' Saad Javed' : 'Гост'}
                     </TextDefault>
                     <TouchableOpacity
                         activeOpacity={0.5}

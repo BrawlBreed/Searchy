@@ -4,8 +4,12 @@ import { Image, TouchableOpacity, View } from 'react-native'
 import { RightButton, TextDefault } from '../../../components'
 import { alignment, colors } from '../../../utilities'
 import styles from './styles'
+import { useUser } from '../../../hooks/useUser'
+import { useSelector } from 'react-redux'
 
 function Profile() {
+    // const { userId } = useSelector(state => state.user)
+    // const { data, error, loading } = useUser(userId)
     const navigation = useNavigation()
 
     useLayoutEffect(() => {
@@ -65,7 +69,7 @@ function Profile() {
                 </View>
                 <TextDefault H4 bold style={[alignment.MBxSmall, alignment.PLsmall, alignment.MTsmall]}>
                     {'Muhammad Saad Javed'}
-                </TextDefault>
+                </TextDefault> 
             </View> 
         </View>
     )

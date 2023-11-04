@@ -1,18 +1,18 @@
 type User {
-  _id: String
-  avatar: String
-  description: String
-  callingCode: Int
-  createdAt: Date
-  email: String
-  followers: [String]
-  following: [String]
-  isActive: Boolean
-  likes: [String]
-  name: String
-  notificationToken: String
-  phone: Int
-  showPhone: Boolean
+  name: String!,
+  phoneCode: String,
+  callingCode: String,
+  description: String!,
+  phone: String!,
+  email: String!,
+  avatar: String!,
+  createdAt: String!,
+  active: Boolean!,
+  followers: [String]!,
+  following: [String]!,
+  favorites: [String]!,
+  notifications: NotificationsInput!,
+  _id: String!,
 }
 
 type UserList { 

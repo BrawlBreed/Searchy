@@ -100,7 +100,7 @@ function Registration() {
                             navigation.navigate('Entry', { email: true })
                         }} 
                     />
-                    <LoginButton
+                    {/* <LoginButton
                         style={{ width: '85%' }}
                         icon='social-google'
                         title='Продължи с Google'
@@ -108,7 +108,7 @@ function Registration() {
                         onPress={async () => {
                             // navigation.navigate('Entry', { email: true })
                         }} 
-                    />
+                    /> */}
                     <TextDefault textColor={colors.fontPlaceholder} bold center small>
                         {'Ако продължите, вие се съгласявате с нашите'}
                     </TextDefault>

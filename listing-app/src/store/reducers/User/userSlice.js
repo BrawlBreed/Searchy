@@ -42,7 +42,6 @@ export const initialState = {
   isLoggedIn: false,
   loading: false,
   userId: '', // Add uid to the state
-  register: false
 };
 
 const userSlice = createSlice({
@@ -58,9 +57,6 @@ const userSlice = createSlice({
     },
     setFavorites: (state, action) => {
       state.favorites = action.payload;
-    },
-    setRegister: (state) => {
-      state.register = !state.register;
     },
     setCreatedAt: (state) => {
       state.createdAt = new Date().toISOString();
@@ -104,7 +100,6 @@ export const {
   changeEmail,
   changePassword,
   changePhone,
-  // ...export other reducers
 } = userSlice.actions;
 
 export default userSlice.reducer;

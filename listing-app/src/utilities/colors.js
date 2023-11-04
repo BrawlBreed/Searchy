@@ -5,7 +5,7 @@ export const colors = {
     headerbackground: '#ebeeef',
     headerText: '#002f34',
     bottomTabColor: '#ebeeef',
-    buttonbackground: '#42A5F5',
+    buttonbackground: '#4286f3',
     buttonText: '#FFFFFF',
     containerTheme: '#ebeeef',
     containerBox: '#FFFFFF',
