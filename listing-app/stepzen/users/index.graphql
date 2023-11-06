@@ -2,17 +2,23 @@ type User {
   name: String!,
   phoneCode: String,
   callingCode: String,
-  description: String!,
-  phone: String!,
-  email: String!,
-  avatar: String!,
-  createdAt: String!,
-  active: Boolean!,
-  followers: [String]!,
-  following: [String]!,
-  favorites: [String]!,
-  notifications: NotificationsInput!,
-  _id: String!,
+  description: String,
+  phone: String,
+  email: String,
+  avatar: String,
+  createdAt: String,
+  active: Boolean,
+  followers: [String],
+  following: [String],
+  favorites: [String],
+  notifications: Notifications,
+  likes: [String],
+  _id: String,
+}
+
+type Notifications { 
+  recommendations: Boolean
+  specialOffers: Boolean
 }
 
 type UserList { 
@@ -33,21 +39,20 @@ type Query {
 }
 
 input NotificationsInput {
-  recommendations: Boolean,
-  specialOffers: Boolean,
+  recommendations: Boolean
+  specialOffers: Boolean
 }
 
 type Mutation {
   register(
     avatar: String
-    description: String,
+    description: String
     callingCode: String
     createdAt: String
     email: String
     followers: [String]
     following: [String]
     favorites: [String]
-    isActive: Boolean
     likes: [String]
     name: String
     notifications: NotificationsInput
@@ -60,4 +65,20 @@ type Mutation {
       endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users.json",
       method: POST
     )
+    changePhone(uid: String!, phone: String!): JSON 
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    changeEmail(uid: String!, email: String!): JSON 
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    changeEssentials(uid: String!, name: String, description: String!, avatar: String!): JSON 
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+
 }

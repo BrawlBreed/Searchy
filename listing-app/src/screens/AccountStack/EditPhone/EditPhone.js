@@ -1,30 +1,53 @@
 import { useNavigation } from '@react-navigation/native'
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { Image, Switch, TextInput, View, KeyboardAvoidingView, Keyboard, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { EmptyButton, ModalHeader, TextDefault } from '../../../components'
 import { alignment, colors } from '../../../utilities'
 import styles from './styles'
+import { changePhone, changePhoneCode } from '../../../store/reducers/User/userSlice'
+import RNPhoneCodeSelect from "react-native-phone-code-select";
+import { useDispatch, useSelector } from 'react-redux'
+import { gql, useMutation } from '@apollo/client'
 
 function EditPhone() {
     const navigation = useNavigation()
-    const [phone, setPhone] = useState('')
     const [focus, setFocus] = useState(false)
+    const [visible, setVisible] = useState(false);
     const [margin, marginSetter] = useState(false)
     const [isEnabled, setIsEnabled] = useState(true);
     const toggleSwitch = () => setIsEnabled(prev => !prev);
     const [adColor, setAdColor] = useState(colors.fontThirdColor)
+    const { uid, phoneCode, phone, avatar } = useSelector(state => state.user) || {}
+    const dispatch = useDispatch()
+
+    const [mutateFunction, { data, loading, error }] = useMutation(gql`
+    mutation MyMutation(
+        $uid: String!,
+        $phone: String!,
+    ) {
+        changePhone( uid: $uid, phone: $phone )
+    }
+    `, {
+        variables: {
+        uid: uid,
+        phone: phone
+        },
+    })
+
+    useEffect(() => {
+        if (data?.changePhone) {
+            dispatch(changePhone(data.changePhone.phone))
+            navigation.goBack()
+        }
+    }, [data])
+
 
     useLayoutEffect(() => {
         navigation.setOptions({
             header: () => null
         })
     }, [navigation])
-
-    function validate() {
-        if (phone.length > 0)
-            return navigation.goBack()
-    }
 
     return (
         <SafeAreaView style={[styles.flex, styles.safeAreaView]}>
@@ -37,33 +60,42 @@ function EditPhone() {
                         <View style={styles.imageContainer}>
                             <Image
                                 style={styles.imgResponsive}
-                                source={require('../../../assets/images/avatar.png')}
+                                source={avatar ? {uri: avatar } : require('../../../assets/images/avatar.png')}
                                 resizeMode='cover'
                             />
                         </View>
                         <TextDefault textColor={colors.fontMainColor} bold H4 style={[alignment.MTlarge, alignment.PLsmall]}>
-                            {'Verify your phone'}
+                            {'Промени телефон'}
                         </TextDefault>
                         <TextDefault textColor={colors.fontSecondColor} style={[alignment.MTsmall, alignment.PLsmall]}>
-                            {'We will send a confirmation code to your phone'}
+                            {'Добавяйки телефон, ще можеш да се свържеш с други потребители'}
                         </TextDefault>
                         <View style={styles.phoneRow}>
                             <View style={styles.countryBox}>
+                                <RNPhoneCodeSelect
+                                    visible={visible}
+                                    onDismiss={() => setVisible(false)}
+                                    onCountryPress={(country) => dispatch(changePhoneCode(country.dial_code))}
+                                    primaryColor="#42A5F5"
+                                    secondaryColor="#42A5F5"
+                                    buttonText="Готово"
+                                />
                                 <TextDefault textColor={colors.fontThirdColor}>
-                                    {'Country'}
+                                    {'Код'}
                                 </TextDefault>
-                                <TextDefault H5 style={[alignment.PBxSmall, alignment.PTxSmall]}>
-                                    {'+92'}
-                                </TextDefault>
+                                <TextDefault H5 style={[alignment.PBxSmall, alignment.PTxSmall]}
+                                    onPress={() => setVisible(true)}
+                                >{phoneCode}</TextDefault>
                             </View>
                             <View style={[styles.numberBox, { borderColor: adColor }]}>
                                 <TextDefault textColor={adColor}>
-                                    {(focus || phone.length > 0) ? 'Phone Number' : ''}
+                                    {(focus || phone.length > 0) ? 'Телефон' : ''}
                                 </TextDefault>
                                 <TextInput style={styles.flex}
                                     placeholder={focus ? '' : 'Phone Number'}
-                                    placeholderTextColor={colors.fontThirdColor}
+                                    placeholderTextColor={error ? colors.google : colors.fontThirdColor}
                                     value={phone}
+                                    maxLength={9}
                                     keyboardType={'phone-pad'}
                                     onFocus={() => {
                                         setFocus(true)
@@ -73,28 +105,17 @@ function EditPhone() {
                                         setFocus(false)
                                         setAdColor(colors.fontThirdColor)
                                     }}
-                                    onChangeText={text => setPhone(text)}
+                                    onChangeText={text => dispatch(changePhone(text))}
                                 />
+                                { error && <TextDefault textColor={colors.google} style={alignment.PTxSmall}>Грешка, опитай по-късно!</TextDefault>}
                             </View>
-                        </View>
-                        <View style={styles.smallContainer}>
-                            <TextDefault H5 bold style={styles.flex}>
-                                {'Show my phone number in ads'}
-                            </TextDefault>
-                            <Switch
-                                trackColor={{ false: colors.headerbackground, true: colors.buttonbackground }}
-                                thumbColor={colors.containerBox}
-                                ios_backgroundColor={colors.headerbackground}
-                                onValueChange={toggleSwitch}
-                                value={isEnabled}
-                            />
                         </View>
                     </View >
                     <View style={styles.buttonView}>
                         <EmptyButton
-                            disabled={phone.length < 1}
+                            disabled={phone.length < 9}
                             title='Save'
-                            onPress={validate} />
+                            onPress={mutateFunction} />
                     </View>
                 </TouchableOpacity >
             </KeyboardAvoidingView>

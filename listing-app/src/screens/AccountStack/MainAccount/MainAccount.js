@@ -1,31 +1,41 @@
 import { AntDesign, Entypo, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useLayoutEffect } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import { EmptyButton, TextDefault } from '../../../components';
 import { alignment, colors, scale } from '../../../utilities';
 import styles from './styles';
-import { useSelector } from 'react-redux';
-import { useUser } from '../../../hooks/useUser';
+import { useDispatch, useSelector } from 'react-redux';
+import useUser from '../../../hooks/useUser';
+import { setCurrentUser } from '../../../store/reducers/User/userSlice';
 
-function MainAccount() {
+function MainAccount() {   
+    const { isLoggedIn, userId, ...user } = useSelector(state => state.user)
     const { data, error, loading } = useUser(userId)
+    const { name, avatar, email } = user
     const navigation = useNavigation()
-    const { isLoggedIn } = useSelector(state => state.user)
-
+    
     return (
         <View style={[styles.flex, styles.container]}>
             <View style={styles.profileContainer}>
                 <View style={styles.imageContainer}>
-                    <Image
-                        style={styles.imgResponsive}
-                        source={require('../../../assets/images/avatar.png')}
-                        resizeMode='cover'
-                    />
-                </View>
+                    { avatar ?
+                        <Image
+                            style={styles.imgResponsive}
+                            source={{ uri: avatar }}
+                            resizeMode='cover'
+                        />
+                        : 
+                        <Image
+                            style={styles.imgResponsive}
+                            source={require('../../../assets/images/avatar.png')}
+                            resizeMode='cover'
+                        />
+                    }
+                </View> 
                 <View style={[styles.flex, styles.profileInfo]}>
                     <TextDefault H4 bold style={alignment.MBmedium}>
-                        {isLoggedIn ? ' Saad Javed' : 'Гост'}
+                        {isLoggedIn ? name : 'Гост'}
                     </TextDefault>
                     <TouchableOpacity
                         activeOpacity={0.5}

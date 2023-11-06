@@ -28,16 +28,16 @@ function MainHome() {
   useEffect(() => {
     dispatch(checkUserAuth())
   }, [])
+
+  useEffect(() => {
+    console.log(error)
+  }, [error])
   
   useLayoutEffect(() => {
     navigation.setOptions({
       header: () => <MainHeader onModalToggle={toggleModal} toggleSearch={toggleSearch} locationText={zone.zone} />
     })
   }, [navigation, zone.zone])
-
-  useEffect(() => {
-    console.log(userId, isLoggedIn)
-  }), [userId]
 
   useEffect(() => {
     fetch('https://geolocation-db.com/json/')

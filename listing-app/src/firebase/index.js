@@ -1,9 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
   GoogleAuthProvider,
   signInWithRedirect,
-  getAuth,
+  getAuth, 
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -13,9 +13,12 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   signInWithPopup,
+  updateEmail as updateEmailAuth,
+  verifyBeforeUpdateEmail
 } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { checkUserAuth, setLoading, setRegister, setUserId } from "../store/reducers/User/userSlice";
+import { checkUserAuth, setCreatedAt, setLoading, setRegister, setUserId } from "../store/reducers/User/userSlice";
+import { getDatabase, ref, set } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB60wKug-C4eUXXKZ1f53LZUXKPNYGchPQ",
@@ -34,6 +37,7 @@ initializeAuth(app, {
 });
 export const auth = getAuth();
 export const provider = new GoogleAuthProvider();
+export const db = getDatabase(app);
 
 // Initialize Realtime Database and get a reference to the service
 export const storage = getStorage(app);
@@ -42,7 +46,8 @@ export async function uploadImages(images, path) {
   const uploadPromises = images.map(async (image, index) => {
     const response = await fetch(image);
     image = await response.blob();
-    const reference = ref(storage, `${path}/${index}`);
+    const reference = storageRef(storage, `${path}/${index}`);
+    console.log(reference)
     await uploadBytes(reference, image);
     return getDownloadURL(reference);
   });
@@ -55,15 +60,32 @@ export async function uploadImages(images, path) {
     return false;
   }
 }
+export async function uploadImage(image, path) {
+  try{
+    const response = await fetch(image);
+    image = await response.blob();
+    const reference = storageRef(storage, `${path}`);
+    console.log(reference)
+    await uploadBytes(reference, image);
+    return getDownloadURL(reference);;
+  } catch (error) {
+    console.error('Some image uploads failed:', error);
+    return false;
+  }
+}
 
-export const createOrSignInWithEmail = async (email, password, dispatch, mutateFunction) => {
+export const createOrSignInWithEmail = async (email, password, dispatch, user) => {
   dispatch(setLoading(true));
   try {
+    const name = email.split('@')[0];
+    const createdAt = new Date().toString()
     // Try to create a new account
     const signUpResponse = await createUserWithEmailAndPassword(auth, email, password);
-    dispatch(setUserId(signUpResponse.user.uid));
-    const res = mutateFunction();
-    console.log(res)
+    const { uid } = signUpResponse.user;
+    dispatch(setUserId(uid));
+    user = {...user, _id: uid, createdAt: createdAt, name: name }
+    createUserWithCustomKey(uid, user);
+
     return signUpResponse;
   } catch (signUpError) {
     if (signUpError.code === 'auth/email-already-in-use') {
@@ -76,6 +98,7 @@ export const createOrSignInWithEmail = async (email, password, dispatch, mutateF
         return signInError.code;
       }
     } else {
+      console.log(signUpError)
       // Handle other errors from account creation
       return signUpError.code;
     }
@@ -96,11 +119,34 @@ export const logout = async (dispatch) => {
   }
 };
 
+export async function createUserWithCustomKey( childId, data ){
+  const { password, isLoggedIn, loading, uid, userId, ...dataWithoutPassword } = data;
+  console.log(dataWithoutPassword)
 
+  try{
+    const res = await set(ref(db, 'users/' + childId), dataWithoutPassword)
+    console.log('Response: ', res)
+  }catch(error){
+    console.error('Error: ', error)
+    return error
+  }
+}
 
+export const sendVerificationEmail = async (newEmail) => {
+  const user = await verifyBeforeUpdateEmail(auth.currentUser, newEmail)
 
+  return user
+}
 
-
+export async function updateEmail(email) {
+  try{
+    const res = await updateEmailAuth(auth.currentUser, email);
+    return res
+  }catch(error){
+    return error
+  };
+  
+}
 // export const createOrSignUpWithPhone = async (phoneNumber, dispatch, mutateFunction) => {
 //   dispatch(setLoading(true));
 

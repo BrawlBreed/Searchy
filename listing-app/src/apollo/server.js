@@ -45,11 +45,13 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
           callingCode
           createdAt
           email
-          isActive
-          name
-          notificationToken
+          active
+          name 
+          notifications{
+            recommendations
+            specialOffers
+          }
           phone
-          showPhone
           likes
           followers
           following
@@ -130,9 +132,9 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
           callingCode
           createdAt
           email
-          isActive
+          active
           name
-          notificationToken
+          notifications
           phone
           showPhone
           likes

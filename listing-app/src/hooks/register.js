@@ -31,7 +31,7 @@ const register = () => {
             $avatar: String!,
             $followers: [String!]!,
             $following: [String!]!,
-            $notifications: NotificationsInput!,
+            $notifications: NotificationsInput,
             $active: Boolean!,
             $favorites: [String!]!,
             $isLoggedIn: Boolean!,

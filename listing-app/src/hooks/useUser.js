@@ -1,36 +1,43 @@
 import { gql, useQuery } from "@apollo/client";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setCurrentUser } from "../store/reducers/User/userSlice";
 
-export function useUser(user) {
-    const { loading, error, data } = useQuery(gql`  query getZones {
-      getUserById() {
-        _id
-        avatar
-        callingCode
-        createdAt
-        description
-        email
-        followers
-        following
-        isActive
-        likes
-        name
-        notificationToken
-        phone
-        showPhone
-      }
-    }`, {
-      variables: {
-        user: user,
-      },
-    })
+function useUser(userId) {
+  const dispatch = useDispatch();
+    const { loading, error, data } = useQuery(
+      gql`
+        query getZones($userId: ID!) {
+          getUserById(user: $userId) {
+            _id
+            avatar
+            callingCode
+            createdAt
+            description
+            email
+            followers
+            following
+            active
+            likes
+            name
+            notifications{
+              recommendations
+              specialOffers
+            }
+            phone
+          }
+        }
+      `,
+      { variables: { userId } 
+    });
 
     useEffect(() => {
-        console.log(user)
+      if (data?.getUserById){
+        dispatch(setCurrentUser(data?.getUserById));
+      }
     }, [data])
+      
+    return ({ data, error, loading });
+  }
   
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Something went wrong...</p>;
-  
-    return ({ data, error, loading })
-}
+  export default useUser;

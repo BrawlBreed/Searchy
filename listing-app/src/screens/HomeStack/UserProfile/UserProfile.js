@@ -7,7 +7,7 @@ import styles from './styles'
 
 function UserProfile({ route }) {
     const navigation = useNavigation()
-    const { avatar, createdAt, email, followers, following, isActive, name, description } = route.params
+    const { avatar, createdAt, email, followers, following, active, name, description } = route.params
 
     useLayoutEffect(() => {
         navigation.setOptions({

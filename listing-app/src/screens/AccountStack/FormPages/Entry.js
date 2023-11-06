@@ -28,6 +28,7 @@ const Entry = ({ route }) => {
   const navigation = useNavigation()
   const inset = useSafeAreaInsets()
   const dispatch = useDispatch()
+  const user = useSelector(state => state.user)
   const { name, phoneCode, description, phone, email, password, avatar, createdAt, active, followers, following, notifications, userId, favorites } = useSelector(state => state.user)
   const [mutateFunction, { data, loading, error }] = useMutation(gql`
   mutation MyMutation(
@@ -109,7 +110,7 @@ const Entry = ({ route }) => {
         if(errors[key]) valid = false
     }
     if(valid) {
-      const response = route.params.email ? await createOrSignInWithEmail(email, password, dispatch,         mutateFunction
+      const response = route.params.email ? await createOrSignInWithEmail(email, password, dispatch, user
       ) : await createOrSignUpWithPhone(phoneCode + phone, dispatch, mutateFunction)
       
       if(response === 'auth/invalid-login-credentials') {

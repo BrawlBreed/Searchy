@@ -10,6 +10,9 @@ export const checkUserAuth = createAsyncThunk(
       onAuthStateChanged(auth, (user) => {
         if (user) {
           // User is signed in
+          if (user.emailVerified) {
+            console.log(user.emailVerified)
+          }      
           dispatch(setUserId(user.uid))
           resolve(user);
         } else {
@@ -48,7 +51,10 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUserId: (state, action) => {
+    setCurrentUser: (state, action) => {
+      Object.assign(state, action.payload);
+    },
+    setUserId: (state, action) => { 
       state.isLoggedIn = true;
       state.userId = action.payload;
     },
@@ -59,7 +65,7 @@ const userSlice = createSlice({
       state.favorites = action.payload;
     },
     setCreatedAt: (state) => {
-      state.createdAt = new Date().toISOString();
+      state.createdAt = new Date().toString();
     },
     changeEmail: (state, action) => {
       state.email = action.payload;
@@ -76,6 +82,15 @@ const userSlice = createSlice({
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
+    changeName: (state, action) => {
+      state.name = action.payload;
+    },
+    changeDescription: (state, action) => {
+      state.description = action.payload;
+    },
+    setAvatar: (state, action) => {
+      state.avatar = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -97,8 +112,12 @@ export const {
   setCreatedAt,
   setLoading,
   changePhoneCode,
+  setCurrentUser,
   changeEmail,
   changePassword,
+  changeName,
+  changeDescription,
+  setAvatar,
   changePhone,
 } = userSlice.actions;
 
