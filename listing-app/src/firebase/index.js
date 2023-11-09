@@ -10,11 +10,11 @@ import {
   initializeAuth,
   getReactNativePersistence,
   signOut,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  signInWithPopup,
   updateEmail as updateEmailAuth,
-  verifyBeforeUpdateEmail
+  verifyBeforeUpdateEmail,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  sendEmailVerification,
 } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { checkUserAuth, setCreatedAt, setLoading, setRegister, setUserId } from "../store/reducers/User/userSlice";
@@ -132,11 +132,51 @@ export async function createUserWithCustomKey( childId, data ){
   }
 }
 
-export const sendVerificationEmail = async (newEmail) => {
-  const user = await verifyBeforeUpdateEmail(auth.currentUser, newEmail)
+export const updateAndVerifyEmail = async (newEmail, password) => {
+  try {
+    // Re-authenticate the user.
+    const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
+    await reauthenticateWithCredential(auth.currentUser, credential);
 
-  return user
-}
+    // Update the email.
+    await updateEmailAuth(auth.currentUser, newEmail);
+    return { success: true, message: 'Email updated!' };
+  } catch (error) {
+    if(error.code === 'auth/operation-not-allowed'){
+      try{
+        const res = await sendEmailVerification(auth.currentUser);
+        if(res === undefined){
+          const res = await verifyBeforeUpdateEmail(auth.currentUser, newEmail);
+
+          return 'Sent'
+        }
+
+        return res;
+      }catch(error){
+        return res;
+      }
+  
+    }
+    return error;
+  }
+};
+
+// export const updateAndVerifyEmail = async (newEmail, password) => {
+//   const credential = EmailAuthProvider.credential(auth.currentUser.email, password)
+//   const res = await reauthenticateWithCredential(auth.currentUser, credential)
+//   console.log(res)
+//   if(res?.user){
+//     try{
+//       const res = await verifyBeforeUpdateEmail(auth.currentUser, newEmail);
+//       console.log(res)
+//       return res
+//     } catch(error){
+//       return error
+//     }
+//   }
+
+//   return res
+// }
 
 export async function updateEmail(email) {
   try{

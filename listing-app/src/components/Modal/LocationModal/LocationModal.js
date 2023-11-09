@@ -34,7 +34,7 @@ function LocationModal(props) {
         .then(response => response.json())
         .then(data => {
             setCoordinates({
-                latitude: data.latitude, 
+                latitude: data.latitude,  
                 longitude: data.longitude
             })
             setCurrentLocation(data.city)

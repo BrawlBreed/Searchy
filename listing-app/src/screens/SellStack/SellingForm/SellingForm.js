@@ -18,11 +18,11 @@ import { validateSellingForm } from './validate'
 const CONDITIONS = [
     {
         value: 0,
-        title: 'New'
+        title: 'Ново'
     },
     {
         value: 1,
-        title: 'Used'
+        title: 'Използвано'
     },
 ]
 const initalState = {

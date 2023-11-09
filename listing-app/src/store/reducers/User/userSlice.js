@@ -1,24 +1,42 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { auth } from '../../../firebase/index'; // Import your Firebase auth instance
 import { onAuthStateChanged } from 'firebase/auth';
+import { client } from '../../../apollo';
+import { gql } from '@apollo/client';
+import { dateStringToDDMMYYYY } from '../../../utilities/methods';
+
+const CHANGE_EMAIL_MUTATION = gql`
+  mutation MyMutation($uid: String!, $email: String!) {
+    changeEmail(uid: $uid, email: $email)
+  }
+`;
 
 // Async thunk for checking user authentication state
 export const checkUserAuth = createAsyncThunk(
   'user/checkUserAuth',
-  async (_, { dispatch }) => {
+  async (_, { dispatch, getState }) => {
     return new Promise((resolve) => {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          // User is signed in
-          if (user.emailVerified) {
-            console.log(user.emailVerified)
-          }      
+      onAuthStateChanged(auth, async (user) => {
+        if(user){
+          dispatch(changeEmail(auth.currentUser.email))
           dispatch(setUserId(user.uid))
           resolve(user);
         } else {
-            console.log('Logged out')
+          // Check if we are awaiting email verification
+          const { awaitingEmailVerification } = getState().user;
+          if(awaitingEmailVerification){
+            dispatch(setEmailChanged(true))
+            useTimeout(() => {
+              dispatch(changeEmail(auth.currentUser.email))
+              dispatch(setAwaitingEmailVerification(false));
+              dispatch(setEmailChanged(false))
+            }, 20000)
+          }else{
+            console.log('Logged out');
             dispatch(logout());
-            resolve(null);
+          }
+          // If we are awaiting email verification, do not dispatch logout
+          resolve(null);
         }
       });
     });
@@ -35,6 +53,8 @@ export const initialState = {
   avatar: '',
   followers: [''],
   following: [''],
+  likedItems: [''],
+  ownedItems: [''],
   notifications: {
     recommendations: false,
     specialOffers: false,
@@ -44,6 +64,8 @@ export const initialState = {
   favorites: [''],
   isLoggedIn: false,
   loading: false,
+  awaitingEmailVerification: false,
+  emailChanged: false,
   userId: '', // Add uid to the state
 };
 
@@ -51,8 +73,14 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    setAwaitingEmailVerification: (state, action) => {
+      state.awaitingEmailVerification = action.payload;
+    },
+    setEmailChanged: (state, action) => {
+      state.emailChanged = action.payload;
+    },
     setCurrentUser: (state, action) => {
-      Object.assign(state, action.payload);
+      Object.assign(state, { ...action.payload, createdAt: dateStringToDDMMYYYY(action.payload.createdAt), email: auth.currentUser.email });
     },
     setUserId: (state, action) => { 
       state.isLoggedIn = true;
@@ -119,6 +147,8 @@ export const {
   changeDescription,
   setAvatar,
   changePhone,
+  setAwaitingEmailVerification,
+  setEmailChanged
 } = userSlice.actions;
 
 export default userSlice.reducer;

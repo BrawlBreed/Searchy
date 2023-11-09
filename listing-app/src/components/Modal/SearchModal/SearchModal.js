@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, scale } from '../../../utilities';
 import { TextDefault } from '../../Text';
 import styles from './styles';
-
+ 
 const CATEGORY = ['Мобилни Устройства', 'Недвижими Имоти', 'Коли', 'Телевизори', 'Мебели']
 
 function SearchModal(props) {
@@ -15,6 +15,7 @@ function SearchModal(props) {
     const navigation = useNavigation()
 
     function navigate(input) {
+        console.log(input)
         navigation.navigate('ProductListing', { search: input ?? 'View All', input: input ?? null })
         props.onModalToggle()
     }

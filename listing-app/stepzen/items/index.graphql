@@ -87,12 +87,17 @@ type Mutation {
     likesCount: Int = 0
   ): JSON
   @rest(
-      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
-      method: POST,
-  )
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
+    method: POST,
+  ) 
   likeItem(name: String!, likesCount: Int!): JSON 
   @rest(
-      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$name.json",
-      method: PATCH
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$name.json",
+    method: PATCH
+  )
+  deleteItem(id: String!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: DELETE
   )
 }

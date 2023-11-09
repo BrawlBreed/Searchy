@@ -1,7 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { FlatList, Image, TouchableOpacity, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { FlatList, Image, TouchableOpacity, View, RefreshControl } from 'react-native';
 import { LocationModal, MainHeader, TextDefault } from '../../../components';
 import SearchModal from '../../../components/Modal/SearchModal/SearchModal';
 import { alignment, colors } from '../../../utilities';
@@ -11,8 +10,8 @@ import useMainHome from '../../../hooks/useMainHome';
 import useCategories from '../../../hooks/useCategories';
 import { setZone } from '../../../store/reducers/Item/addItemSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import likeItem from '../../../hooks/likeItem';
 import { checkUserAuth } from '../../../store/reducers/User/userSlice';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const COLORS = ['#ffd54d', '#6df8f3', '#ff7a7a', '#d5b09f', '#eccbcb']
 
@@ -20,10 +19,25 @@ function MainHome() {
   const navigation = useNavigation()
   const [modalVisible, setModalVisible] = useState(false);
   const [searchVisible, setSerachVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const { zone, userId } = useSelector(state => state.addItem)
   const { isLoggedIn } = useSelector(state => state.user)
   const dispatch = useDispatch()
-  const { loading, error, items } = useMainHome(zone.zone);
+  const { refetch, loading, error, items } = useMainHome();
+
+
+  useEffect(() => {
+    refetch()
+  }, [])
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    refetch().then(() => {
+      setRefreshing(false);
+    }).catch(() => {
+      setRefreshing(false);
+    });
+  }, [refetch]);
 
   useEffect(() => {
     dispatch(checkUserAuth())
@@ -39,7 +53,7 @@ function MainHome() {
     })
   }, [navigation, zone.zone])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetch('https://geolocation-db.com/json/')
       .then(response => response.json())
       .then((data) => {
@@ -102,12 +116,15 @@ function MainHome() {
         error ? <TextDefault center>Грешка!</TextDefault> :
         categories.length === 0 ? emptyView() : 
         <>
-          <View style={styles.headerContainer}>
+          <ScrollView style={styles.headerContainer} 
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
             {categoryHeader()}
             <FlatList
               data={categories}
               keyExtractor={item => item.id}
               contentContainerStyle={styles.categoryContainer}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
               renderItem={({ item, index }) => (
@@ -129,7 +146,7 @@ function MainHome() {
                 </TouchableOpacity>
               )}
             />
-          </View>
+          </ScrollView>
           <View style={styles.spacer} />
           <View style={styles.headerTitle}>
             <TextDefault H5 bold>
@@ -155,6 +172,8 @@ function MainHome() {
               contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.containerBox, ...alignment.PBlarge }}
               keyExtractor={item => item.id}
               showsVerticalScrollIndicator={false}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
               ListEmptyComponent={emptyView}
               ListHeaderComponent={renderHeader}
               numColumns={2}

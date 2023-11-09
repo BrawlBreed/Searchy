@@ -65,7 +65,7 @@ type Mutation {
       endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users.json",
       method: POST
     )
-    changePhone(uid: String!, phone: String!): JSON 
+    changePhone(uid: String!, phone: String!, phoneCode: String!): JSON 
     @rest(
       endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
       method: PATCH

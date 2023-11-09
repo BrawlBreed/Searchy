@@ -134,9 +134,11 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
           email
           active
           name
-          notifications
+          notifications{
+            recommendations
+            specialOffers
+          }
           phone
-          showPhone
           likes
           followers
           following
@@ -158,3 +160,30 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
       }
     }
   }`
+
+export const GET_ZONES_QUERY = gql`
+  query getZones($userId: ID!) {
+    getUserById(user: $userId) {
+      _id
+      avatar
+      callingCode
+      createdAt
+      description
+      followers
+      following
+      active 
+      likes
+      name
+      notifications{
+        recommendations
+        specialOffers
+      }
+      phone
+    }
+  }
+`;
+export const DELETE_ITEM = gql`
+mutation MyMutation($id: String!) {
+    deleteItem(id: $id)
+}
+`;

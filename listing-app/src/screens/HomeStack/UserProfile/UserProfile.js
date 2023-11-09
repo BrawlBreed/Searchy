@@ -4,6 +4,7 @@ import { Image, View } from 'react-native'
 import { EmptyButton, RightButton, TextDefault } from '../../../components'
 import { alignment, colors } from '../../../utilities'
 import styles from './styles'
+import { dateStringToDDMMYYYY } from '../../../utilities/methods'
 
 function UserProfile({ route }) {
     const navigation = useNavigation()
@@ -56,7 +57,7 @@ function UserProfile({ route }) {
                     {name}
                 </TextDefault>
                 <TextDefault textColor={colors.fontSecondColor} bold style={[alignment.MBxSmall, alignment.PLsmall]} uppercase>
-                    {`Член от ${createdAt}`}
+                    {`Член от ${dateStringToDDMMYYYY(createdAt)}`}
                 </TextDefault>
                 <TextDefault textColor={colors.fontSecondColor} bold style={[alignment.MBxSmall, alignment.PLsmall, alignment.MTlarge]} uppercase>
                     Описание

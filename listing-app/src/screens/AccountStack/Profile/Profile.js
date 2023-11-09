@@ -4,15 +4,15 @@ import { Image, TouchableOpacity, View } from 'react-native'
 import { RightButton, TextDefault } from '../../../components'
 import { alignment, colors } from '../../../utilities'
 import styles from './styles'
-import useUser from '../../../hooks/useUser'
 import { useDispatch, useSelector } from 'react-redux'
-import { setCurrentUser } from '../../../store/reducers/User/userSlice'
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { GET_ZONES_QUERY } from '../../../apollo/server'
 
 function Profile() {
     const { userId, ...user } = useSelector(state => state.user)
-    const { data, error, loading } = useUser(userId)
     const { followers, following, avatar, name, email  } = user
     const navigation = useNavigation()
+    const [getZones, { loading, data, error }] = useLazyQuery(GET_ZONES_QUERY);
 
     const followersCount = followers.reduce((acc, curr) => {
         // Optimization with a query to check if the user is active
@@ -83,7 +83,7 @@ function Profile() {
                             onPress={() => navigation.navigate('EditProfile')}
                         >
                             <TextDefault textColor={colors.buttonbackground}>
-                                {'Edit Profile'}
+                                {'Редактирай профил'}
                             </TextDefault>
                         </TouchableOpacity>
                     </View>

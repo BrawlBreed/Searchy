@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     },
     locationText: {
         flex: 1,
+        color: colors.fontSecondColor,
         ...alignment.PLxSmall,
         ...alignment.PRxSmall
     },

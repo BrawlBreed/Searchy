@@ -7,11 +7,11 @@ import styles from './styles'
 import { Entypo, Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context'
-import useUser from '../../../hooks/useUser'
 import { changeDescription, changeName, setAvatar, setCurrentUser } from '../../../store/reducers/User/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { uploadImage } from '../../../firebase'
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { GET_ZONES_QUERY } from '../../../apollo/server'
 
 function EditProfile() {
     const navigation = useNavigation()
@@ -22,52 +22,41 @@ function EditProfile() {
     const [descriptionError, setDescriptionError] = useState(null)
     const [image, setImage] = useState(null)
     const dispatch = useDispatch()
-    const { userId } = useSelector(state => state.user)
-    const { uid, name, email, description, phone, phoneCode, avatar } = useSelector(state => state.user)
+    const  user = useSelector(state => state.user)
+    const { userId, uid, name, email, description, phone, phoneCode, avatar } = useSelector(state => state.user)
+    const [getUser, { loading, data, error }] = useLazyQuery(GET_ZONES_QUERY);
 
-    function handleSave() {
-        if (!name) {
-            setNameError('Името е задължително!')
-        }
-        else{
-            setNameError(null)
-        }
-        if (name && !nameError) {
-            mutateFunction()
-        }
-    }
-
-    const { loading, error, data } = useQuery(
-        gql`
-          query getZones($userId: ID!) {
-            getUserById(user: $userId) {
-              _id
-              avatar
-              callingCode
-              createdAt
-              description
-              email
-              followers
-              following
-              active
-              likes
-              name
-              notifications{
-                recommendations
-                specialOffers
-              }
-              phone
-            }
-          }
-        `,
-        { variables: { userId: userId } 
-      });
+    // const { loading, error, data } = useQuery(
+    //     gql`
+    //       query getZones($userId: ID!) {
+    //         getUserById(user: $userId) {
+    //           _id
+    //           avatar
+    //           callingCode
+    //           createdAt
+    //           description
+    //           followers
+    //           following
+    //           active 
+    //           likes
+    //           name
+    //           notifications{
+    //             recommendations
+    //             specialOffers
+    //           }
+    //           phone
+    //         }
+    //       }
+    //     `,
+    //     { variables: { userId: userId } 
+    //   });
   
     useEffect(() => {
-    if (data?.getUserById){
-        dispatch(setCurrentUser(data?.getUserById));
-    }
-    }, [data])
+        getUser({ variables: { userId: userId } });
+        if (data?.getUserById){
+            dispatch(setCurrentUser(data?.getUserById));
+        }
+    }, [mutateFunction])
 
     useEffect(() => {
         if(changeResponse?.data){
@@ -101,13 +90,13 @@ function EditProfile() {
           if (image) {
             updateAvatar();
           }
-        }, [image]);
-        
+    }, [image]);
+     
     useLayoutEffect(() => {
         navigation.setOptions({
             title: null,
             headerLeft: () => <LeftButton icon='close' iconColor={colors.headerText} />,
-            headerRight: () => <RightButton iconColor={colors.headerText} icon='text' title='Save' onPress={() => handleSave()}
+            headerRight: () => <RightButton iconColor={colors.headerText} icon='text' title='Запази' onPress={() => mutateFunction()}
             />
         })
     }, [navigation])
@@ -265,7 +254,7 @@ function EditProfile() {
                                 <Entypo name="chevron-small-right" size={scale(25)} color={colors.fontMainColor} />
                             </TouchableOpacity>
                             <TextDefault textColor={colors.fontSecondColor} style={[alignment.MTxSmall, alignment.MBsmall]}>
-                                {"This email will be useful to keep in touch. We won't share your private email with other APP users."}
+                                {"Този имейл е свързан със съществуващия Ви акаунт и можем да се свържем с Вас по него."}
                             </TextDefault>
                         </View>
                         {/* <View style={styles.basicInfoContainer}>

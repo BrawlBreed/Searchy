@@ -55,6 +55,7 @@ function ProductListing() {
                 ListHeaderComponent={headerView}
                 ItemSeparatorComponent={() => <View style={styles.spacer} />}
                 showsVerticalScrollIndicator={false}
+                ListEmptyComponent={() => <TextDefault style={styles.fontText} center>Няма намерени резултати</TextDefault>}
                 renderItem={({ item }) => (
                     <ProductCard {...item} />
                 )}

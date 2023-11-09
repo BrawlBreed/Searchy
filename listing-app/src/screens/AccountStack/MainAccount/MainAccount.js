@@ -6,14 +6,15 @@ import { EmptyButton, TextDefault } from '../../../components';
 import { alignment, colors, scale } from '../../../utilities';
 import styles from './styles';
 import { useDispatch, useSelector } from 'react-redux';
-import useUser from '../../../hooks/useUser';
 import { setCurrentUser } from '../../../store/reducers/User/userSlice';
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { GET_ZONES_QUERY } from '../../../apollo/server'
 
 function MainAccount() {   
     const { isLoggedIn, userId, ...user } = useSelector(state => state.user)
-    const { data, error, loading } = useUser(userId)
     const { name, avatar, email } = user
     const navigation = useNavigation()
+    const [getZones, { loading, data, error }] = useLazyQuery(GET_ZONES_QUERY);
     
     return (
         <View style={[styles.flex, styles.container]}>

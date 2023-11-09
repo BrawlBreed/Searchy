@@ -25,13 +25,15 @@ function EditPhone() {
     mutation MyMutation(
         $uid: String!,
         $phone: String!,
+        $phoneCode: String!
     ) {
-        changePhone( uid: $uid, phone: $phone )
+        changePhone( uid: $uid, phone: $phone, phoneCode: $phoneCode )
     }
     `, {
         variables: {
         uid: uid,
-        phone: phone
+        phone: phone,
+        phoneCode: phoneCode
         },
     })
 

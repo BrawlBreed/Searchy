@@ -13,6 +13,9 @@ import Slider from './Slider'
 import MapView, { Marker } from 'react-native-maps'
 import likeItem from '../../../hooks/likeItem'
 import { useSelector } from 'react-redux'
+import { DELETE_ITEM } from '../../../apollo/server'
+import { client } from '../../../apollo'
+import { dateStringToDDMMYYYY } from '../../../utilities/methods'
 
 function ProductDescription({ route, preview }) { 
     const { title, price, likesCount, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address } = route ? route.params : preview
@@ -21,6 +24,26 @@ function ProductDescription({ route, preview }) {
     const { isLoggedIn } = useSelector(state => state.user)
     const [reportModal, setReportModal] = useState(false);
     const { mutateFunction } = likeItem({name: id, likesCount: likesCount + isLike})
+ 
+    const deleteItem = async () => {
+        try {
+          const response = await client.mutate({
+            mutation: DELETE_ITEM,
+            variables: { id: id },
+          });
+          console.log('Item deleted:', response.data.deleteItem);
+          // Handle the success response here
+        } catch (error) {
+          console.error('Error deleting the item:', error);
+          // Handle the error response here
+        }
+    };
+    
+    useEffect(() => {
+        if(!user && route){
+            deleteItem()
+        }
+    }, [route])
 
     useEffect(() => {
         if(isLike === true) {
@@ -39,6 +62,7 @@ function ProductDescription({ route, preview }) {
     function toggleModal() {
         setReportModal(prev => !prev)
     }
+
     async function share() {
         try {
             const result = await Share.share({
@@ -67,12 +91,12 @@ function ProductDescription({ route, preview }) {
         else if (!Device.isDevice)
             FlashMessage({ message: 'This function is not working on Simulator/Emulator', type: 'warning' })
         else {
-            let phoneNumber = user.phone;
+            let phoneNumber = user?.phone;
             if (Platform.OS === 'android') {
-                phoneNumber = `tel:${user.phone}`;
+                phoneNumber = `tel:${user?.phone}`;
             }
             else {
-                phoneNumber = `telprompt:${user.phone}`;
+                phoneNumber = `telprompt:${user?.phone}`;
             }
 
             Linking.openURL(phoneNumber);
@@ -83,7 +107,7 @@ function ProductDescription({ route, preview }) {
         if (!isLoggedIn)
             navigation.navigate('Registration')
         else {
-            let url = `sms:${user.phone}${Platform.OS === "ios" ? "&" : "?"}body=${"This is sample text"}`
+            let url = `sms:${user?.phone}${Platform.OS === "ios" ? "&" : "?"}body=${"This is sample text"}`
 
             Linking.openURL(url);
         }
@@ -119,7 +143,7 @@ function ProductDescription({ route, preview }) {
                         )}
                         
                     </View>
-                    <TextDefault>
+                    <TextDefault style={{ fontSize: 20 }}>
                         {title}
                     </TextDefault>
                     <View style={styles.locationRow}>
@@ -127,8 +151,8 @@ function ProductDescription({ route, preview }) {
                         <TextDefault numberOfLines={1} style={styles.locationText}>
                             {route ? location : address.address}
                         </TextDefault>
-                        <TextDefault numberOfLines={1} uppercase>
-                            {createdAt.split('T')[0]}
+                        <TextDefault numberOfLines={1}>
+                            от {dateStringToDDMMYYYY(createdAt)}
                         </TextDefault>
                     </View>
                     <MapView initialRegion={{
@@ -179,40 +203,43 @@ function ProductDescription({ route, preview }) {
                     </TextDefault>
                 </View>
                 { route && (
-                    <>
-                        <TouchableOpacity
-                            borderless={false}
-                            style={styles.profileContainer}
-                            onPress={() => navigation.navigate('UserProfile', { ...user })}>
-                            <View style={styles.imageResponsive}>
-                                <Image
-                                    style={styles.image}
-                                    source={user.avatar}/>
-                            </View>
-                            <View style={styles.profileInfo}>
-                                <TextDefault bold>
-                                    {user.name}
-                                </TextDefault>
-                                <TextDefault light small>
-                                    {`Член от ${user.createdAt}`}
-                                </TextDefault>
-                                <TextDefault textColor={colors.spinnerColor} bold style={alignment.MTxSmall}>
-                                    {'Виж профил'}
-                                </TextDefault>
-                            </View>
-                            <Entypo name='chevron-small-right' size={scale(20)} color={colors.buttonbackground} />
-                        </TouchableOpacity>
-                        <View style={styles.profileContainer}>
-                            <TextDefault >
-                                {`ID на офертата:${id}`}
-                            </TextDefault>
-                            <TouchableOpacity activeOpacity={0.7} onPress={() => toggleModal()}>
-                                <TextDefault textColor={colors.spinnerColor} uppercase bold>
-                                    {'Report This AD'}
-                                </TextDefault>
+                    user && (
+                        <>
+                            <TouchableOpacity
+                                borderless={false}
+                                style={styles.profileContainer}
+                                onPress={() => navigation.navigate('UserProfile', { ...user })}>
+                                <View style={styles.imageResponsive}>
+                                    <Image
+                                        style={styles.image}
+                                        source={user.avatar}/>
+                                </View>
+                                <View style={styles.profileInfo}>
+                                    <TextDefault bold>
+                                        {user.name}
+                                    </TextDefault>
+                                    <TextDefault light small>
+                                        {`Член от ${dateStringToDDMMYYYY(user.createdAt)}`}
+                                    </TextDefault>
+                                    <TextDefault textColor={colors.spinnerColor} bold style={alignment.MTxSmall}>
+                                        {'Виж профил'}
+                                    </TextDefault>
+                                </View>
+                                <Entypo name='chevron-small-right' size={scale(20)} color={colors.buttonbackground} />
                             </TouchableOpacity>
-                        </View>
-                    </>
+                            <View style={styles.profileContainer}>
+                                <TextDefault >
+                                    {`ID на офертата:${id}`}
+                                </TextDefault>
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => toggleModal()}>
+                                    <TextDefault textColor={colors.spinnerColor} uppercase bold>
+                                        {'Report This AD'}
+                                    </TextDefault>
+                                </TouchableOpacity>
+                            </View>
+                        </>
+                    )
+                    
                 )}
 
 

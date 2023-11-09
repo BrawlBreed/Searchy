@@ -1,27 +1,25 @@
-// Single component
-import { gql, useQuery } from '@apollo/client';
+import { gql, useLazyQuery } from '@apollo/client';
 import { nearByItems } from '../apollo/server';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { resetForm } from '../store/reducers/Item/addItemSlice';
 
 const useMainHome = () => {
   const [items, setItems] = useState([]);
-  const { zone } = useSelector((state) => state.addItem); 
+  const { zone } = useSelector((state) => state.addItem);
   const prevZone = useRef(zone.zone); // Store the previous value of zone
 
-  const { loading, error, data, refetch } = useQuery(nearByItems, {
+  // useLazyQuery instead of useQuery
+  const [getNearByItems, { loading, error, data, refetch }] = useLazyQuery(nearByItems, {
     variables: { zone: zone.zone },
-    skip: !zone.zone,
-    key: zone.zone,
+    fetchPolicy: 'network-only', // Ensures fresh data is fetched
   });
 
   useEffect(() => {
     if (zone.zone && prevZone.current !== zone.zone) {
-      refetch();
+      getNearByItems(); // Execute the query manually
     }
     prevZone.current = zone.zone; // Update the previous value of zone
-  }, [zone, refetch]);
+  }, [zone, getNearByItems]);
 
   useEffect(() => {
     if (!data) return;
@@ -46,7 +44,8 @@ const useMainHome = () => {
     }
   }, [data, zone]);
 
-  return { loading, error, items };
+  // Expose the refetch function to allow manual refreshing of the query
+  return { loading, error, items, refetch: getNearByItems };
 };
 
 export default useMainHome;
