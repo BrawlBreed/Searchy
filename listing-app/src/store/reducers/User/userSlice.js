@@ -80,6 +80,7 @@ const userSlice = createSlice({
       state.emailChanged = action.payload;
     },
     setCurrentUser: (state, action) => {
+      console.log('User set')
       Object.assign(state, { ...action.payload, createdAt: dateStringToDDMMYYYY(action.payload.createdAt), email: auth.currentUser.email });
     },
     setUserId: (state, action) => { 
@@ -118,7 +119,16 @@ const userSlice = createSlice({
     },
     setAvatar: (state, action) => {
       state.avatar = action.payload;
-    }
+    },
+    appendFavorites: (state, action) => {
+      const itemExists = state.favorites.some(favorite => favorite === action.payload);
+      if (!itemExists) {
+        state.favorites.push(action.payload);
+      }
+    },
+    removeFavorite: (state, action) => {
+      state.favorites = state.favorites.filter((favorite) => favorite !== action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -148,7 +158,9 @@ export const {
   setAvatar,
   changePhone,
   setAwaitingEmailVerification,
-  setEmailChanged
+  setEmailChanged,
+  appendFavorites,
+  removeFavorite,
 } = userSlice.actions;
 
 export default userSlice.reducer;

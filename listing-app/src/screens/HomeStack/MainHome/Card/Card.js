@@ -5,13 +5,10 @@ import { Image, TouchableOpacity, View } from 'react-native';
 import { TextDefault } from '../../../../components';
 import { colors, scale } from '../../../../utilities';
 import styles from '../styles';
-import likeItem from '../../../../hooks/likeItem';
  
 function Card(props) {
     const navigation = useNavigation()
     const [isLike, isLikeSetter] = useState(null) 
-
-    const { mutateFunction } = likeItem({name: props.id, likesCount: props.likesCount + isLike})
 
     useEffect(() => {
         if(isLike === true) {

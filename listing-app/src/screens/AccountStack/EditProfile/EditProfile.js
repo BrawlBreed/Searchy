@@ -25,31 +25,6 @@ function EditProfile() {
     const  user = useSelector(state => state.user)
     const { userId, uid, name, email, description, phone, phoneCode, avatar } = useSelector(state => state.user)
     const [getUser, { loading, data, error }] = useLazyQuery(GET_ZONES_QUERY);
-
-    // const { loading, error, data } = useQuery(
-    //     gql`
-    //       query getZones($userId: ID!) {
-    //         getUserById(user: $userId) {
-    //           _id
-    //           avatar
-    //           callingCode
-    //           createdAt
-    //           description
-    //           followers
-    //           following
-    //           active 
-    //           likes
-    //           name
-    //           notifications{
-    //             recommendations
-    //             specialOffers
-    //           }
-    //           phone
-    //         }
-    //       }
-    //     `,
-    //     { variables: { userId: userId } 
-    //   });
   
     useEffect(() => {
         getUser({ variables: { userId: userId } });

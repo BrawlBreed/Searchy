@@ -10,9 +10,8 @@ import useMainHome from '../../../hooks/useMainHome';
 import useCategories from '../../../hooks/useCategories';
 import { setZone } from '../../../store/reducers/Item/addItemSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkUserAuth } from '../../../store/reducers/User/userSlice';
+import { checkUserAuth, setCurrentUser } from '../../../store/reducers/User/userSlice';
 import { ScrollView } from 'react-native-gesture-handler';
-
 const COLORS = ['#ffd54d', '#6df8f3', '#ff7a7a', '#d5b09f', '#eccbcb']
 
 function MainHome() {
@@ -21,14 +20,9 @@ function MainHome() {
   const [searchVisible, setSerachVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { zone, userId } = useSelector(state => state.addItem)
-  const { isLoggedIn } = useSelector(state => state.user)
+  const { favorites } = useSelector(state => state.user)
   const dispatch = useDispatch()
   const { refetch, loading, error, items } = useMainHome();
-
-
-  useEffect(() => {
-    refetch()
-  }, [])
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -43,10 +37,6 @@ function MainHome() {
     dispatch(checkUserAuth())
   }, [])
 
-  useEffect(() => {
-    console.log(error)
-  }, [error])
-  
   useLayoutEffect(() => {
     navigation.setOptions({
       header: () => <MainHeader onModalToggle={toggleModal} toggleSearch={toggleSearch} locationText={zone.zone} />

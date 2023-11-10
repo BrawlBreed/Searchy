@@ -55,6 +55,7 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
           likes
           followers
           following
+          favorites
         }
       }
       name
@@ -171,6 +172,7 @@ export const GET_ZONES_QUERY = gql`
       description
       followers
       following
+      favorites
       active 
       likes
       name
@@ -183,7 +185,17 @@ export const GET_ZONES_QUERY = gql`
   }
 `;
 export const DELETE_ITEM = gql`
-mutation MyMutation($id: String!) {
+  mutation MyMutation($id: String!) {
     deleteItem(id: $id)
-}
+  }
+`;
+export const ADD_TO_FAVORITES = gql`
+  mutation MyMutation($uid: String!, $favorites: [String!]) {
+    addToFavorites(uid: $uid, favorites: $favorites, )
+  }
+`;
+export const LIKE_ITEM_MUTATION = gql`
+    mutation MyMutation($likesCount: Int!, $name: String!) {
+        likeItem(likesCount: $likesCount, name: $name)
+    }
 `;

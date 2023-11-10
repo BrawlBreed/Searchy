@@ -11,19 +11,77 @@ import { BorderlessButton } from 'react-native-gesture-handler'
 import * as Device from 'expo-device';
 import Slider from './Slider'
 import MapView, { Marker } from 'react-native-maps'
-import likeItem from '../../../hooks/likeItem'
-import { useSelector } from 'react-redux'
-import { DELETE_ITEM } from '../../../apollo/server'
+import { useDispatch, useSelector } from 'react-redux'
+import { ADD_TO_FAVORITES, DELETE_ITEM, GET_ZONES_QUERY, LIKE_ITEM_MUTATION } from '../../../apollo/server'
 import { client } from '../../../apollo'
 import { dateStringToDDMMYYYY } from '../../../utilities/methods'
+import { appendFavorites, removeFavorite, setFavorites } from '../../../store/reducers/User/userSlice'
+import { useLazyQuery } from '@apollo/client'
 
 function ProductDescription({ route, preview }) { 
     const { title, price, likesCount, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address } = route ? route.params : preview
     const [isLike, isLikeSetter] = useState(isLike)
     const navigation = useNavigation()
-    const { isLoggedIn } = useSelector(state => state.user)
+    const { isLoggedIn, uid, favorites } = useSelector(state => state.user)
     const [reportModal, setReportModal] = useState(false);
-    const { mutateFunction } = likeItem({name: id, likesCount: likesCount + isLike})
+    const [fetched, setFetched] = useState(false)
+    const [getUser] = useLazyQuery(GET_ZONES_QUERY);
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        isLikeSetter(favorites.some(favorite => favorite === id));
+    }, [favorites, id])
+
+    const likeItem = async () => {
+        try {    
+            // Perform the mutation
+            const response = await client.mutate({
+                mutation: LIKE_ITEM_MUTATION,
+                variables: {
+                    name: id,
+                    likesCount: likesCount
+                },
+            });
+    
+            return response.data.likeItem;
+        } catch (error) {
+            console.error('Error liking the item:', error);
+            throw error;
+        }
+    };
+
+    useEffect(() => {
+        const fetchUser = async () => {
+          try {
+            const response = await getUser({ variables: { userId: uid } });
+            if (response.data?.getUserById) {
+              return response.data.getUserById;
+            }
+          } catch (error) {
+            console.error('Error fetching user:', error);
+          }
+        };
+      
+        fetchUser().then(user => {
+          if (user?.favorites) {
+            dispatch(setFavorites(user.favorites));
+            setFetched(true)
+          }
+        });
+    }, [dispatch, getUser, uid]);
+              
+    const addToFavourites = async () => {
+        try{
+            console.log('Favorites: ', favorites)
+            const response = await client.mutate({
+                mutation: ADD_TO_FAVORITES,
+                variables: { uid: uid , favorites: favorites },
+            });
+        }catch (error) {
+            console.error('Error adding item to favourites:', error);
+            // Handle the error response here
+        }
+    }
  
     const deleteItem = async () => {
         try {
@@ -46,10 +104,26 @@ function ProductDescription({ route, preview }) {
     }, [route])
 
     useEffect(() => {
-        if(isLike === true) {
-            mutateFunction()
-        }else if(isLike === false) {
-            mutateFunction() 
+        if(fetched){
+            addToFavourites() 
+        }
+    }, [likeItem])
+
+    useEffect(() => {
+        console.log(user)
+        if(isLike === true && isLoggedIn) {
+            likeItem()
+            dispatch(appendFavorites(id))
+        }else if(isLike === false && isLoggedIn) {
+            likeItem() 
+            dispatch(removeFavorite(id))
+        }else if(isLike === true && !isLoggedIn) {
+            isLikeSetter(false)
+            navigation.navigate('Registration')
+        }
+        else if(isLike === false && !isLoggedIn) {
+            isLikeSetter(false)
+            navigation.navigate('Registration')
         }
     }, [isLike])
     
@@ -131,7 +205,9 @@ function ProductDescription({ route, preview }) {
                             {price} лв.
                         </TextDefault>
                         { route && (
-                            <TouchableOpacity activeOpacity={0} onPress={() => isLikeSetter(prev => !prev)}>
+                            <TouchableOpacity activeOpacity={0} onPress={() => {
+                                isLikeSetter(prev => !prev)}
+                            }>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             {isLike ? 
                                 <FontAwesome name="heart" size={scale(20)} color="black" /> :

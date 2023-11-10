@@ -80,5 +80,9 @@ type Mutation {
       endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
       method: PATCH
     )
-
+    addToFavorites(uid: String!, favorites: [String!]): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
 }
