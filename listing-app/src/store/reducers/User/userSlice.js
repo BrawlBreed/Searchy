@@ -67,6 +67,7 @@ export const initialState = {
   awaitingEmailVerification: false,
   emailChanged: false,
   userId: '', // Add uid to the state
+  changed: false,
 };
 
 const userSlice = createSlice({
@@ -129,6 +130,12 @@ const userSlice = createSlice({
     removeFavorite: (state, action) => {
       state.favorites = state.favorites.filter((favorite) => favorite !== action.payload);
     },
+    setOwnedItems: (state, action) => {
+      state.ownedItems = action.payload;
+    },
+    changeOwnedItems: (state) => {
+      state.changed = !state.changed;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -161,6 +168,8 @@ export const {
   setEmailChanged,
   appendFavorites,
   removeFavorite,
+  changeOwnedItems,
+  setOwnedItems
 } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -32,7 +32,7 @@ function MainHome() {
       setRefreshing(false);
     });
   }, [refetch]);
-
+ 
   useEffect(() => {
     dispatch(checkUserAuth())
   }, [])
@@ -168,7 +168,7 @@ function MainHome() {
               ListHeaderComponent={renderHeader}
               numColumns={2}
               renderItem={({ item }) => (
-                <Card {...item} />
+                <Card {...item} /> 
               )}
             />
 

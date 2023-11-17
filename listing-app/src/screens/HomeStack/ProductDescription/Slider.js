@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Entypo } from '@expo/vector-icons';
 import { Image, View } from 'react-native';
 import Swiper from 'react-native-swiper';
@@ -19,7 +19,9 @@ function Slider(props) {
                   <Entypo name="trash" 
                   style={{zIndex: 100,alignContent: 'center',alignItems: 'center',alignSelf: 'center',position: 'absolute',}} 
                   size={100} color="#ed6d6b"
-                    onPress={() => dispatch(removeImage(i))}
+                    onPress={() => {
+                      dispatch(removeImage(i))
+                    }}
                 />
               )}
               <Image

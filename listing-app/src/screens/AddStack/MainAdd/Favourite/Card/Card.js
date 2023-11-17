@@ -1,6 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import { TextDefault } from '../../../../../components';
 import { colors, scale } from '../../../../../utilities';
@@ -11,10 +11,10 @@ function Card(props) {
     return (
         <TouchableOpacity activeOpacity={1}
             style={styles.productCardContainer}
-            onPress={() => navigation.navigate('ProductDescription')}>
+            onPress={() => navigation.navigate('ProductDescription', { ...props, id: props._id })}>
             <View style={styles.topCardContainer}>
                 <Image
-                    source={props.image}
+                    source={{ uri: props.images[0] }}
                     resizeMode="cover"
                     style={styles.imgResponsive}
                 />
@@ -27,8 +27,8 @@ function Card(props) {
                 <TextDefault numberOfLines={2} textColor={colors.fontMainColor}>
                     {props.title}
                 </TextDefault>
-                <TextDefault textColor={colors.fontMainColor}>
-                    {props.price}
+                <TextDefault style={{ fontWeight: 'bold' }} textColor={colors.fontMainColor}>
+                    {props.price} лв.
                 </TextDefault>
             </View>
         </TouchableOpacity>

@@ -39,7 +39,7 @@ function LocationConfirm() {
                 console.log("No address found");
             }
         });
-    }, [coordinates])
+    }, [coordinates]) 
 
     function toggleModal() {
         setModalVisible(prev => !prev)

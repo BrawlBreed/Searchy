@@ -14,6 +14,8 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
         title
         images
         zoneId
+        promoted
+        views
         zone {
           zone
           coordinates {
@@ -98,10 +100,12 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
         itemId
         likesCount
         price
+        promoted
         status
         title
         images
         zoneId
+        views
         zone {
           zone
           coordinates {
@@ -173,6 +177,7 @@ export const GET_ZONES_QUERY = gql`
       followers
       following
       favorites
+      ownedItems
       active 
       likes
       name
@@ -199,3 +204,92 @@ export const LIKE_ITEM_MUTATION = gql`
         likeItem(likesCount: $likesCount, name: $name)
     }
 `;
+export const GET_ITEM_BY_ID = gql`
+  query MyQuery($id: String!) {
+    getItemById(id: $id) {
+        _id
+        condition
+        createdAt
+        description
+        itemId
+        promoted
+        likesCount
+        price
+        status
+        title
+        images
+        zoneId
+        views
+        zone {
+          zone
+          coordinates {
+            longitude 
+            latitude
+          }
+        }
+        subCategory {
+          _id
+          parentCategoryId
+          title
+          category {
+            _id
+            image
+            title
+          }
+        }
+        address {
+          address
+            coordinates{
+              latitude
+              longitude
+            }
+        }
+        user {
+          _id
+          avatar
+          description
+          callingCode
+          createdAt
+          email
+          active
+          name
+          notifications{
+            recommendations
+            specialOffers
+          }
+          phone
+          likes
+          followers
+          following
+        }
+    }
+  }
+`;
+
+export const ADD_OWNED_ITEM = gql`
+  mutation MyMutation($uid: String!, $ownedItems: [String!]) {
+    addOwnedItem( uid: $uid, ownedItems: $ownedItems)
+  }
+`;
+
+export const ADD_ID_TO_ITEM = gql`
+  mutation MyMutation($id: String!, $_id: String!) {
+    addIdToItem(id: $id, _id: $_id)
+  }
+`;
+
+export const EDIT_ITEM = gql`
+  mutation MyMutation($id: String!, $title: String!, $description: String!, $price: Float!, $condition: String!, $images: [String!]!, $address: AddressInput!) {
+    editItem(id: $id, title: $title, description: $description, price: $price, condition: $condition, images: $images, address: $address)
+  }
+`
+export const INCREMENT_VIEWS = gql`
+  mutation MyMutation($id: String!, $views: Float!) {
+    incrementViewCount(id: $id, views: $views)
+  }
+`
+export const DEACTIVATE_ITEM = gql`
+  mutation MyMutation($id: String!, $status: String!) {
+    deactivateItem(id: $id, status: $status)
+  }
+`

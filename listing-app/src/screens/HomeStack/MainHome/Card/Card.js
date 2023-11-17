@@ -10,13 +10,13 @@ function Card(props) {
     const navigation = useNavigation()
     const [isLike, isLikeSetter] = useState(null) 
 
-    useEffect(() => {
-        if(isLike === true) {
-            mutateFunction()
-        }else if(isLike === false) {
-            mutateFunction()
-        }
-    }, [isLike])
+    // useEffect(() => {
+    //     if(isLike === true) {
+    //         mutateFunction()
+    //     }else if(isLike === false) {
+    //         mutateFunction()
+    //     }
+    // }, [isLike])
 
     return (
         <TouchableOpacity activeOpacity={1}
@@ -24,7 +24,7 @@ function Card(props) {
             onPress={() => navigation.navigate('ProductDescription', { ...props, isLike, isLikeSetter })}>
             <View style={styles.topCardContainer}>
                 <Image
-                    source={{ uri: props.images[0] }}
+                    source={{ uri: props.image }}
                     resizeMode="cover"
                     style={styles.imgResponsive}
                 />

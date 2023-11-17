@@ -28,12 +28,13 @@ const addItem = () => {
                 description: $description
                 images: $images
                 price: $price
-                status: "Pending"
+                status: "active"
                 subCategoryId: $subCategoryId
                 title: $title
                 userId: $userId
                 zoneId: $zoneId
                 likesCount: 0
+                views: 0
                 address: $address
             )
         }

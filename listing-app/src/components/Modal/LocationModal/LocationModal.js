@@ -46,14 +46,15 @@ function LocationModal(props) {
 
     useEffect(() => {
         setZones(data?.getZones.filter((item) => {
-            return item.value.zone.toLowerCase().includes(input.toLowerCase())
+            return item.value.zone?.toLowerCase().includes(input?.toLowerCase())
         }))
-    }, [input])
+    }, [input]) 
 
     function btnLocation(zone) {
+        console.log('pressed')
         dispatch(setZoneId(zone.name))
         dispatch(setZone({
-            zone: zone.zone,
+            zone: zone.zone, 
             coordinates: zone.coordinates
         }))
         props.onModalToggle()

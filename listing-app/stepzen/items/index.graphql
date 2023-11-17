@@ -15,7 +15,9 @@ type Item {
   images: [String]
   itemId: String
   likesCount: Int
+  views: Float
   price: Float
+  promoted: Boolean
   status: String
   title: String
   subCategoryId: String
@@ -82,14 +84,21 @@ type Mutation {
     subCategoryId: String!,
     title: String!,
     userId: String!,
+    promoted: Boolean = false,
     zoneId: String!,
     address: AddressInput!,
     likesCount: Int = 0
+    views: Float = 0
   ): JSON
   @rest(
     endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
     method: POST,
   ) 
+  addIdToItem(id: String!, _id: String!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: PATCH
+  )
   likeItem(name: String!, likesCount: Int!): JSON 
   @rest(
     endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$name.json",
@@ -99,5 +108,20 @@ type Mutation {
   @rest(
     endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
     method: DELETE
+  )
+  editItem(id: String!, title: String!, description: String!, price: Float!, images: [String!]!, condition: String!, address: AddressInput!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: PATCH
+  )
+  incrementViewCount(id: String!, views: Float!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: PATCH
+  )
+  deactivateItem(id: String!, status: String!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: PATCH
   )
 }

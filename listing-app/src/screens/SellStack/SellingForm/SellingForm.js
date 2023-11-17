@@ -39,7 +39,7 @@ function SellingForm({ route }) {
     const [errors, setErrors] = useState(initalState)
     const state = useSelector(state => state.addItem)
     const { title, description, condition, price } = state
-    const dispatch = useDispatch();
+    const dispatch = useDispatch(); 
 
     useEffect(() => {
         Keyboard.addListener("keyboardDidShow", _keyboardDidShow);

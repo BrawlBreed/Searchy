@@ -1,45 +1,24 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, View, TouchableOpacity, FlatList, Modal } from 'react-native';
 import { AddFilter, EmptyButton, TextDefault } from '../../../../components';
 import { alignment, colors, scale } from '../../../../utilities';
 import styles from './styles';
 import { Feather, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons'
-
+import useOwnedItems from '../../../../hooks/useOwnedItems';
 import Card from './Card';
+import { useDispatch, useSelector } from 'react-redux';
 
-const dataList = [
-    {
-        status: 'ACTIVE',
-        title: 'Japanese 28 inches cycle',
-        price: 'RS: 20,000',
-        img: require('../../../../assets/images/products/cycle.jpg'),
-        views: 9,
-        likes: 0,
-        postingDate: '29 Sep 2020',
-        endingDate: '29 OCT 2020'
-    },
-    {
-        status: 'PENDING',
-        title: 'Japanese 28 inches cycle',
-        price: 'RS: 20,000',
-        img: require('../../../../assets/images/products/cycle.jpg'),
-        views: 0,
-        likes: 0,
-        postingDate: '29 Sep 2020',
-        endingDate: '29 OCT 2020'
-    }
-]
 
-function Ads() {
+function Ads() { 
     const navigation = useNavigation()
     const [visible, setVisible] = useState(false)
+    const { changed } = useSelector(state => state.user)
+    const { items, loading, error } = useOwnedItems(navigation);
 
     function onModalToggle() {
         setVisible(prev => !prev)
     }
-
-    
 
     function emptyView() {
         return (
@@ -49,13 +28,13 @@ function Ads() {
                     source={require('../../../../assets/images/emptyView/ads.png')}
                 />
                 <TextDefault H4 center bold style={alignment.MTlarge}>
-                    {"You haven't listed anything yet."}
+                    {"Все още нямаш обяви."}
                 </TextDefault>
                 <TextDefault H5 center light style={alignment.MTsmall}>
-                    {"Let go of what you don't use anymore"}
+                    {"Излишни вещи или идея за продукт? Продавай чрез нас ги сега!"}
                 </TextDefault>
                 <EmptyButton
-                    title='Start selling'
+                    title='Продай сега'
                     onPress={() => navigation.navigate('Sell', { screen: 'Home' })}
                 />
             </View>
@@ -67,7 +46,7 @@ function Ads() {
             <TouchableOpacity style={styles.smallContainer}
                 onPress={onModalToggle}>
                 <TextDefault bolder H5 style={alignment.PRsmall}>
-                    {`View All (${dataList.length})`}
+                    {`Виж всички (${items.length})`}
                 </TextDefault>
                 <Feather name="chevron-down" size={scale(15)} color={colors.fontSecondColor} />
             </TouchableOpacity>
@@ -77,7 +56,7 @@ function Ads() {
     return (
         <View style={[styles.flex, styles.mainContainer]}>
             <FlatList
-                data={dataList}
+                data={items}
                 style={styles.flex}
                 contentContainerStyle={{ flexGrow: 1 }}
                 showsVerticalScrollIndicator={false}
@@ -86,11 +65,11 @@ function Ads() {
                 keyExtractor={(item, index) => index.toString()}
                 stickyHeaderIndices={[0]}
                 renderItem={({ item, index }) => (
-                    <Card {...item} />
+                    <Card navigation={navigation} {...item} />
                 )}
             />
 
-            <AddFilter visible={visible} onModalToggle={onModalToggle} active={dataList.length} />
+            <AddFilter visible={visible} onModalToggle={onModalToggle} active={items.length} />
         </View>
     )
 }

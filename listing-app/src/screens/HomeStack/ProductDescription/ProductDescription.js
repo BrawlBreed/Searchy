@@ -12,25 +12,21 @@ import * as Device from 'expo-device';
 import Slider from './Slider'
 import MapView, { Marker } from 'react-native-maps'
 import { useDispatch, useSelector } from 'react-redux'
-import { ADD_TO_FAVORITES, DELETE_ITEM, GET_ZONES_QUERY, LIKE_ITEM_MUTATION } from '../../../apollo/server'
+import { ADD_TO_FAVORITES, GET_ZONES_QUERY, INCREMENT_VIEWS, LIKE_ITEM_MUTATION } from '../../../apollo/server'
 import { client } from '../../../apollo'
 import { dateStringToDDMMYYYY } from '../../../utilities/methods'
 import { appendFavorites, removeFavorite, setFavorites } from '../../../store/reducers/User/userSlice'
 import { useLazyQuery } from '@apollo/client'
 
-function ProductDescription({ route, preview }) { 
-    const { title, price, likesCount, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address } = route ? route.params : preview
+function ProductDescription({ route, preview }) {  
+    const { title, price, likesCount, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address, views } = route ? route?.params : preview
     const [isLike, isLikeSetter] = useState(isLike)
-    const navigation = useNavigation()
+    const navigation = useNavigation() 
     const { isLoggedIn, uid, favorites } = useSelector(state => state.user)
     const [reportModal, setReportModal] = useState(false);
-    const [fetched, setFetched] = useState(false)
+    const [fetched, setFetched] = useState(false);
     const [getUser] = useLazyQuery(GET_ZONES_QUERY);
-    const dispatch = useDispatch()
-
-    useEffect(() => {
-        isLikeSetter(favorites.some(favorite => favorite === id));
-    }, [favorites, id])
+    const dispatch = useDispatch();
 
     const likeItem = async () => {
         try {    
@@ -39,7 +35,7 @@ function ProductDescription({ route, preview }) {
                 mutation: LIKE_ITEM_MUTATION,
                 variables: {
                     name: id,
-                    likesCount: likesCount
+                    likesCount: likesCount + isLike
                 },
             });
     
@@ -55,7 +51,7 @@ function ProductDescription({ route, preview }) {
           try {
             const response = await getUser({ variables: { userId: uid } });
             if (response.data?.getUserById) {
-              return response.data.getUserById;
+                return response.data.getUserById;
             }
           } catch (error) {
             console.error('Error fetching user:', error);
@@ -63,69 +59,58 @@ function ProductDescription({ route, preview }) {
         };
       
         fetchUser().then(user => {
-          if (user?.favorites) {
-            dispatch(setFavorites(user.favorites));
-            setFetched(true)
-          }
+            if (user?.favorites) {
+                dispatch(setFavorites(user.favorites));
+                isLikeSetter(user.favorites.includes(id));
+                setFetched(true);
+            }
         });
     }, [dispatch, getUser, uid]);
               
-    const addToFavourites = async () => {
-        try{
-            console.log('Favorites: ', favorites)
-            const response = await client.mutate({
-                mutation: ADD_TO_FAVORITES,
-                variables: { uid: uid , favorites: favorites },
-            });
-        }catch (error) {
-            console.error('Error adding item to favourites:', error);
-            // Handle the error response here
-        }
-    }
- 
-    const deleteItem = async () => {
-        try {
-          const response = await client.mutate({
-            mutation: DELETE_ITEM,
-            variables: { id: id },
-          });
-          console.log('Item deleted:', response.data.deleteItem);
-          // Handle the success response here
-        } catch (error) {
-          console.error('Error deleting the item:', error);
-          // Handle the error response here
-        }
-    };
-    
     useEffect(() => {
-        if(!user && route){
-            deleteItem()
+        // Do nothing if not logged in
+        if (!isLoggedIn) return;
+
+        const toggleFavorite = async () => {
+            if(!fetched) return
+            try {
+                const response = await likeItem();
+                if(!fetched) return
+                if (!response) return;
+                if (isLike) {
+                    await client.mutate({
+                        mutation: ADD_TO_FAVORITES,
+                        variables: { uid: uid, favorites: [...favorites, id] },
+                    });
+                    dispatch(appendFavorites(id));
+                } else {
+                    const newFavorites = favorites?.filter(favorite => favorite !== id);
+                    await client.mutate({
+                        mutation: ADD_TO_FAVORITES,
+                        variables: { uid: uid, favorites: newFavorites },
+                    });
+                    dispatch(removeFavorite(id));
+                }
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+            }
+        };
+
+        // If fetched is true, call the function to toggle favorite
+        if (fetched) {
+            toggleFavorite();
+        }
+    }, [isLike]);
+
+    useEffect(() => {
+        if(uid !== user?._id){
+            client.mutate({
+                mutation: INCREMENT_VIEWS,
+                variables: { id: id, views: Number(views + 1)}
+            })
+
         }
     }, [route])
-
-    useEffect(() => {
-        if(fetched){
-            addToFavourites() 
-        }
-    }, [likeItem])
-
-    useEffect(() => {
-        console.log(user)
-        if(isLike === true && isLoggedIn) {
-            likeItem()
-            dispatch(appendFavorites(id))
-        }else if(isLike === false && isLoggedIn) {
-            likeItem() 
-            dispatch(removeFavorite(id))
-        }else if(isLike === true && !isLoggedIn) {
-            isLikeSetter(false)
-            navigation.navigate('Registration')
-        }
-        else if(isLike === false && !isLoggedIn) {
-            isLikeSetter(false)
-            navigation.navigate('Registration')
-        }
-    }, [isLike])
     
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -213,7 +198,7 @@ function ProductDescription({ route, preview }) {
                                 <FontAwesome name="heart" size={scale(20)} color="black" /> :
                                 <FontAwesome name="heart-o" size={scale(20)} color="black" />
                             }
-                            <TextDefault style={{ marginLeft: 5 }}>{isLike ? likesCount + 1 : likesCount}</TextDefault>
+                            <TextDefault style={{ marginLeft: 5 }}>{likesCount + isLike}</TextDefault>
                             </View>
                         </TouchableOpacity>
                         )}
@@ -227,9 +212,12 @@ function ProductDescription({ route, preview }) {
                         <TextDefault numberOfLines={1} style={styles.locationText}>
                             {route ? location : address.address}
                         </TextDefault>
-                        <TextDefault numberOfLines={1}>
-                            от {dateStringToDDMMYYYY(createdAt)}
-                        </TextDefault>
+                        {route && (
+                            <TextDefault numberOfLines={1}>
+                                от {dateStringToDDMMYYYY(createdAt)}
+                            </TextDefault>
+                        )}
+                        
                     </View>
                     <MapView initialRegion={{
                             latitude: address.coordinates.latitude,
@@ -258,7 +246,7 @@ function ProductDescription({ route, preview }) {
                             {'Състояние'}
                         </TextDefault>
                         <TextDefault bold style={alignment.MBsmall}>
-                            {condition.toLowerCase() === 'new' ? 'Ново' : 'Използвано'}
+                            {condition?.toLowerCase() === 'new' ? 'Ново' : 'Използвано'}
                         </TextDefault>
                     </View>
                     <View style={styles.row}>

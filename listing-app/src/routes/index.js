@@ -7,7 +7,7 @@
  import { colors, scale } from '../utilities';
  import { StackOptions, tabIcon, tabOptions, TopBarOptions } from './screenOptions';
 import { useSelector } from 'react-redux';
-
+import EditAd from '../screens/AddStack/MainAdd/Ads/EditAd';
 
  const Tabs = createBottomTabNavigator()
  const MainStack = createStackNavigator()
@@ -21,6 +21,7 @@ import { useSelector } from 'react-redux';
  const AccountTOP = createBottomTabNavigator()
  const ChatTOP = createBottomTabNavigator()
  const AdsTOP = createBottomTabNavigator()
+ const AdStack = createStackNavigator();
 
 function NetworkTabs() {
     return (
@@ -34,12 +35,21 @@ function NetworkTabs() {
 function AdsTabs() {
     return (
         <AdsTOP.Navigator initialRouteName='Ads' tabBarOptions={TopBarOptions()}>
-            <AdsTOP.Screen name='Ads' component={AddScreens.Ads} />
-            <AdsTOP.Screen name='Favourite' component={AddScreens.Favourite} />
-        </AdsTOP.Navigator>
+            <AdsTOP.Screen name='Моите Обяви' component={AddScreens.Ads} />
+            <AdsTOP.Screen name='Любими' component={AddScreens.Favourite} />
+        </AdsTOP.Navigator>        
     )
 }
 
+function AdStackScreen() {
+    return (
+      <AdStack.Navigator>
+        <AdStack.Screen name="Ads" component={AddScreens.Ads} />
+        <AdStack.Screen name="EditAd" component={EditAd} />
+      </AdStack.Navigator>
+    );
+  }
+  
 function InboxTabs() {
     return (
         <ChatTOP.Navigator initialRouteName='All'
@@ -110,7 +120,7 @@ function AddTabs() {
     return (
         <AddStack.Navigator initialRouteName='MainAds' screenOptions={StackOptions()}>
             <AddStack.Screen name='MainAds' component={AdsTabs} options={{
-                title: 'MY ADS',
+                title: 'Обяви',
                 headerStyle: {
                     backgroundColor: colors.headerbackground,
                 },
@@ -125,7 +135,6 @@ function EditAccount() {
             <EditAccountStack.Screen name='EditPhone' component={AccountScreens.EditPhone} />
             <EditAccountStack.Screen name='EditEmail' component={AccountScreens.EditEmail} />
         </EditAccountStack.Navigator>
-
     )
 }
 function AccountTabs() {
@@ -180,6 +189,7 @@ function AppContainer() {
                 <MainStack.Screen name='Registration' component={AccountScreens.Registration} options={{ headerShown: false }} />
                 <MainStack.Screen name='Entry' component={AccountScreens.Entry} options={{ headerShown: false }}/>
                 <MainStack.Screen name='ForgotPassword' component={AccountScreens.ForgotPassword}  options={{ headerShown: false }}/>
+                <MainStack.Screen name='EditAd' component={EditAd}/>
                 <MainStack.Screen name='FilterModal' component={FilterScreen} options={{
                     headerShown: false,
                     ...TransitionPresets.ModalSlideFromBottomIOS

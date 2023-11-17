@@ -1,25 +1,51 @@
 import { gql, useLazyQuery } from '@apollo/client';
-import { nearByItems } from '../apollo/server';
+import { GET_ZONES_QUERY, nearByItems } from '../apollo/server';
 import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setFavorites, setOwnedItems } from '../store/reducers/User/userSlice';
 
 const useMainHome = () => {
   const [items, setItems] = useState([]);
   const { zone } = useSelector((state) => state.addItem);
+  const { uid } = useSelector((state) => state.user);
+  const dispatch = useDispatch(); 
   const prevZone = useRef(zone.zone); // Store the previous value of zone
-
-  // useLazyQuery instead of useQuery
   const [getNearByItems, { loading, error, data, refetch }] = useLazyQuery(nearByItems, {
     variables: { zone: zone.zone },
     fetchPolicy: 'network-only', // Ensures fresh data is fetched
   });
+  const [getUser] = useLazyQuery(GET_ZONES_QUERY);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await getUser({ variables: { userId: uid } });
+        if (response.data?.getUserById) {
+          return response.data.getUserById;
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+  
+    fetchUser().then(user => {
+      if (user?.favorites) {
+        dispatch(setFavorites(user.favorites));
+      }
+      if(user?.ownedItems){
+        dispatch(setOwnedItems(user.ownedItems));
+      }
+    });
+  }, [dispatch, getUser, uid]);
 
   useEffect(() => {
     if (zone.zone && prevZone.current !== zone.zone) {
       getNearByItems(); // Execute the query manually
+    }else{
+      refetch();
     }
     prevZone.current = zone.zone; // Update the previous value of zone
-  }, [zone, getNearByItems]);
+  }, [getNearByItems]);
 
   useEffect(() => {
     if (!data) return;
@@ -31,7 +57,8 @@ const useMainHome = () => {
         location: value.address.address,
         image: value.images[0],
         ...value,
-      })).sort((a, b) => {
+      })).filter(item => item.status === 'active')
+      .sort((a, b) => {
         if (a.zoneId === zone.zone && b.zoneId !== zone.zone) {
           return -1;
         }

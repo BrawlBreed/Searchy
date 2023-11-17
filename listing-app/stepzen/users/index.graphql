@@ -11,6 +11,7 @@ type User {
   followers: [String],
   following: [String],
   favorites: [String],
+  ownedItems: [String],
   notifications: Notifications,
   likes: [String],
   _id: String,
@@ -81,6 +82,11 @@ type Mutation {
       method: PATCH
     )
     addToFavorites(uid: String!, favorites: [String!]): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    addOwnedItem(uid: String!, ownedItems: [String!]): JSON
     @rest(
       endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
       method: PATCH

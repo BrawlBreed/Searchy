@@ -7,7 +7,8 @@ const initialState = {
   description: '',
   images:[],
   price: 0,
-  status: 'Pending',
+  status: 'active',
+  promoted: false,
   subCategoryId: '',
   title: '',
   userId: '',
@@ -25,7 +26,8 @@ const initialState = {
       longitude: 0,
       latitude: 0  
     }
-  }
+  },
+  views: 0
 }
 
 export const addItemSlice = createSlice({
@@ -38,10 +40,10 @@ export const addItemSlice = createSlice({
       state.description = ''
       state.images = []
       state.price = 0
-      state.status = 'Pending'
+      state.status = 'active'
       state.subCategoryId = ''
       state.title = ''
-      state.userId = 'userId1'
+      state.userId = ''
       state.zoneId = ''
       state.zone = {
         zone: '',
@@ -56,7 +58,8 @@ export const addItemSlice = createSlice({
           longitude: 0,
           latitude: 0  
         }
-      }
+      },
+      state.views = 0
     },
     changeTitle: (state, action) => {
       state.title = action.payload

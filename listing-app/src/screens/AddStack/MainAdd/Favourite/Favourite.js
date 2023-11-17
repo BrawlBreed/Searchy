@@ -1,24 +1,18 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { FlatList, Image, View } from 'react-native';
 import { EmptyButton, TextDefault } from '../../../../components';
 import { alignment, colors } from '../../../../utilities';
 import Card from './Card/Card';
 import styles from './styles';
-
-const data = [
-    {
-        id: '10',
-        title: 'Japanese 28 inches cycle',
-        price: 'Rs: 22,900',
-        location: 'Peshawar Road, Rawalpindi, Punjab',
-        image: require('../../../../assets/images/products/cycle.jpg')
-    }
-]
-
+import { useSelector, useDispatch } from 'react-redux';
+import useFavorites from '../../../../hooks/useFavorites';
 
 function Favourite() {
     const navigation = useNavigation()
+    const dispatch = useDispatch()
+    const { items, loading, error } = useFavorites();
+
     function emptyView() {
         return (
             <View style={[styles.flex, styles.emptyContainer]}>
@@ -27,13 +21,13 @@ function Favourite() {
                     source={require('../../../../assets/images/emptyView/favourite.png')}
                 />
                 <TextDefault H4 center bold style={alignment.MTlarge}>
-                    {"You haven't liked anything yet."}
+                    {"Няма добавени любими продукти."}
                 </TextDefault>
                 <TextDefault H5 center light style={alignment.MTsmall}>
-                    {"Mark the items that you like and share it with the world!"}
+                    {"Добавете продукти в любими, за да ги откриете по-лесно!"}
                 </TextDefault>
                 <EmptyButton
-                    title='Dicover'
+                    title='Добави продукти'
                     onPress={() => navigation.navigate('Main')}
                 />
             </View>
@@ -43,7 +37,7 @@ function Favourite() {
     return (
         <View style={[styles.flex, styles.mainContainer]}>
             <FlatList
-                data={data}
+                data={items}
                 style={styles.flex}
                 contentContainerStyle={{ flexGrow: 1 }}
                 ListEmptyComponent={emptyView}
