@@ -122,6 +122,10 @@ function ProductDescription({ route, preview }) {
         setReportModal(prev => !prev)
     }
 
+    useEffect(() => {
+        console.log(user._id, uid)
+    }, [route])
+
     async function share() {
         try {
             const result = await Share.share({
@@ -272,11 +276,17 @@ function ProductDescription({ route, preview }) {
                             <TouchableOpacity
                                 borderless={false}
                                 style={styles.profileContainer}
-                                onPress={() => navigation.navigate('UserProfile', { ...user })}>
+                                onPress={() => {
+                                    if(user._id === uid){
+                                        navigation.navigate('MainAccount')
+                                    }else{
+                                        navigation.navigate('UserProfile', { ...user })                                    
+                                    }
+                                }}>
                                 <View style={styles.imageResponsive}>
                                     <Image
                                         style={styles.image}
-                                        source={user.avatar}/>
+                                        source={{uri:user.avatar}}/>
                                 </View>
                                 <View style={styles.profileInfo}>
                                     <TextDefault bold>
@@ -292,12 +302,12 @@ function ProductDescription({ route, preview }) {
                                 <Entypo name='chevron-small-right' size={scale(20)} color={colors.buttonbackground} />
                             </TouchableOpacity>
                             <View style={styles.profileContainer}>
-                                <TextDefault >
+                                <TextDefault small>
                                     {`ID на офертата:${id}`}
                                 </TextDefault>
                                 <TouchableOpacity activeOpacity={0.7} onPress={() => toggleModal()}>
                                     <TextDefault textColor={colors.spinnerColor} uppercase bold>
-                                        {'Report This AD'}
+                                        {'Докладвай обява'}
                                     </TextDefault>
                                 </TouchableOpacity>
                             </View>

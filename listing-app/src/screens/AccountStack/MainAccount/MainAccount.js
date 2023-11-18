@@ -12,9 +12,24 @@ import { GET_ZONES_QUERY } from '../../../apollo/server'
 
 function MainAccount() {   
     const { isLoggedIn, userId, ...user } = useSelector(state => state.user)
-    const { name, avatar, email } = user
+    const { name, avatar } = user
     const navigation = useNavigation()
-    const [getZones, { loading, data, error }] = useLazyQuery(GET_ZONES_QUERY);
+    const [getZones, { loading, data, error }] = useLazyQuery(GET_ZONES_QUERY, {
+        variables: {
+            userId: userId
+        }
+    });
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        console.log(userId)
+        getZones()
+    }, [])
+    useEffect(() => {
+        if(data?.getUserById) {
+            dispatch(setCurrentUser(data?.getUserById))
+        }
+    }, [data])
     
     return (
         <View style={[styles.flex, styles.container]}>
@@ -59,10 +74,10 @@ function MainAccount() {
                     <FontAwesome5 name="users" size={scale(20)} color={colors.buttonbackground} />
                     <View style={[styles.flex]}>
                         <TextDefault bold H5 style={alignment.PLlarge}>
-                            {'My Network'}
+                            {'Социална мрежа'}
                         </TextDefault>
                         <TextDefault light style={[alignment.PLlarge, alignment.MTxSmall]}>
-                            {'Followers, following and find friends'}
+                            {'Последователи, следващи, приятели'}
                         </TextDefault>
                     </View>
                     <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />

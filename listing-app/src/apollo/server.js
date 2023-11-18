@@ -293,3 +293,13 @@ export const DEACTIVATE_ITEM = gql`
     deactivateItem(id: $id, status: $status)
   }
 `
+export const FOLLOW_USER = gql`
+  mutation MyMutation($uid: String!, $followers: [String!]) {
+    followUser(uid: $uid, followers: $followers)
+  }
+`
+export const FOLLOWING_USER = gql`
+  mutation MyMutation($uid: String!, $following: [String!]) {
+    followingUser(uid: $uid, following: $following)
+  }
+`

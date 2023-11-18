@@ -236,7 +236,7 @@ const Entry = ({ route }) => {
           style={formStyles.button}
           onPress={() => handleSubmit()}
         >
-          <Text style={formStyles.buttonText}>Влез</Text>
+          <Text style={[formStyles.buttonText]}>Влез</Text>
         </TouchableOpacity>
         <Text style={{color: 'gray'}}></Text> 
         <View style={{ marginBottom: 30}}>

@@ -8,7 +8,7 @@ import { colors, scale } from '../../../utilities'
 import { TextDefault } from '../../Text'
 import styles from './styles'
 
-function MainHeader(props) {
+function MainHeader(props) { 
     const inset = useSafeAreaInsets()
     const navigation = useNavigation() 
     return (

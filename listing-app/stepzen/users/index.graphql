@@ -91,4 +91,14 @@ type Mutation {
       endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
       method: PATCH
     )
+    followUser(uid: String!, followers: [String!]): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    followingUser(uid: String!, following: [String!]): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
 }

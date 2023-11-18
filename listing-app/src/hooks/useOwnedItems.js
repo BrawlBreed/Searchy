@@ -26,7 +26,7 @@ const useOwnedItems = (navigation) => {
         const ownedItemsResponse = await Promise.all(favoriteItemsPromises);
 
         // Extract the data and set the items
-        const newItems = ownedItemsResponse.map(response => response.data.getItemById).filter(item => item !== null);
+        const newItems = ownedItemsResponse.map(response => { return {...response.data.getItemById, id: response.data.getItemById._id} }).filter(item => item !== null);
         setItems(newItems);
       }      
     } catch (error) {

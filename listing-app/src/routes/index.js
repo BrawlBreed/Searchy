@@ -140,7 +140,7 @@ function EditAccount() {
 function AccountTabs() {
     return (
         <AccountStack.Navigator initialRouteName='MainAccount' headerMode='screen' screenOptions={StackOptions()}>
-            <AccountStack.Screen name='MainAccount' component={AccountScreens.MainAccount} options={{ title: 'My Account' }} />
+            <AccountStack.Screen name='MainAccount' component={AccountScreens.MainAccount} options={{ title: 'Моят Акаунт' }} />
             <AccountStack.Screen name='Help' component={AccountScreens.Help} options={{ title: 'Help and Support' }} />
             <AccountStack.Screen name='Settings' component={AccountScreens.Settings} />
             <AccountStack.Screen name='Profile' component={AccountScreens.Profile} />

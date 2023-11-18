@@ -20,7 +20,6 @@ function MainHome() {
   const [searchVisible, setSerachVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { zone, userId } = useSelector(state => state.addItem)
-  const { favorites } = useSelector(state => state.user)
   const dispatch = useDispatch()
   const { refetch, loading, error, items } = useMainHome();
 
@@ -37,13 +36,17 @@ function MainHome() {
     dispatch(checkUserAuth())
   }, [])
 
+  useEffect(() => {
+    console.log(zone.zone)
+  }, [zone])
+
   useLayoutEffect(() => {
     navigation.setOptions({
       header: () => <MainHeader onModalToggle={toggleModal} toggleSearch={toggleSearch} locationText={zone.zone} />
     })
   }, [navigation, zone.zone])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     fetch('https://geolocation-db.com/json/')
       .then(response => response.json())
       .then((data) => {

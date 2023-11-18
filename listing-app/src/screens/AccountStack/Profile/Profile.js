@@ -62,7 +62,7 @@ function Profile() {
                                     {followingCount}
                                 </TextDefault>
                                 <TextDefault textColor={colors.fontSecondColor} light uppercase>
-                                    {'Following'}
+                                    {'Следва'}
                                 </TextDefault>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -74,7 +74,7 @@ function Profile() {
                                     {followersCount}
                                 </TextDefault>
                                 <TextDefault textColor={colors.fontSecondColor} light uppercase>
-                                    {'Followers'}
+                                    {'Последователи'}
                                 </TextDefault>
                             </TouchableOpacity>
                         </View>

@@ -81,7 +81,6 @@ const userSlice = createSlice({
       state.emailChanged = action.payload;
     },
     setCurrentUser: (state, action) => {
-      console.log('User set')
       Object.assign(state, { ...action.payload, createdAt: dateStringToDDMMYYYY(action.payload.createdAt), email: auth.currentUser.email });
     },
     setUserId: (state, action) => { 

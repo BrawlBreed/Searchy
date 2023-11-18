@@ -22,36 +22,16 @@ function LocationModal(props) {
     const { data, loading, error } = addZone()
 
     useEffect(() => {
-        dispatch(setCurrentCoordinates(coordinates))
-        dispatch(setZone({
-            zone: currentLocation,
-            coordinates: coordinates
-        }))
-    }, [currentLocation, coordinates])
-
-    useEffect(() => {
-        fetch('https://geolocation-db.com/json/')
-        .then(response => response.json())
-        .then(data => {
-            setCoordinates({
-                latitude: data.latitude,  
-                longitude: data.longitude
-            })
-            setCurrentLocation(data.city)
-        })
-        .catch(error => console.log(error))  
-        if(!data) return
-        if(data.getZones) setZones(data.getZones)
-    }, [data])
-
-    useEffect(() => {
         setZones(data?.getZones.filter((item) => {
             return item.value.zone?.toLowerCase().includes(input?.toLowerCase())
         }))
     }, [input]) 
 
+    useEffect(() => {
+        setZones(data?.getZones)
+    }, [data])
+
     function btnLocation(zone) {
-        console.log('pressed')
         dispatch(setZoneId(zone.name))
         dispatch(setZone({
             zone: zone.zone, 
@@ -59,6 +39,7 @@ function LocationModal(props) {
         }))
         props.onModalToggle()
     }
+
     return (
         <Modal
             animationType="slide"
