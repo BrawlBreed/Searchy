@@ -10,8 +10,11 @@ import useFavorites from '../../../../hooks/useFavorites';
 
 function Favourite() {
     const navigation = useNavigation()
-    const dispatch = useDispatch()
     const { items, loading, error } = useFavorites();
+
+    useEffect(() => {
+        console.log(items)
+    }, [items])
 
     function emptyView() {
         return (

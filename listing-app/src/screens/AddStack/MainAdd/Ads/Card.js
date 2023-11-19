@@ -8,12 +8,14 @@ import { alignment, colors, scale } from '../../../../utilities'
 import styles from './styles'
 import { dateStringToDDMMYYYY } from '../../../../utilities/methods'
 import { client } from '../../../../apollo'
-import { DEACTIVATE_ITEM, DELETE_ITEM } from '../../../../apollo/server'
+import { ADD_OWNED_ITEM, DEACTIVATE_ITEM, DELETE_ITEM } from '../../../../apollo/server'
+import { useSelector } from 'react-redux'
 
 function Card(props) {
     const navigation = useNavigation()
     const [deleteBox, setDeletebox] = useState(false)
     const [opacity, setopacity] = useState(1)
+    const { uid, ownedItems, changed } = useSelector(state => state.user);
 
     function onBoxToggle() {
         setDeletebox(prev => !prev)
@@ -27,6 +29,7 @@ function Card(props) {
     }
 
     function deleteItem() {
+        const newOwnedItems = ownedItems.filter(item => item !== props._id)
         Alert.alert(
             'Изтриване на обява', // Title
             'Сигурни ли сте, че искате да изтриете тази обява?', // Message
@@ -38,9 +41,12 @@ function Card(props) {
                 { 
                     text: 'Изтрий', 
                     onPress: () => client.mutate({
-                        mutation: DELETE_ITEM,
-                        variables: { id: props._id }
-                    }) 
+                        mutation: ADD_OWNED_ITEM,
+                        variables: { id: uid }
+                    }).then(() => client.mutate({
+                        mutation: ADD_OWNED_ITEM,
+                        variables: { id: uid, ownedItems: newOwnedItems }
+                    })).then(() => props.refetch())
                 },
             ],
             { cancelable: false } // This prevents the alert from being dismissed by tapping outside of the alert box
@@ -52,7 +58,8 @@ function Card(props) {
             client.mutate({
                 mutation: DEACTIVATE_ITEM,
                 variables: { id: props._id, status: status }
-            }) 
+            }).then(() => props.refetch())
+
             return
         }
         Alert.alert(
@@ -70,7 +77,7 @@ function Card(props) {
                     onPress: () => client.mutate({
                         mutation: DEACTIVATE_ITEM,
                         variables: { id: props._id, status: status }
-                    }) 
+                    }) .then(() => props.refetch())
                 },
             ],
             { cancelable: false } // This prevents the alert from being dismissed by tapping outside of the alert box
@@ -80,7 +87,7 @@ function Card(props) {
     function activeState(data) {
         if (data)
             setopacity(0.5)
-        else
+        else 
             setopacity(1)
     }
     return (
@@ -120,7 +127,7 @@ function Card(props) {
                             </View>
                             <FontAwesome name="heart" size={scale(13)} color={'#E91F63'} />
                             <TextDefault numberOfLines={1} small bold style={styles.locationText}>
-                                {'Харесвания:'} <TextDefault small bold> {props.status?.toLowerCase() === 'inactive' ? '-' : props.likesCount}</TextDefault>
+                                {'Харесвания:'} <TextDefault small bold> {props.status?.toLowerCase() === 'inactive' ? '-' : props?.likes?.length}</TextDefault>
                             </TextDefault>
                         </View>
                     </View>
@@ -197,9 +204,7 @@ function Card(props) {
                                     {'Маркирай като продадена'}
                                 </TextDefault>
                             </RectButton>
-                        )
-                        }
-                        
+                        )}
                     </View>
                 }
             </BaseButton>

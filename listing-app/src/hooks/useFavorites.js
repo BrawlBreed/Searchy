@@ -20,14 +20,19 @@ const useFavorites = () => {
 
         // Fetch each favorite item details
         const favoriteItemsPromises = filteredFavorites.map(favoriteId =>
-            getItemById({ variables: { id: favoriteId } })
+            getItemById({ variables: { id: favoriteId } }) 
         );
 
         // Wait for all the items to be fetched
         const favoriteItemsResponses = await Promise.all(favoriteItemsPromises);
 
         // Extract the data and set the items
-        const newItems = favoriteItemsResponses.map(response => response.data.getItemById).filter(item => item !== null);
+        const newItems = favoriteItemsResponses.map((response) => response.data.getItemById).reduce((unique, item) => {
+          if (item !== null && !unique.some(i => i.id === item.id)) {
+            unique.push(item);
+          }
+          return unique;
+        }, []);
         setItems(newItems);
         // }
       } catch (error) {
@@ -38,10 +43,6 @@ const useFavorites = () => {
       fetchUserFavorites();
     }
   }, [uid, getUser, getItemById, favorites]);
-
-  useEffect(() => {
-    console.log('Favorites changed:', items);
-  }, [items])
 
   return {
     items,

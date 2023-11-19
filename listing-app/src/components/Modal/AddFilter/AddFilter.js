@@ -5,33 +5,40 @@ import ModalHeader from '../../Header/ModalHeader/ModalHeader';
 import { TextDefault } from '../../Text';
 import styles from './styles';
 
-const OPTIONS = [
-    {
-        value: 0,
-        title: 'View all (2)'
-    },
-    {
-        value: 1,
-        title: 'Active Ads (0)'
-    },
-    {
-        value: 2,
-        title: 'Inactive Ads (0)'
-    },
-    {
-        value: 3,
-        title: 'Pending Ads (0)'
-    },
-    {
-        value: 4,
-        title: 'Moderated Ads (0)'
-    },
-]
-
 function AddFilter(props) {
     const inset = useSafeAreaInsets()
 
-    return (
+    function selectHandler({title, value}){
+        props.setState(title.split('(')[0].trim(''))
+        props.setAds(value)
+        props.onModalToggle()
+    }
+
+    function OPTIONS(items) {
+        const activeItems = items?.filter(ad => ad.status === 'active')
+        const inactiveItems = items?.filter(ad => ad.status === 'inactive')
+        const soldItems = items?.filter(ad => ad.status === 'sold')
+        return([
+            {
+                value: items,
+                title: `Виж всички обяви (${items?.length || 0})`
+            },
+            {
+                value: activeItems,
+                title: `Активни обяви (${activeItems?.length || 0})`
+            },
+            {
+                value: inactiveItems,
+                title: `Неактивни обяви (${inactiveItems?.length || 0})`
+            },
+            {
+                value: soldItems,
+                title: `Продадени (${soldItems?.length || 0})`
+            }
+        ])
+    }   
+
+    return ( 
         <Modal
             animationType="slide"
             transparent={true}
@@ -44,7 +51,7 @@ function AddFilter(props) {
                 <View style={[styles.flex, styles.mainContainer]}>
                     <ModalHeader closeModal={props.onModalToggle} title={'Filters'} />
                     <FlatList
-                        data={OPTIONS}
+                        data={OPTIONS(props.items)}
                         contentContainerStyle={{ flexGrow: 1 }}
                         style={styles.body}
                         ItemSeparatorComponent={() => <View style={styles.seperator} />}
@@ -52,7 +59,9 @@ function AddFilter(props) {
                         renderItem={({ item, index }) => (
                             <TouchableOpacity
                                 style={styles.stateBtn}
-                                onPress={props.onModalToggle}>
+                                onPress={() => {
+                                    console.log(item)
+                                    selectHandler(item)}}>
                                 <TextDefault style={[styles.flex, styles.font]} H5>
                                     {item.title}
                                 </TextDefault>
@@ -60,7 +69,7 @@ function AddFilter(props) {
                         )} />
                 </View>
             </View>
-        </Modal >
+        </Modal > 
     )
 }
 export default React.memo(AddFilter)

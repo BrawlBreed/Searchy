@@ -5,7 +5,7 @@ import { TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { EmptyButton, LocationModal, TextDefault } from '../../../components'
 import { alignment, colors, scale } from '../../../utilities'
-import { setZoneId, setCurrentCoordinates, setAddress } from '../../../store/reducers/Item/addItemSlice'
+import { setZoneId, setCurrentCoordinates, setAddress, setZone } from '../../../store/reducers/Item/addItemSlice'
 import styles from './styles' 
 import MapView, { Marker } from 'react-native-maps'
 import { useDispatch, useSelector } from 'react-redux'
@@ -16,7 +16,7 @@ function LocationConfirm() {
     const [filters, setFilters] = useState('')
     const [ input, setInput ] = useState('')
     const state = useSelector(state => state.addItem)
-    const { coordinates } = useSelector(state => state.addItem.address)
+    const { coordinates, zone } = useSelector(state => state.addItem.zone)
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -27,6 +27,7 @@ function LocationConfirm() {
 
     useEffect(() => {
         dispatch(setAddress(input))
+        dispatch(setCurrentCoordinates(coordinates))
     }, [input])
 
     useEffect(() => {
@@ -67,9 +68,12 @@ function LocationConfirm() {
                             longitudeDelta: 0.005
                         }}
                         onDoublePress={(e) => {
-                            dispatch(setCurrentCoordinates({
-                                latitude: e.nativeEvent.coordinate.latitude,
-                                longitude: e.nativeEvent.coordinate.longitude 
+                            dispatch(setZone({
+                                zone,
+                                coordinates: {
+                                    latitude: e.nativeEvent.coordinate.latitude,
+                                    longitude: e.nativeEvent.coordinate.longitude 
+                                }
                             }))
                         }}
                         style={{width: 'auto', height: 200, flexGrow: 1}}

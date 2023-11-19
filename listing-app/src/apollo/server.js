@@ -8,7 +8,7 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
         createdAt
         description
         itemId
-        likesCount
+        likes
         price
         status
         title
@@ -98,7 +98,7 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
         createdAt
         description
         itemId
-        likesCount
+        likes
         price
         promoted
         status
@@ -200,8 +200,8 @@ export const ADD_TO_FAVORITES = gql`
   }
 `;
 export const LIKE_ITEM_MUTATION = gql`
-    mutation MyMutation($likesCount: Int!, $name: String!) {
-        likeItem(likesCount: $likesCount, name: $name)
+    mutation MyMutation($likes: [String], $name: String!) {
+        likeItem(likes: $likes, name: $name)
     }
 `;
 export const GET_ITEM_BY_ID = gql`
@@ -213,7 +213,7 @@ export const GET_ITEM_BY_ID = gql`
         description
         itemId
         promoted
-        likesCount
+        likes
         price
         status
         title

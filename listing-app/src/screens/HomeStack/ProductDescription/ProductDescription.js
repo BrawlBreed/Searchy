@@ -19,32 +19,49 @@ import { appendFavorites, removeFavorite, setFavorites } from '../../../store/re
 import { useLazyQuery } from '@apollo/client'
 
 function ProductDescription({ route, preview }) {  
-    const { title, price, likesCount, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address, views } = route ? route?.params : preview
+    const { refetch, title, price, likes, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address, views } = route ? route?.params : preview
     const [isLike, isLikeSetter] = useState(isLike)
     const navigation = useNavigation() 
     const { isLoggedIn, uid, favorites } = useSelector(state => state.user)
     const [reportModal, setReportModal] = useState(false);
     const [fetched, setFetched] = useState(false);
     const [getUser] = useLazyQuery(GET_ZONES_QUERY);
+    const [likesList, setLikesList] = useState([]);
+    const [favoritesList, setFavoritesList] = useState([]);
     const dispatch = useDispatch();
 
     const likeItem = async () => {
+        const newLikes = isLike ? [...(likesList || []), uid] : (likesList || []).filter(like => like !== uid) || [''];
         try {    
             // Perform the mutation
             const response = await client.mutate({
                 mutation: LIKE_ITEM_MUTATION,
                 variables: {
                     name: id,
-                    likesCount: likesCount + isLike
+                    likes: newLikes
                 },
+            }).then(({data}) => {
+                setLikesList(data.likeItem.likes)
+
+                return data.likeItem.likes === null ? [] : data.likeItem.likes
             });
     
-            return response.data.likeItem;
+            return response
         } catch (error) {
             console.error('Error liking the item:', error);
             throw error;
         }
     };
+
+    useEffect(() => {
+        const likeList = likes?.filter(like => like !== '');
+        setLikesList(likeList)
+    }, [likes, isLike])
+
+    useEffect(() => {
+        const favList = favorites?.filter(favorite => favorite !== '') || [''];
+        setFavoritesList(favList);
+    }, [favorites])
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -65,32 +82,23 @@ function ProductDescription({ route, preview }) {
                 setFetched(true);
             }
         });
-    }, [dispatch, getUser, uid]);
+    }, [dispatch, getUser, uid, refetch, likes]);
               
     useEffect(() => {
         // Do nothing if not logged in
         if (!isLoggedIn) return;
-
         const toggleFavorite = async () => {
             if(!fetched) return
             try {
                 const response = await likeItem();
                 if(!fetched) return
                 if (!response) return;
-                if (isLike) {
-                    await client.mutate({
-                        mutation: ADD_TO_FAVORITES,
-                        variables: { uid: uid, favorites: [...favorites, id] },
-                    });
-                    dispatch(appendFavorites(id));
-                } else {
-                    const newFavorites = favorites?.filter(favorite => favorite !== id);
+                    const newFavorites = isLike ? [...(favoritesList || []), id] : (favoritesList || []).filter(fav => fav !== id) || [''];
                     await client.mutate({
                         mutation: ADD_TO_FAVORITES,
                         variables: { uid: uid, favorites: newFavorites },
-                    });
-                    dispatch(removeFavorite(id));
-                }
+                    })
+                    isLike ? dispatch(appendFavorites(id)) : dispatch(removeFavorite(id));
             } catch (error) {
                 console.error('Error toggling favorite:', error);
             }
@@ -121,10 +129,6 @@ function ProductDescription({ route, preview }) {
     function toggleModal() {
         setReportModal(prev => !prev)
     }
-
-    useEffect(() => {
-        console.log(user._id, uid)
-    }, [route])
 
     async function share() {
         try {
@@ -202,7 +206,7 @@ function ProductDescription({ route, preview }) {
                                 <FontAwesome name="heart" size={scale(20)} color="black" /> :
                                 <FontAwesome name="heart-o" size={scale(20)} color="black" />
                             }
-                            <TextDefault style={{ marginLeft: 5 }}>{likesCount + isLike}</TextDefault>
+                            <TextDefault style={{ marginLeft: 5 }}>{likesList?.length ? likesList.length : '0'}</TextDefault>
                             </View>
                         </TouchableOpacity>
                         )}
@@ -214,7 +218,7 @@ function ProductDescription({ route, preview }) {
                     <View style={styles.locationRow}>
                         <MaterialIcons name='location-on' size={scale(15)} color={colors.headerText} />
                         <TextDefault numberOfLines={1} style={styles.locationText}>
-                            {route ? location : address.address}
+                            {address.address}
                         </TextDefault>
                         {route && (
                             <TextDefault numberOfLines={1}>

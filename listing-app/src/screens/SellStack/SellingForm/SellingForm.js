@@ -148,9 +148,17 @@ function SellingForm({ route }) {
                                         }}
                                         onBlur={() => setAdColor(colors.fontMainColor)}
                                         onChangeText={text => {
-                                            const numericText = text.replace(/[^0-9]/g, '');
-                                            dispatch(changePrice(numericText));
-                                          }}
+                                            // Check if the text is a valid float or an incomplete float (like "3." or "4.5")
+                                            const isFloat = /^(\d+)?(\.\d*)?$/.test(text);
+                                          
+                                            if (isFloat) {
+                                              // If it's a valid or incomplete float, update the state with the text
+                                              dispatch(changePrice(text));
+                                            } else {
+                                              // If it's not a valid float, you might want to handle this case
+                                              // For now, let's not update the state
+                                            }
+                                        }}  
                                         value={String(price)}
                                         placeholderTextColor={colors.fontSecondColor}
                                         placeholder={'Цена на обявата'}

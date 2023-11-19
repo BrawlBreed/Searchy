@@ -15,6 +15,7 @@ import { ADD_ID_TO_ITEM, ADD_OWNED_ITEM } from '../../../apollo/server';
 const AdPosted = () => {
     const item = useSelector(state => state.addItem)
     const { title, description, price, condition, images, createdAt, subCategoryId, zoneId, address, userId } = item
+    const { ownedItems } = useSelector(state => state.user)
     const navigation = useNavigation()
     const dispatch = useDispatch()
 
@@ -36,12 +37,14 @@ const AdPosted = () => {
     }
 
     const addOwnedItem = async () => {
+        const newOwnedItems = ownedItems.filter(item => item !== null)
+        newOwnedItems.push(data.addItem.name)
         try{
             const response = await client.mutate({
                 mutation: ADD_OWNED_ITEM,
                 variables: { 
                     uid: userId,
-                    ownedItems: [data?.addItem?.name]
+                    ownedItems: newOwnedItems
                 }
             })
 
@@ -78,7 +81,7 @@ const AdPosted = () => {
                 title: $title
                 userId: $userId
                 zoneId: $zoneId
-                likesCount: 0
+                likes: [""]
                 views: 0
                 address: $address
             )
@@ -108,9 +111,15 @@ const AdPosted = () => {
 
     useLayoutEffect(() => {
         async function addItem(){
-            const res = await mutateFunction().then(res => {
-                addIdToItem(res?.data?.addItem?.name)
-            })
+            try{
+                mutateFunction().then(res => {
+                    addIdToItem(res?.data?.addItem?.name)
+                })
+            }catch (error) {
+                console.error('Error adding id to the item:', error);
+                throw error;
+            }
+            
         }
         addItem()
     }, [])

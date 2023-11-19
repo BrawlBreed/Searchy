@@ -35,7 +35,7 @@ function AdPosting() {
             navigation.dispatch(StackActions.popToTop())
             navigation.navigate('AdPosted')
         }else{
-            setError('Нещо се обърка, моля опитайте по-късно!')
+            setError('Нещо се обърка, моля опитайте по-късно или рестартирайте приложението!')
             setActive(true)
         }
     }

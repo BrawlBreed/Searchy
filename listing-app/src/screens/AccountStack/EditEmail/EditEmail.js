@@ -65,7 +65,6 @@ function EditEmail() {
 
     useEffect(() => {
         if(awaitingEmailVerification){
-            console.log('Awaiting email verification')
             // Define a function that reloads the user's auth state and checks for email verification
             const checkEmailVerification = async () => {
                 const user = auth.currentUser;

@@ -14,7 +14,7 @@ type Item {
   description: String
   images: [String]
   itemId: String
-  likesCount: Int
+  likes: [String]
   views: Float
   price: Float
   promoted: Boolean
@@ -87,7 +87,7 @@ type Mutation {
     promoted: Boolean = false,
     zoneId: String!,
     address: AddressInput!,
-    likesCount: Int = 0
+    likes: [String]
     views: Float = 0
   ): JSON
   @rest(
@@ -99,7 +99,7 @@ type Mutation {
     endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
     method: PATCH
   )
-  likeItem(name: String!, likesCount: Int!): JSON 
+  likeItem(name: String!, likes: [String]): JSON 
   @rest(
     endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$name.json",
     method: PATCH

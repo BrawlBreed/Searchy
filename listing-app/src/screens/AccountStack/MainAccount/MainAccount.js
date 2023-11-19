@@ -22,7 +22,6 @@ function MainAccount() {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        console.log(userId)
         getZones()
     }, [])
     useEffect(() => {

@@ -50,7 +50,7 @@ const CONDITIONS = [
     },
 ]
 const EditAd = ({route}) => {
-    const { title, price, likesCount, _id, description, zone, location, images, user, createdAt, condition, subCategory, subCategoryId, address, navigation } = route.params
+    const { refetch, title, price, likes, _id, description, zone, location, images, user, createdAt, condition, subCategory, subCategoryId, address, navigation } = route.params
     const [reportModal, setReportModal] = useState(false);
     const [active, setActive] = useState(false)
     const [errors, setErrors] = useState(initalState)
@@ -59,7 +59,7 @@ const EditAd = ({route}) => {
     const initialState = {
         title: title,
         price: price,
-        likesCount: likesCount,
+        likes: likes,
         id: _id,
         condition: condition,
         description: description,
@@ -105,7 +105,6 @@ const EditAd = ({route}) => {
     }, [state.address.coordinates]) 
 
     const updateProperty = (property, value) => {
-        console.log(property, value)
         dispatch({ type: 'SET_PROPERTY', payload: { property, value } });
       };
     function toggleModal() {
@@ -205,11 +204,7 @@ const EditAd = ({route}) => {
                     },
                     images: state.images
                 }
-            })
-    
-            if(res.data.editItem) {
-                navigation.goBack()
-            }    
+            }).then(() => refetch()) 
         }
     }
 

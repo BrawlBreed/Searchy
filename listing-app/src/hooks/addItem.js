@@ -33,7 +33,7 @@ const addItem = () => {
                 title: $title
                 userId: $userId
                 zoneId: $zoneId
-                likesCount: 0
+                likes: ['']
                 views: 0
                 address: $address
             )

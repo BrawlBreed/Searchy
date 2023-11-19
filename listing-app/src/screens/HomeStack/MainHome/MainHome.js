@@ -36,10 +36,6 @@ function MainHome() {
     dispatch(checkUserAuth())
   }, [])
 
-  useEffect(() => {
-    console.log(zone.zone)
-  }, [zone])
-
   useLayoutEffect(() => {
     navigation.setOptions({
       header: () => <MainHeader onModalToggle={toggleModal} toggleSearch={toggleSearch} locationText={zone.zone} />
@@ -171,7 +167,7 @@ function MainHome() {
               ListHeaderComponent={renderHeader}
               numColumns={2}
               renderItem={({ item }) => (
-                <Card {...item} /> 
+                <Card refetch={refetch} {...item} /> 
               )}
             />
 

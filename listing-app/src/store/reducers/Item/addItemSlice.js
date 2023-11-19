@@ -27,7 +27,8 @@ const initialState = {
       latitude: 0  
     }
   },
-  views: 0
+  views: 0,
+  likes: ['']
 }
 
 export const addItemSlice = createSlice({
@@ -38,6 +39,7 @@ export const addItemSlice = createSlice({
       state.condition = ''
       state.createdAt = ''  
       state.description = ''
+      state.likes = ['']
       state.images = []
       state.price = 0
       state.status = 'active'
@@ -48,8 +50,8 @@ export const addItemSlice = createSlice({
       state.zone = {
         zone: '',
         coordinates: {
-          longitude: 0,
-          latitude: 0
+          longitude: 42.6833,
+          latitude: 23.3167
         }
       }
       state.address = {
@@ -68,9 +70,19 @@ export const addItemSlice = createSlice({
       state.description = action.payload
     },
     changePrice: (state, action) => {
-      state.price = Number(action.payload)
+      // Check if the payload is a valid float or an incomplete float
+      const isFloat = /^(\d+)?(\.\d*)?$/.test(action.payload);
+    
+      if (isFloat) {
+        // If it's a valid or incomplete float, store it as a string
+        state.price = action.payload;
+      } else {
+        // If it's not a valid float, you might want to handle this case
+        // For now, let's set the price to 0 or keep the previous value
+        state.price = state.price || 0;
+      }
     },
-    changeCondition: (state, action) => {
+        changeCondition: (state, action) => {
       state.condition = action.payload
     },
     changeImages: (state, action) => {

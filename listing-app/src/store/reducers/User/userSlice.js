@@ -17,9 +17,9 @@ export const checkUserAuth = createAsyncThunk(
   async (_, { dispatch, getState }) => {
     return new Promise((resolve) => {
       onAuthStateChanged(auth, async (user) => {
-        if(user){
-          dispatch(changeEmail(auth.currentUser.email))
-          dispatch(setUserId(user.uid))
+        if(auth?.currentUser){
+          dispatch(changeEmail(auth?.currentUser?.email))
+          dispatch(setUserId(user?.uid))
           resolve(user);
         } else {
           // Check if we are awaiting email verification
