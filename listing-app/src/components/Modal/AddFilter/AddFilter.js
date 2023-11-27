@@ -60,7 +60,6 @@ function AddFilter(props) {
                             <TouchableOpacity
                                 style={styles.stateBtn}
                                 onPress={() => {
-                                    console.log(item)
                                     selectHandler(item)}}>
                                 <TextDefault style={[styles.flex, styles.font]} H5>
                                     {item.title}

@@ -55,9 +55,9 @@ function InboxTabs() {
         <ChatTOP.Navigator initialRouteName='All'
             tabBarOptions={TopBarOptions()}
         >
-            <ChatTOP.Screen name='All' component={ChatScreens.All} />
-            <ChatTOP.Screen name='Buying' component={ChatScreens.Buying} />
-            <ChatTOP.Screen name='Selling' component={ChatScreens.Selling} />
+            <ChatTOP.Screen name='All' options={{tabBarButton: () => null, title: '', tabBarStyle: { display: 'none' }}} component={ChatScreens.All} />
+            {/* <ChatTOP.Screen name='Buying' component={ChatScreens.Buying} />
+            <ChatTOP.Screen name='Selling' component={ChatScreens.Selling} /> */}
         </ChatTOP.Navigator>
     )
 }
@@ -88,7 +88,7 @@ function ChatTabs() {
     return (
         <ChatStack.Navigator initialRouteName='MainChat' headerMode='screen' screenOptions={StackOptions()}>
             <ChatStack.Screen name='MainChat' component={InboxTabs} options={{
-                title: 'Inbox',
+                title: 'Съобщения',
                 headerStyle: {
                     backgroundColor: colors.headerbackground,
                 },

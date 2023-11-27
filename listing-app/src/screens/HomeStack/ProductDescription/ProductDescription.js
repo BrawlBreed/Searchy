@@ -17,6 +17,8 @@ import { client } from '../../../apollo'
 import { dateStringToDDMMYYYY } from '../../../utilities/methods'
 import { appendFavorites, removeFavorite, setFavorites } from '../../../store/reducers/User/userSlice'
 import { useLazyQuery } from '@apollo/client'
+import { fetchChatsByUserIDs, addChat } from '../../../firebase'
+import { generateRandomId } from '../../../store/reducers/Item/helpers'
 
 function ProductDescription({ route, preview }) {  
     const { refetch, title, price, likes, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address, views } = route ? route?.params : preview
@@ -128,6 +130,31 @@ function ProductDescription({ route, preview }) {
 
     function toggleModal() {
         setReportModal(prev => !prev)
+    }
+
+    async function chatCheck(){
+        if (!isLoggedIn)
+            navigation.navigate('Registration')
+        else{
+            const chats = await fetchChatsByUserIDs(uid, id);
+            if(chats.length){ 
+                navigation.navigate('LiveChat', { id: chats[0].id } ) 
+            } else{
+                const chatObject = {
+                    createdAt: new Date().toISOString(),
+                    id: generateRandomId(28),
+                    members: [
+                        uid,
+                        user._id
+                    ],
+                    image: images[0],
+                    title: title,
+                };                  
+                const chatId = await addChat(chatObject)
+                navigation.navigate('LiveChat', { id: chatId } )
+            }
+
+        }
     }
 
     async function share() {
@@ -337,7 +364,7 @@ function ProductDescription({ route, preview }) {
                     <TouchableOpacity
                         activeOpacity={0.7}
                         style={styles.button}
-                        onPress={() => navigation.navigate('Chat', { screen: 'LiveChat', initial: false })}
+                        onPress={chatCheck}
                     >
                         <SimpleLineIcons name='bubble' size={scale(20)} color={colors.white} />
                         <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>

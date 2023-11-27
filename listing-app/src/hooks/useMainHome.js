@@ -57,7 +57,7 @@ const useMainHome = () => {
         location: value.address.address,
         image: value.images[0],
         ...value,
-      })).filter(item => item.status === 'active')
+      })).filter(item => item.status === 'active' && item.user._id !== uid)
       .sort((a, b) => {
         if (a.zoneId === zone.zone && b.zoneId !== zone.zone) {
           return -1;

@@ -18,7 +18,8 @@ import {
 } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { checkUserAuth, setCreatedAt, setLoading, setRegister, setUserId } from "../store/reducers/User/userSlice";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set, orderByKey, onValue, on, orderByValue, get } from "firebase/database";
+import { collection, getFirestore, onSnapshot, where, query, getDocs, addDoc, doc, setDoc, orderBy, updateDoc, deleteDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB60wKug-C4eUXXKZ1f53LZUXKPNYGchPQ",
@@ -38,6 +39,7 @@ initializeAuth(app, {
 export const auth = getAuth();
 export const provider = new GoogleAuthProvider();
 export const db = getDatabase(app);
+export const dbFirestore = getFirestore(app)
 
 // Initialize Realtime Database and get a reference to the service
 export const storage = getStorage(app);
@@ -47,7 +49,6 @@ export async function uploadImages(images, path) {
     const response = await fetch(image);
     image = await response.blob();
     const reference = storageRef(storage, `${path}/${index}`);
-    console.log(reference)
     await uploadBytes(reference, image);
     return getDownloadURL(reference);
   });
@@ -140,7 +141,7 @@ export const updateAndVerifyEmail = async (newEmail, password) => {
 
     // Update the email.
     await updateEmailAuth(auth.currentUser, newEmail);
-    return { success: true, message: 'Email updated!' };
+    return { success: true, message: 'Email updated!' }; 
   } catch (error) {
     if(error.code === 'auth/operation-not-allowed'){
       try{
@@ -160,6 +161,128 @@ export const updateAndVerifyEmail = async (newEmail, password) => {
     return error;
   }
 };
+
+export function fetchChatsByUserIDs(uid1, uid2) {
+  return new Promise((resolve, reject) => {
+    const chatsRef = collection(dbFirestore, 'chats');
+    const q = query(chatsRef, where('members', 'array-contains-any', [uid1, uid2]));
+
+    getDocs(q)
+      .then(querySnapshot => {
+        const allChats = [];
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          data.id = doc.id;
+          // Check if both user IDs are in the 'members' array
+          allChats.push(data);
+        });
+        resolve(allChats);
+      })
+      .catch(error => reject(error));
+  });
+}
+export function fetchChatsByUserID(uid1) {
+  return new Promise((resolve, reject) => {
+    const chatsRef = collection(dbFirestore, 'chats');
+    const q = query(chatsRef, where('members', 'array-contains', uid1));
+
+    getDocs(q)
+      .then(querySnapshot => {
+        const allChats = [];
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          data.id = doc.id;
+          allChats.push(data);
+        });
+        console.log(allChats);
+        resolve(allChats);
+      })
+      .catch(error => reject(error));
+  });
+}
+
+export function addChat(chatObject) {
+  return new Promise((resolve, reject) => {
+    const chatsRef = collection(dbFirestore, 'chats');
+    const chatDocRef = doc(chatsRef, chatObject.id); // Use custom ID for the document
+
+    setDoc(chatDocRef, chatObject)
+      .then(docRef => {
+        resolve(chatObject.id)
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+}
+
+export const deleteChat = async (chatId) => {
+  return new Promise((resolve, reject) => {
+    // Reference to the specific chat document
+    const chatDocRef = doc(dbFirestore, 'chats', chatId);
+
+    // Deleting the document
+    deleteDoc(chatDocRef)
+      .then(() => {
+        resolve(`Chat with ID ${chatId} deleted successfully.`);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+}
+
+export function fetchMessagesByChatId(chatId, setMessages) {
+  const messagesRef = collection(dbFirestore, `chats/${chatId}/messages`);
+  const q = query(messagesRef, orderBy('createdAt', 'desc'));
+
+  return onSnapshot(q, (querySnapshot) => {
+      const allMessages = querySnapshot.docs.map(doc => ({
+        _id: doc.id, // Assuming _id is the Firestore document ID
+        createdAt: doc.data().createdAt.toDate(),
+        text: doc.data().text,
+        user: doc.data().user
+      }));
+      setMessages(allMessages);
+  }, (error) => {
+      console.error("Error fetching messages: ", error);
+  });
+}
+
+export function saveMessage({ id, createdAt, text, user }) {
+  return new Promise((resolve, reject) => {
+    if (text.trim()) {
+      const message = {
+        createdAt,
+        text,
+        user
+      };
+
+      const messagesRef = collection(dbFirestore, `chats/${id}/messages`); // Assuming you have a "chats" collection
+
+      const recentMessage = {
+        messageText: text,
+        sentAt: createdAt,
+        sentBy: user
+      }
+      addDoc(messagesRef, message)
+        .then(docRef => {
+          const chatDocRef = doc(dbFirestore, 'chats', id);
+          updateDoc(chatDocRef, { recentMessage: recentMessage })
+
+          return docRef
+        })
+        .then(docRef => {
+          resolve({ ...message, id: docRef.id });
+        })
+        .catch(error => {
+          reject(error);
+        });
+    } else {
+      reject(new Error('Message text cannot be empty'));
+    }
+  });
+}
 
 // export const updateAndVerifyEmail = async (newEmail, password) => {
 //   const credential = EmailAuthProvider.credential(auth.currentUser.email, password)

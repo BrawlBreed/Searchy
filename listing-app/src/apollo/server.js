@@ -303,3 +303,20 @@ export const FOLLOWING_USER = gql`
     followingUser(uid: $uid, following: $following)
   }
 `
+export const GET_NUMBER = gql`
+  query MyQuery($userId: ID!) {
+    getUserById(user: $userId) {
+      _id
+      phone
+    }
+  }
+`
+export const GET_AVATAR_AND_NAME = gql`
+  query MyQuery($userId: ID!) {
+    getUserById(user: $userId) {
+      _id
+      avatar
+      name
+    }
+  }
+`

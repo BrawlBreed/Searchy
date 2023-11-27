@@ -102,7 +102,7 @@ const Entry = ({ route }) => {
   const handleSubmit = async () => {
     let valid = true
     const error = route.params.email 
-    ? validateEmailForm({ email, password }, errors) 
+    ? validateEmailForm({ email, password }, errors)
     : validatePhoneForm({ phone, password }, errors)
 
     setErrors(error)
@@ -232,12 +232,10 @@ const Entry = ({ route }) => {
             {errors.password}
           </TextDefault>
         }
-        <TouchableOpacity
-          style={formStyles.button}
+        <Button
+          title='Вход'
           onPress={() => handleSubmit()}
-        >
-          <Text style={[formStyles.buttonText]}>Влез</Text>
-        </TouchableOpacity>
+        />
         <Text style={{color: 'gray'}}></Text> 
         <View style={{ marginBottom: 30}}>
         <Text 
