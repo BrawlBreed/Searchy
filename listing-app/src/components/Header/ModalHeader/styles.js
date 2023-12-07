@@ -15,7 +15,8 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '90%',
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'flex-start',
     },
     closeBtn: {
         justifyContent: "center",

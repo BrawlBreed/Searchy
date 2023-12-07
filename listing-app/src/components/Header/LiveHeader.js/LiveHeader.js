@@ -1,6 +1,7 @@
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import * as Device from 'expo-device'
+import ReportModal from '../../Modal/ReportModal/ReportModal'
 import React, { useEffect, useState } from 'react'
 import { Alert, Dimensions, FlatList, Image, Linking, Modal, Platform, TouchableOpacity, View } from 'react-native'
 import { BorderlessButton } from 'react-native-gesture-handler'
@@ -12,28 +13,33 @@ import { LeftButton } from '../HeaderIcons/HeaderIcons'
 import styles from './styles'
 import { useSelector } from 'react-redux'
 import { useLazyQuery } from '@apollo/client'
-import { GET_NUMBER } from '../../../apollo/server'
+import { GET_ITEM_BY_ID, GET_NUMBER } from '../../../apollo/server'
 import { deleteChat } from '../../../firebase'
 
 const { width, height } = Dimensions.get('window')
 
 function ModalHeader() {
     const [open, setOpen] = useState(false)
+    const [reportModal, setReportModal] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState('')
     const inset = useSafeAreaInsets()
     const route = useRoute();
-    const { id, name, image, avatar, uid } = route.params || {};
-    const [getNumberById, { loading, data, error } ] = useLazyQuery(GET_NUMBER, {
+    const { id, name, image, avatar, uid, adId, description, createdAt } = route.params || {};
+    const [getNumberById, { loading: loadingNumber, data: dataNumber, error: errorNumber }] = useLazyQuery(GET_NUMBER, {
         variables: { userId: uid },
-    })
-    const navigation = useNavigation()
+    });
+    const [getItemById, { loading: loadingItem, data: dataItem, error: errorItem }] = useLazyQuery(GET_ITEM_BY_ID, {
+        variables: { id: adId },
+    });
 
+    const navigation = useNavigation()
     useEffect(() => {
-        if(data?.getUserById?.phone) setPhoneNumber(data?.getUserById?.phone)
-    }, [data])
+        if(dataNumber?.getUserById?.phone) setPhoneNumber(dataNumber?.getUserById?.phone)
+    }, [dataNumber])
 
     useEffect(() => {
         getNumberById()
+        getItemById()
     }, [route])
 
     function dialCall() {
@@ -58,12 +64,6 @@ function ModalHeader() {
         Linking.openURL(url);
     };
 
-    function customMessage() {
-        FlashMessage({ message: 'Pending Features' })
-        setOpen(false)
-        // navigation.goBack()
-    }
-
     function onDeleteChat() {
         Alert.alert(
             'Изтриване на чат', // Title
@@ -82,16 +82,27 @@ function ModalHeader() {
                 },
             ]
         );
+    }
 
+    const handleNavigateProduct = () => {
+        if(dataItem?.getItemById) {
+            navigation.navigate('ProductDescription', { ...dataItem?.getItemById , id: adId })
+        }
+    }
+
+    function toggleModal() {
+        setReportModal(prev => !prev)
+        setOpen(false)
     }
 
     return (
         <SafeAreaView edges={['top']} style={styles.safeAreaContainer}>
             <View style={styles.headerContainer}>
+                <ReportModal userId={uid} adId={adId} itemId={id} visible={reportModal} onModalToggle={toggleModal} />
                 <View style={styles.headerContents}>
                     <LeftButton icon='back' iconColor={colors.headerText} />
                     <View style={[styles.flex, styles.titleContainer]}>
-                        <View style={styles.imageResponsive}>
+                        <TouchableOpacity style={styles.imageResponsive} onPress={handleNavigateProduct}>
                             <Image
                                 style={[styles.flex, styles.img]}
                                 source={typeof image === 'string' && { uri: image }} />
@@ -99,12 +110,12 @@ function ModalHeader() {
                                 style={styles.profileImg}
                                 source={typeof avatar === 'string' && avatar === 'false' || !avatar ? require('../../../assets/images/avatar.png') : { uri: avatar }}
                             />
-                        </View>
-                        <View style={styles.infoContainer}>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { ...route.params, _id: uid})} style={styles.infoContainer}>
                             <TextDefault bold H5>
                                 {name} 
                             </TextDefault>
-                        </View>
+                        </TouchableOpacity>
                         <View style={styles.iconContainer}>
                             <TouchableOpacity
                                 style={alignment.PxSmall}
@@ -146,7 +157,7 @@ function ModalHeader() {
                                         </TextDefault>
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        onPress={customMessage}
+                                        onPress={toggleModal}
                                         borderless={false}
                                         style={{ ...alignment.Pmedium }}>
                                         <TextDefault bold H5>
@@ -161,6 +172,7 @@ function ModalHeader() {
             </View>
         </SafeAreaView >
     )
-
+ 
 }
 export default React.memo(ModalHeader)
+

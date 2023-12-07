@@ -16,7 +16,7 @@ const useFavorites = () => {
       try {
         // const response = await getUser({ variables: { userId: uid } });
         // if (response.data?.getUserById) {
-        const filteredFavorites = favorites.filter(favorite => favorite !== '');
+        const filteredFavorites = favorites?.filter(favorite => favorite !== '') || [];
 
         // Fetch each favorite item details
         const favoriteItemsPromises = filteredFavorites.map(favoriteId =>
@@ -27,7 +27,7 @@ const useFavorites = () => {
         const favoriteItemsResponses = await Promise.all(favoriteItemsPromises);
 
         // Extract the data and set the items
-        const newItems = favoriteItemsResponses.map((response) => response.data.getItemById).reduce((unique, item) => {
+        const newItems = favoriteItemsResponses.map((response) => response?.data?.getItemById).reduce((unique, item) => {
           if (item !== null && !unique.some(i => i.id === item.id)) {
             unique.push(item);
           }

@@ -143,7 +143,7 @@ const Entry = ({ route }) => {
         styles.safeAreaViewStyles,
         styles.flex,
         { paddingTop: inset.top, paddingBottom: inset.bottom }]}>
-            <ModalHeader title="Вход" closeModal={() => navigation.goBack()} />
+            <ModalHeader type='back' title="Вход" closeModal={() => navigation.goBack()} />
         <View style={styles.logoContainer}>
           <View style={styles.image}>
             { !isKeyboardVisible && (
@@ -237,15 +237,15 @@ const Entry = ({ route }) => {
           onPress={() => handleSubmit()}
         />
         <Text style={{color: 'gray'}}></Text> 
-        <View style={{ marginBottom: 30}}>
-        <Text 
-          style={{     
-            borderBottomRadius: 3,
-            borderBottomWidth: 2,
-            borderBottomColor: `#42A5F5`,
-            paddingBottom: 3.5
-          }}>Забравена парола?</Text>
-        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={{ marginBottom: 30}}>
+          <Text 
+            style={{     
+              borderBottomRadius: 3,
+              borderBottomWidth: 2,
+              borderBottomColor: `#42A5F5`,
+              paddingBottom: 3.5
+            }}>Забравена парола?</Text>
+        </TouchableOpacity>
         
       </View>
     </>

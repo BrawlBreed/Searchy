@@ -9,7 +9,7 @@ import { BorderlessButton, BaseButton, RectButton } from 'react-native-gesture-h
 import { fetchChatsByUserID } from '../../../../firebase';
 import { useSelector } from 'react-redux';
 import { getDurationFromFirestoreTimestamp } from '../../../../store/reducers/Item/helpers';
-import { GET_AVATAR_AND_NAME } from '../../../../apollo/server';
+import { GET_AVATAR_NAME_DESCRIPTION_CREATED_AT } from '../../../../apollo/server';
 import { useLazyQuery } from '@apollo/client';
 
 function ALL() {
@@ -18,7 +18,7 @@ function ALL() {
     // const [filter, setFilter] = useState(FILTERS[0].value)
     const [ chats, setChats ] = useState([]);
     const { uid } = useSelector(state => state.user);
-    const [getAvatarAndName, { data }] = useLazyQuery(GET_AVATAR_AND_NAME);
+    const [getAvatarAndName, { data }] = useLazyQuery(GET_AVATAR_NAME_DESCRIPTION_CREATED_AT);
 
     useLayoutEffect(() => {
         const fetchMessagesByChatId = async () => {
@@ -33,6 +33,7 @@ function ALL() {
                     const duration = getDurationFromFirestoreTimestamp(chat?.recentMessage?.sentAt);
                     const adTitle = chat.title;
                     const addPic = chat.image;
+                    const adId = chat.adId;
                     const userId = chat.members.filter((member) => member !== uid)[0];
                     const res = await getAvatarAndName({ variables: { userId: userId } });
     
@@ -42,9 +43,12 @@ function ALL() {
                         lastMessage,
                         duration,
                         adTitle,
+                        adId,
                         addPic,
                         imaga: res?.data?.getUserById?.avatar,
                         username: res.data.getUserById.name,
+                        createdAt: res.data.getUserById?.createdAt,
+                        description: res.data.getUserById?.description,
                         userId
                     };
                 });
@@ -103,7 +107,7 @@ function ALL() {
                         activeOpacity={0.07}
                         style={styles.messageContainer}
                         onPress={() => {
-                            navigation.navigate('LiveChat', { id: item.id, name: item.username, image: item.addPic, avatar: item.imaga, uid: item.userId})
+                            navigation.navigate('LiveChat', { id: item.id, name: item.username, image: item.addPic, avatar: item.imaga, uid: item.userId, adId: item.adId, description: item.description, createdAt: item.createdAt })
                         }}>
                         <View style={styles.imgResposive}>
                             <Image

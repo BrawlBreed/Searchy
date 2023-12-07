@@ -67,7 +67,10 @@ function MainHome() {
 
   function emptyView() {
     return (
-      <View style={[styles.flex, styles.emptyContainer]}> 
+      <ScrollView refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        contentContainerStyle={[styles.emptyContainer, {height: '100%'}]} style={[styles.flex]}> 
         <Image
           style={styles.emptyImage}
           source={require('../../../assets/images/emptyView/noData.png')}
@@ -78,7 +81,7 @@ function MainHome() {
         <TextDefault center light>
           Моля свържете се с оператор!
         </TextDefault>
-      </View>
+      </ScrollView>
     )
   }
   function categoryHeader() {
@@ -101,7 +104,7 @@ function MainHome() {
 
     return (
       <>
-        {loading ? <TextDefault>Loading...</TextDefault> : 
+        {loading ? <TextDefault>Зарежда се...</TextDefault> : 
         error ? <TextDefault center>Грешка!</TextDefault> :
         categories.length === 0 ? emptyView() : 
         <>
@@ -150,7 +153,7 @@ function MainHome() {
   return (
     <>
     {
-      loading ? <TextDefault>Loading...</TextDefault> :
+      loading ? <TextDefault>Зарежда се...</TextDefault> :
       error ? <TextDefault center>Грешка!</TextDefault> :
       items.length === 0 ? emptyView() : 
         <View style={[styles.flex, styles.container]}>

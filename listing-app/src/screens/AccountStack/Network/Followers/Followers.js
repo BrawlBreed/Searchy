@@ -1,25 +1,53 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, View, FlatList, Share } from 'react-native'
 import { EmptyButton, FlashMessage, TextDefault } from '../../../../components'
 import { alignment, colors } from '../../../../utilities'
 import Card from './Card'
 import styles from './styles'
-
-const data = [
-    {
-        img: require('../../../../assets/images/avatar.png'),
-        name: 'John',
-        following: false
-    },
-    {
-        img: require('../../../../assets/images/avatar.png'),
-        name: 'Doe',
-        following: false
-    },
-]
+import { useLazyQuery } from '@apollo/client'
+import { FOLLOWING_USER, FOLLOW_USER, GET_AVATAR_NAME_DESCRIPTION_CREATED_AT } from '../../../../apollo/server'
+import { useSelector } from 'react-redux'
 
 function Followers() {
-
+    const [items, setItems] = useState([]);
+    const { uid } = useSelector(state => state.user);
+    const [getOwnUserData, { loading: l, error: e, data: d, refetch: r }] = useLazyQuery(GET_AVATAR_NAME_DESCRIPTION_CREATED_AT);
+    const [getUserById, { loading, error, data, refetch }] = useLazyQuery(GET_AVATAR_NAME_DESCRIPTION_CREATED_AT);
+     
+    useEffect(() => {
+        const fetchUserFollowers = async () => {
+            try {
+                const response = await getOwnUserData({ variables: { userId: uid } });
+                const followers = response.data.getUserById.followers || [];
+    
+                const filteredFollowers = followers.filter(followerId => followerId !== '');
+    
+                // Fetch each follower's details
+                const followersItemsPromises = filteredFollowers.map(followerId =>
+                    getUserById({ variables: { userId: followerId } }).then(response => response.data.getUserById)
+                );
+    
+                // Wait for all the items to be fetched
+                const followersItemsResponses = await Promise.all(followersItemsPromises);
+    
+                // Process and set the items
+                const newItems = followersItemsResponses.reduce((unique, item) => {
+                    if (item && !unique.some(i => i.id === item.id)) {
+                        unique.push({ ...item, isFollowing: item.followers.includes(uid)});
+                    }
+                    return unique;
+                }, []);
+                setItems(newItems);
+            } catch (error) {
+                console.error('Error fetching user followers:', error);
+            }
+        };
+    
+        if (uid) {
+            fetchUserFollowers();
+        }
+    }, [uid, data]);
+    
     async function share() {
         try {
             const result = await Share.share({
@@ -50,10 +78,10 @@ function Followers() {
                     source={require('../../../../assets/images/emptyView/followers.png')}
                 />
                 <TextDefault H4 center bold style={alignment.MTlarge}>
-                    {"You don't have followers yet."}
+                    {"Нямаш последователи все още.."}
                 </TextDefault>
                 <TextDefault H5 center light style={alignment.MTsmall}>
-                    {'Chat, post or start following somebody so they can follow you.'}
+                    {'Когато някой те последва - ще се появи тук.'}
                 </TextDefault>
             </View>
         )
@@ -83,12 +111,12 @@ function Followers() {
             <FlatList
                 style={styles.flex}
                 contentContainerStyle={[styles.mainContainer, { flexGrow: 1 }]}
-                data={data}
+                data={items}
                 ListEmptyComponent={emptyView()}
-                ListHeaderComponent={data.length > 0 && header()}
+                ListHeaderComponent={items.length > 0 && header()}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
-                    <Card {...item} />
+                    <Card r={r} refetch={refetch} {...item} />
                 )}
             />
         </View>

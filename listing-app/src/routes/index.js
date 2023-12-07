@@ -26,8 +26,8 @@ import EditAd from '../screens/AddStack/MainAdd/Ads/EditAd';
 function NetworkTabs() {
     return (
         <AccountTOP.Navigator initialRouteName='Following' tabBarOptions={TopBarOptions()}>
-            <AccountTOP.Screen name='Following' component={AccountScreens.Following} />
-            <AccountTOP.Screen name='Followers' component={AccountScreens.Followers} />
+            <AccountTOP.Screen name='Следваш' component={AccountScreens.Following} />
+            <AccountTOP.Screen name='Последователи' component={AccountScreens.Followers} />
         </AccountTOP.Navigator>
     )
 }
@@ -149,7 +149,7 @@ function AccountTabs() {
             <AccountStack.Screen name='Notifications' component={AccountScreens.Notifications} />
             <AccountStack.Screen name='HelpBrowser' component={AccountScreens.HelpBrowser} />
             <AccountStack.Screen name='Network' component={NetworkTabs} options={{
-                title: 'My Network',
+                title: 'Моята социална мрежа',
                 headerStyle: {
                     backgroundColor: colors.headerbackground,
                 },

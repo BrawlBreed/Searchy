@@ -23,7 +23,7 @@ function MainHeader(props) {
                 </TextDefault>
                 <Feather name='chevron-down' size={scale(20)} color={colors.fontSecondColor} />
             </TouchableOpacity>
-            <View style={styles.searchContainer}>
+            <View style={styles.searchContainer}> 
                 <TouchableOpacity
                     onPress={() => props.toggleSearch()}
                     activeOpacity={1}
@@ -37,10 +37,10 @@ function MainHeader(props) {
                         {'Мобилен Телефон, Недвижим Имот и др...'}
                     </TextDefault>
                 </TouchableOpacity> 
-                <BorderlessButton style={styles.bellBtn}
+                {/* <BorderlessButton style={styles.bellBtn}
                     onPress={() => navigation.navigate('Notifications')}>
                     <FontAwesome name="bell-o" size={scale(18)} color={colors.headerText} />
-                </BorderlessButton>
+                </BorderlessButton> */}
             </View>
         </View>
     )

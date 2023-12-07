@@ -15,6 +15,7 @@ import {
   reauthenticateWithCredential,
   EmailAuthProvider,
   sendEmailVerification,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { checkUserAuth, setCreatedAt, setLoading, setRegister, setUserId } from "../store/reducers/User/userSlice";
@@ -308,8 +309,19 @@ export async function updateEmail(email) {
   }catch(error){
     return error
   };
-  
 }
+
+export const sendForgotPasswordEmail = async (email) => {
+  const auth = getAuth();
+  try{
+    await sendPasswordResetEmail(auth, email)
+    return true
+  }catch(error){
+    console.log(error)
+    return false
+  }
+};
+
 // export const createOrSignUpWithPhone = async (phoneNumber, dispatch, mutateFunction) => {
 //   dispatch(setLoading(true));
 

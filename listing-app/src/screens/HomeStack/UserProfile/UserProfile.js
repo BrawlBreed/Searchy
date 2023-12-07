@@ -4,12 +4,14 @@ import { Image, View } from 'react-native'
 import { EmptyButton, RightButton, TextDefault } from '../../../components'
 import { alignment, colors } from '../../../utilities'
 import styles from './styles'
-import { dateStringToDDMMYYYY } from '../../../utilities/methods'
+import btnStyles from '../../../components/Buttons/EmptyButton/styles';
+import { dateStringToDDMMYYYY, filterFalsyValues } from '../../../utilities/methods'
 import { useDispatch, useSelector } from 'react-redux'
 import { client } from '../../../apollo'
 import { FOLLOWING_USER, FOLLOW_USER, GET_ZONES_QUERY } from '../../../apollo/server'
 import { useLazyQuery } from '@apollo/client'
 import { setCurrentUser } from '../../../store/reducers/User/userSlice'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 function UserProfile({ route }) {
     const navigation = useNavigation()
@@ -25,11 +27,11 @@ function UserProfile({ route }) {
     });
 
     useEffect(() => {
-        getZones()
+        refetch().then(() => getZones())
     }, [])
 
     useEffect(() => {
-        setIsFollowing(followersList.some(item => item === _id))
+        setIsFollowing(followersList.some(item => item === user.uid))
     }, [followersList])
 
     useLayoutEffect(() => {
@@ -41,14 +43,14 @@ function UserProfile({ route }) {
 
     useEffect(() => {
         if(data?.getUserById){
-            setFollowersList(data?.getUserById?.followers.filter((item) => item !== ''))
-            setFollowingList(data?.getUserById?.following.filter((item) => item !== ''))
+            setFollowersList(filterFalsyValues(data?.getUserById?.followers))
+            setFollowingList(filterFalsyValues(data?.getUserById?.following))
         }
     }, [data])
 
     function follow () {
-        const newFollowers = [...followersList, _id]
-        const newFollowing = [...user.following, user._id]
+        const newFollowers = [...filterFalsyValues(followersList), user.uid]
+        const newFollowing = [...filterFalsyValues(user.following), _id]
         client.mutate({
             mutation: FOLLOW_USER,
             variables: {
@@ -58,14 +60,14 @@ function UserProfile({ route }) {
         }).then(() => client.mutate({
             mutation: FOLLOWING_USER,
             variables: {
-                uid: user._id,
+                uid: user.uid,
                 following: newFollowing.length > 0 ? newFollowing : ['']
             }
         })).then(() => refetch())
     }
     function unfollow () {
-        const newFollowers = followersList.filter((item) => item !== _id)
-        const newFollowing = user.following.filter((item) => item !== user._id)
+        const newFollowers = followersList?.filter((item) => item !== user.uid) || ['']
+        const newFollowing = user?.following?.filter((item) => item !== _id) || ['']
         client.mutate({
             mutation: FOLLOW_USER,
             variables: {
@@ -75,7 +77,7 @@ function UserProfile({ route }) {
         }).then(() => client.mutate({
             mutation: FOLLOWING_USER,
             variables: {
-                uid: user._id,
+                uid: user.uid,
                 following: newFollowing.length > 0 ? newFollowing : ['']
             }
         })).then(() => refetch())
@@ -88,7 +90,7 @@ function UserProfile({ route }) {
                     <View style={styles.imageContainer}>
                         <Image
                             style={styles.imgResponsive}
-                            source={{ uri: avatar }}
+                            source={avatar ? { uri: avatar } : require('../../../assets/images/avatar.png')}
                             resizeMode='cover'
                         />
                     </View>
@@ -113,13 +115,20 @@ function UserProfile({ route }) {
                         </View>
                         {isFollowing ? (
                             <View style={styles.editButton}>
-                                <EmptyButton title='Отпоследвай'
-                                    onPress={() => unfollow()} />
+                                <TouchableOpacity
+                                    activeOpacity={0.7}
+                                    style={[btnStyles.emptyButton, { backgroundColor: colors.fontPlaceholder }]}
+                                    onPress={unfollow}
+                                    >
+                                    <TextDefault textColor={colors.buttonbackground} H4 bolder center>
+                                        {'Отпоследвай'}
+                                    </TextDefault>
+                                </TouchableOpacity>
                             </View>
                         ) : (
                             <View style={styles.editButton}>
-                                <EmptyButton title='Последвай'
-                                    onPress={() => follow()} />
+                                <EmptyButton title='Последвай' 
+                                    onPress={follow} />
                             </View>
                         )}
                     </View>

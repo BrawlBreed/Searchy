@@ -9,9 +9,9 @@ function ModalHeader(props) {
     return (
         <View style={[styles.headerContainer, { borderBottomWidth: props.title ? StyleSheet.hairlineWidth : 0 }]}>
             <View style={styles.headerContents}> 
-                <LeftButton icon='close' iconColor={colors.headerText} navigate={props.closeModal} />
+                <LeftButton icon={props.type} iconColor={colors.headerText} navigate={props.closeModal} />
                 {props.title &&
-                    <TextDefault textColor={colors.headerText} style={styles.title} bolder H3>
+                    <TextDefault textColor={colors.headerText} style={[{ width: '50%', textAlign: 'center'}]} bolder H3>
                         {props.title}
                     </TextDefault>
                 }

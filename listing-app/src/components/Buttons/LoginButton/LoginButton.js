@@ -12,11 +12,11 @@ function LoginButton(props) {
         <TouchableOpacity
             disabled={props.disabled ?? false}
             activeOpacity={0.7}
-            style={StyleSheet.compose(styles.emptyButton, props.style)}
+            style={StyleSheet.compose(styles.emptyButton, props.style )}
             onPress={props.onPress}>
             {props.icon &&
-                <SimpleLineIcons name={props.icon} size={scale(20)} color={colors.buttonbackground} />}
-            <TextDefault textColor={colors.buttonbackground} H4 style={[styles.flex, alignment.PLmedium]}>
+                <SimpleLineIcons name={props.icon} size={scale(30)} color={colors.buttonbackground} />}
+            <TextDefault textColor={colors.buttonbackground} H4 style={[styles.flex, alignment.PLmedium, { fontSize: 25 }]}>
                 {props.title}
             </TextDefault>
         </TouchableOpacity>

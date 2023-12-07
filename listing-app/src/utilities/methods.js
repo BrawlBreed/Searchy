@@ -15,3 +15,8 @@ export function dateStringToDDMMYYYY(dateString) {
     // Return the formatted string
     return `${day}.${month}.${year}г.`;
   }
+
+  export function filterFalsyValues(array) {
+    return Array.from(new Set(array?.filter(item => item) || ['']));
+  }
+  

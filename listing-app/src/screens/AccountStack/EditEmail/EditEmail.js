@@ -7,7 +7,7 @@ import styles from './styles'
 import { Ionicons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { changeEmail, checkUserAuth, setAwaitingEmailVerification, setEmailChanged } from '../../../store/reducers/User/userSlice'
+import { changeEmail, checkUserAuth, logout, setAwaitingEmailVerification, setEmailChanged } from '../../../store/reducers/User/userSlice'
 import { gql, useMutation } from '@apollo/client'
 import { updateEmail, updateAndVerifyEmail, auth } from '../../../firebase'
 import { set } from 'firebase/database'
@@ -61,6 +61,7 @@ function EditEmail() {
         dispatch(setAwaitingEmailVerification(false))
         dispatch(setEmailChanged(false))
         setStep(false)
+        dispatch(logout())
     }
 
     useEffect(() => {

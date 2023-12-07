@@ -5,10 +5,6 @@ import { TextDefault } from '../../Text'
 import styles from './styles'
 
 function UnfollowModal(props) {
-    function CallOk() {
-        props.onFollowing()
-        props.onModalToggle()
-    }
     return (
         <Modal
             animationType="slide"
@@ -18,23 +14,20 @@ function UnfollowModal(props) {
             <TouchableOpacity activeOpacity={1} onPress={props.onModalToggle} style={styles.centeredView}>
                 <View style={styles.modalView}>
                     <TextDefault bolder H5 style={{ width: '100%' }}>
-                        {`Do you want to unfollow ${props.name}`}
-                    </TextDefault>
-                    <TextDefault style={[alignment.MTmedium, { width: '100%' }]}>
-                        {'You will have to find this user again'}
+                        {`Наистина ли искате да отпоследвате ${props.name} ?`}
                     </TextDefault>
                     <View style={styles.buttonsRow}>
                         <TouchableOpacity style={styles.button} onPress={props.onModalToggle}>
                             <View style={styles.buttonText}>
                                 <TextDefault bold H5>
-                                    {'Cancel'}
+                                    {'Отказ'}
                                 </TextDefault>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.button} onPress={() => CallOk()}>
+                        <TouchableOpacity style={styles.button} onPress={props.unfollow}>
                             <View style={styles.buttonText}>
                                 <TextDefault bold H5>
-                                    {'Unfollow'}
+                                    {'Отпоследвай'}
                                 </TextDefault>
                             </View>
                         </TouchableOpacity>

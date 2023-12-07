@@ -1,7 +1,7 @@
 export const colors = {
     black: '#000',
     white: '#FFF',
-    themeBackground: '#F7F7F7',
+    themeBackground: '#FFF',
     headerbackground: '#ebeeef',
     headerText: '#002f34',
     bottomTabColor: '#ebeeef',

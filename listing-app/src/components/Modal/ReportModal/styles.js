@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     },
     buttonsRow: {
         flexDirection: "row",
-        justifyContent: "flex-end",
+        justifyContent: "space-between",
         ...alignment.PTsmall
     },
     button: {

@@ -73,7 +73,7 @@ function Registration() {
             styles.flex,
             { paddingTop: inset.top, paddingBottom: inset.bottom }]}>
             <View style={[styles.flex, styles.mainContainer]}>
-                <ModalHeader closeModal={() => navigation.goBack()} />
+                <ModalHeader type='close' closeModal={() => navigation.goBack()} />
                 <View style={styles.logoContainer}>
                     <View style={styles.image}>
                         <Image
@@ -93,7 +93,7 @@ function Registration() {
                             navigation.navigate('Entry', { email: false })
                         }} /> */}
                     <LoginButton
-                        style={{ width: '85%' }}
+                        style={{ width: '85%', height: '30%' }}
                         icon='envelope'
                         title='Продължи с имейл'
                         onPress={async () => {

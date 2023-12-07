@@ -11,10 +11,9 @@ import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { GET_ZONES_QUERY } from '../../../apollo/server'
 
 function MainAccount() {   
-    const { isLoggedIn, userId, ...user } = useSelector(state => state.user)
-    const { name, avatar } = user
+    const { isLoggedIn, userId, name, avatar, email } = useSelector(state => state.user)
     const navigation = useNavigation()
-    const [getZones, { loading, data, error }] = useLazyQuery(GET_ZONES_QUERY, {
+    const [getZones, { loading, data, error, refetch }] = useLazyQuery(GET_ZONES_QUERY, {
         variables: {
             userId: userId
         }
@@ -22,8 +21,9 @@ function MainAccount() {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        getZones()
-    }, [])
+        refetch().then(() => getZones())
+    }, [data])
+
     useEffect(() => {
         if(data?.getUserById) {
             dispatch(setCurrentUser(data?.getUserById))
@@ -34,23 +34,15 @@ function MainAccount() {
         <View style={[styles.flex, styles.container]}>
             <View style={styles.profileContainer}>
                 <View style={styles.imageContainer}>
-                    { avatar ?
                         <Image
                             style={styles.imgResponsive}
-                            source={{ uri: avatar }}
+                            source={avatar ? { uri: avatar } : require('../../../assets/images/avatar.png')}
                             resizeMode='cover'
                         />
-                        : 
-                        <Image
-                            style={styles.imgResponsive}
-                            source={require('../../../assets/images/avatar.png')}
-                            resizeMode='cover'
-                        />
-                    }
                 </View> 
                 <View style={[styles.flex, styles.profileInfo]}>
                     <TextDefault H4 bold style={alignment.MBmedium}>
-                        {isLoggedIn ? name : 'Гост'}
+                        {isLoggedIn ? name ? name : email.split('@')[0] : 'Гост'}
                     </TextDefault>
                     <TouchableOpacity
                         activeOpacity={0.5}
@@ -69,7 +61,7 @@ function MainAccount() {
                 </View>
             </View>
             {isLoggedIn && <>
-                <TouchableOpacity style={styles.smallContainer} onPress={() => navigation.navigate('Network')}>
+                {/* <TouchableOpacity style={styles.smallContainer} onPress={() => navigation.navigate('Network')}>
                     <FontAwesome5 name="users" size={scale(20)} color={colors.buttonbackground} />
                     <View style={[styles.flex]}>
                         <TextDefault bold H5 style={alignment.PLlarge}>
@@ -80,7 +72,7 @@ function MainAccount() {
                         </TextDefault>
                     </View>
                     <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity style={styles.smallContainer} onPress={() => navigation.navigate('Settings')}>
                     <AntDesign name="setting" size={scale(22)} color={colors.buttonbackground} />
                     <View style={[styles.flex]}>

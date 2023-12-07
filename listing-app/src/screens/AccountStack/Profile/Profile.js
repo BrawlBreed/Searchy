@@ -12,7 +12,7 @@ function Profile() {
     const { userId, ...user } = useSelector(state => state.user)
     const { followers, following, avatar, name, email  } = user
     const navigation = useNavigation()
-    const [getZones, { loading, data, error }] = useLazyQuery(GET_ZONES_QUERY);
+    const [getZones, { loading, data, error, refetch }] = useLazyQuery(GET_ZONES_QUERY);
 
     const followersCount = followers.reduce((acc, curr) => {
         // Optimization with a query to check if the user is active
@@ -40,7 +40,7 @@ function Profile() {
                         { avatar ?
                             <Image
                                 style={styles.imgResponsive}
-                                source={{ uri: avatar }}
+                                source={avatar ? { uri: avatar } : require('../../../assets/images/avatar.png')}
                                 resizeMode='cover'
                             />
                             : 

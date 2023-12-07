@@ -13,18 +13,21 @@ function LiveChat({ route }) {
     const navigation = useNavigation()
     const [messages, setMessages] = useState([])
     const user = useSelector(state => state.user)
-    const { id, image, name, avatar, uid } = route.params
+    const { id, image, name, avatar, uid, adId, description, createdAt } = route.params
 
     useLayoutEffect(() => {
         navigation.setOptions({
             header: () => <LiveHeader />
         })
         navigation.setParams({
-            id: id,
-            uid: uid,
-            name: name,
-            image: image,
-            avatar: avatar
+            id, 
+            uid,
+            name,
+            image,
+            avatar,
+            adId,
+            description, 
+            createdAt
         })
     }, [navigation])
 

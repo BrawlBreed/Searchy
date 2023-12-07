@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 export const FlashMessage = props => {
   showMessage({
+    duration: 50000,
     hideOnPress: true,
     hideStatusBar: false,
     message: props.message,
@@ -14,5 +15,6 @@ export const FlashMessage = props => {
   })
 }
 FlashMessage.propTypes = {
-  message: PropTypes.string.isRequired
+  message: PropTypes.string.isRequired,
+  duration: PropTypes.number.isRequired,
 }

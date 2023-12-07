@@ -93,7 +93,7 @@ function Card(props) {
     return (
         <View
             style={[styles.adContainer, { borderLeftColor: props.status?.toLowerCase() === 'inactive' ? colors.horizontalLine : colors.activeLine }]}>
-            <BaseButton onPress={navigateScreen} activeOpacity={0.04} onActiveStateChange={activeState}
+            <BaseButton activeOpacity={0.04} onActiveStateChange={activeState}
                 style={{ opacity: Platform.OS === 'ios' ? opacity : 1 }}>
                 <View style={[styles.dateRow, { flexDirection: "row", alignItems: "center", ...alignment.PTxSmall, ...alignment.PBxSmall }]}>
                     <TextDefault small textColor={colors.fontSecondColor} uppercase style={[styles.flex, alignment.PLsmall, {}]}>

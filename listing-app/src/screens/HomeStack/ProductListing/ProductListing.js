@@ -20,6 +20,10 @@ function ProductListing() {
     const { loading, error, items } = useItems(searchSubCategory, searchCategory, searchInput)
     const [modalVisible, setModalVisible] = useState(false);
 
+    useEffect(() => {
+        console.log(items)
+    })
+
     useLayoutEffect(() => {
         navigation.setOptions(
             navigationOption({ searchCategory: searchSubCategory })
@@ -58,7 +62,7 @@ function ProductListing() {
                 ListEmptyComponent={() => <TextDefault style={styles.fontText} center>Няма намерени резултати</TextDefault>}
                 renderItem={({ item }) => (
                     <ProductCard {...item} />
-                )}
+                )} 
             />
             {/* <FilterModal visible={modalVisible} onModalToggle={toggleModal} searchCategory={searchCategory} /> */}
         </View>

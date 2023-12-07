@@ -56,7 +56,7 @@ function ProductDescription({ route, preview }) {
     };
 
     useEffect(() => {
-        const likeList = likes?.filter(like => like !== '');
+        const likeList = Array.from(new Set(likes)).filter(like => like !== '' && like !== uid);
         setLikesList(likeList)
     }, [likes, isLike])
 
@@ -70,7 +70,7 @@ function ProductDescription({ route, preview }) {
           try {
             const response = await getUser({ variables: { userId: uid } });
             if (response.data?.getUserById) {
-                return response.data.getUserById;
+                return { ...response.data.getUserById, favorites: response.data.getUserById.favorites || [''] } ;
             }
           } catch (error) {
             console.error('Error fetching user:', error);
@@ -78,7 +78,7 @@ function ProductDescription({ route, preview }) {
         };
       
         fetchUser().then(user => {
-            if (user?.favorites) {
+            if (user?.favorites ) {
                 dispatch(setFavorites(user.favorites));
                 isLikeSetter(user.favorites.includes(id));
                 setFetched(true);
@@ -88,7 +88,11 @@ function ProductDescription({ route, preview }) {
               
     useEffect(() => {
         // Do nothing if not logged in
-        if (!isLoggedIn) return;
+        if (!isLoggedIn) {
+            isLikeSetter(false)
+            navigation.navigate('Registration')
+            return
+        };
         const toggleFavorite = async () => {
             if(!fetched) return
             try {
@@ -117,6 +121,8 @@ function ProductDescription({ route, preview }) {
             client.mutate({
                 mutation: INCREMENT_VIEWS,
                 variables: { id: id, views: Number(views + 1)}
+            }).then(() => {
+                refetch()
             })
 
         }
@@ -133,12 +139,14 @@ function ProductDescription({ route, preview }) {
     }
 
     async function chatCheck(){
-        if (!isLoggedIn)
-            navigation.navigate('Registration')
+        if (!isLoggedIn) navigation.navigate('Registration')
         else{
+            const chatObj = {
+                name: user.name, image: images[0], avatar: user.avatar, uid: user._id, adId: id
+            }
             const chats = await fetchChatsByUserIDs(uid, id);
             if(chats.length){ 
-                navigation.navigate('LiveChat', { id: chats[0].id } ) 
+                navigation.navigate('LiveChat', { id: chats[0].id, ...chatObj } ) 
             } else{
                 const chatObject = {
                     createdAt: new Date().toISOString(),
@@ -147,11 +155,12 @@ function ProductDescription({ route, preview }) {
                         uid,
                         user._id
                     ],
+                    adId: id,
                     image: images[0],
                     title: title,
                 };                  
                 const chatId = await addChat(chatObject)
-                navigation.navigate('LiveChat', { id: chatId } )
+                navigation.navigate('LiveChat', { id: chatId, ...chatObj } )
             }
 
         }
@@ -317,7 +326,7 @@ function ProductDescription({ route, preview }) {
                                 <View style={styles.imageResponsive}>
                                     <Image
                                         style={styles.image}
-                                        source={{uri:user.avatar}}/>
+                                        source={user.avatar ? {uri:user.avatar} : require('../../../assets/images/avatar.png')}/>
                                 </View>
                                 <View style={styles.profileInfo}>
                                     <TextDefault bold>

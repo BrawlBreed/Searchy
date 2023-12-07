@@ -307,16 +307,38 @@ export const GET_NUMBER = gql`
   query MyQuery($userId: ID!) {
     getUserById(user: $userId) {
       _id
-      phone
+      phone 
     }
   }
 `
-export const GET_AVATAR_AND_NAME = gql`
+export const GET_AVATAR_NAME_DESCRIPTION_CREATED_AT = gql`
   query MyQuery($userId: ID!) {
     getUserById(user: $userId) {
       _id
       avatar
+      description
+      createdAt
       name
+      following
+      followers
     }
+  }
+`
+
+export const SEND_REPORT = gql`
+  mutation MyMutation(    
+    $userId: String!,
+    $itemId: String!,
+    $reason: String!,
+    $additionalInfo: String,
+    $sentAt: String!
+  ) {
+    sendReport(
+      userId: $userId,
+      itemId: $itemId
+      reason: $reason
+      additionalInfo: $additionalInfo
+      sentAt: $sentAt
+    )
   }
 `

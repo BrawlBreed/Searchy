@@ -30,6 +30,7 @@ export const checkUserAuth = createAsyncThunk(
               dispatch(changeEmail(auth.currentUser.email))
               dispatch(setAwaitingEmailVerification(false));
               dispatch(setEmailChanged(false))
+              dispatch(logout())
             }, 20000)
           }else{
             console.log('Logged out');

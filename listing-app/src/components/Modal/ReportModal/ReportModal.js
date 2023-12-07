@@ -1,43 +1,67 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, Keyboard, KeyboardAvoidingView, Modal, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { scale } from '../../../utilities';
+import { colors, scale } from '../../../utilities';
 import { FlashMessage } from '../../FlashMessage/FlashMessage';
 import ModalHeader from '../../Header/ModalHeader/ModalHeader';
 import RadioButton from '../../RadioBtn/RadioBtn';
 import { TextDefault } from '../../Text';
 import styles from './styles';
+import { SEND_REPORT } from '../../../apollo/server';
+import { client } from '../../../apollo';
 
 const REPORT_OPTIONS = [
     {
         value: 0,
-        title: 'Offensive content'
+        title: 'Неподходящо съдържание'
     },
     {
         value: 1,
-        title: 'Fraud'
+        title: 'Измамен продавач'
     },
     {
         value: 2,
-        title: 'Duplicate ad'
+        title: 'Повтаряща се обява'
     },
     {
         value: 3,
-        title: 'Product already sold'
+        title: 'Продукта вече е продаден'
     },
     {
         value: 4,
-        title: 'Other'
+        title: 'Друго'
     },
 ]
 
 function ReportModal(props) {
     const inset = useSafeAreaInsets()
     const [check, setCheck] = useState(null)
+    const [additionalInfo, setAdditionalInfo] = useState('')
     const [margin, marginSetter] = useState(false)
+    const { userId, adId, itemId } = props
 
-    function Send() {
-        FlashMessage({ message: 'Thanks for your feedback', type: 'success' })
+    async function Send() {
+        if(check === null) {
+            FlashMessage({ message: 'Не сте дали причина за докладване на потребителя!', type: 'danger' })
+        }else{
+            try{
+                await client.mutate({
+                    mutation: SEND_REPORT,
+                    variables: {
+                        userId: userId,
+                        adId: adId,
+                        itemId: itemId,
+                        reason: REPORT_OPTIONS[check].title,
+                        additionalInfo: additionalInfo,
+                        sentAt: new Date().toISOString()
+                    }
+                })    
+                FlashMessage({ message: 'Благодарим за информацията!', type: 'success' })
+            }catch(err){
+                console.log(err)
+                FlashMessage({ message: 'Нещо се обърка, моля опитайте по-късно!', type: 'warning' })
+            }
+        }
         props.onModalToggle()
     }
     useEffect(() => {
@@ -62,20 +86,22 @@ function ReportModal(props) {
             <View style={styles.footerView}>
                 <TextInput
                     style={styles.textInput}
-                    placeholder='Comment'
+                    placeholder='Допълнителна информация'
+                    value={additionalInfo}
+                    onChangeText={(text) => setAdditionalInfo(text)}
                 />
                 <View style={styles.buttonsRow}>
                     <TouchableOpacity style={styles.button} onPress={() => props.onModalToggle()}>
                         <View style={styles.buttonText}>
                             <TextDefault>
-                                {'Cancel'}
+                                {'Отказ'}
                             </TextDefault>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.button} onPress={Send}>
                         <View style={styles.buttonText}>
                             <TextDefault>
-                                {'Send'}
+                                {'Изпрати'}
                             </TextDefault>
                         </View>
                     </TouchableOpacity>
@@ -97,8 +123,8 @@ function ReportModal(props) {
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={styles.flex}>
                     <View style={[styles.flex, styles.mainContainer, { paddingBottom: margin ? scale(50) : scale(0) }]}>
-                        <ModalHeader closeModal={props.onModalToggle} title={'Report ad'} />
-                        <FlatList
+                        <ModalHeader closeModal={props.onModalToggle} title={'Докладване'} />
+                        <FlatList 
                             data={REPORT_OPTIONS}
                             contentContainerStyle={{ flexGrow: 1 }}
                             style={styles.body}
