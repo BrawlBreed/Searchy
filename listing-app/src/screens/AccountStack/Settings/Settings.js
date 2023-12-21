@@ -20,7 +20,7 @@ function Settings() {
 
     return (
         <View style={[styles.flex, styles.mainContainer]}>
-            <TouchableOpacity style={styles.smallContainer}
+            {/* <TouchableOpacity style={styles.smallContainer}
                 onPress={() => navigation.navigate('Notifications')}>
                 <View style={[styles.flex]}>
                     <TextDefault bold H5 style={alignment.PLlarge}>
@@ -31,8 +31,8 @@ function Settings() {
                     </TextDefault>
                 </View>
                 <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.smallContainer}
+            </TouchableOpacity> */}
+            {/* <TouchableOpacity style={styles.smallContainer}
                 onPress={() => navigation.navigate('Privacy')}>
                 <View style={[styles.flex]}>
                     <TextDefault bold H5 style={alignment.PLlarge}>
@@ -43,7 +43,7 @@ function Settings() {
                     </TextDefault>
                 </View>
                 <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity style={styles.smallContainer}
                 onPress={() => {
                     logout(dispatch)
@@ -66,8 +66,8 @@ function Settings() {
             <TouchableOpacity style={styles.smallContainer}
                 onPress={onModalToggle}>
                 <TextDefault bold H5 style={[alignment.PLlarge, styles.flex]}>
-                    {'Деактивиране на профил'}
-                </TextDefault>
+                    {'Изтрий профила си'}
+                </TextDefault> 
             </TouchableOpacity>
 
             <DeactivateModal

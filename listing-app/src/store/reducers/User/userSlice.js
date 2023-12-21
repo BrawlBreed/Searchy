@@ -5,12 +5,6 @@ import { client } from '../../../apollo';
 import { gql } from '@apollo/client';
 import { dateStringToDDMMYYYY } from '../../../utilities/methods';
 
-const CHANGE_EMAIL_MUTATION = gql`
-  mutation MyMutation($uid: String!, $email: String!) {
-    changeEmail(uid: $uid, email: $email)
-  }
-`;
-
 // Async thunk for checking user authentication state
 export const checkUserAuth = createAsyncThunk(
   'user/checkUserAuth',
@@ -67,7 +61,8 @@ export const initialState = {
   loading: false,
   awaitingEmailVerification: false,
   emailChanged: false,
-  userId: '', // Add uid to the state
+  uid: '', // Add uid to the state
+  userId: '',
   changed: false,
 };
 
@@ -82,7 +77,7 @@ const userSlice = createSlice({
       state.emailChanged = action.payload;
     },
     setCurrentUser: (state, action) => {
-      Object.assign(state, { ...action.payload, createdAt: dateStringToDDMMYYYY(action.payload.createdAt), email: auth.currentUser.email });
+      Object.assign(state, { ...action.payload, createdAt: dateStringToDDMMYYYY(action.payload?.createdAt), email: auth.currentUser.email });
     },
     setUserId: (state, action) => { 
       state.isLoggedIn = true;
@@ -95,7 +90,7 @@ const userSlice = createSlice({
       state.favorites = action.payload;
     },
     setCreatedAt: (state) => {
-      state.createdAt = new Date().toString();
+      state.createdAt = new Date()?.toString();
     },
     changeEmail: (state, action) => {
       state.email = action.payload;
@@ -125,10 +120,11 @@ const userSlice = createSlice({
       const itemExists = state.favorites.some(favorite => favorite === action.payload);
       if (!itemExists) {
         state.favorites.push(action.payload);
+        state.favorites = Array.from(new Set(state.favorites));
       }
     },
     removeFavorite: (state, action) => {
-      state.favorites = state.favorites.filter((favorite) => favorite !== action.payload);
+      state.favorites = Array.from(new Set(state.favorites.filter((favorite) => favorite !== action.payload)));
     },
     setOwnedItems: (state, action) => {
       state.ownedItems = action.payload;
@@ -136,6 +132,12 @@ const userSlice = createSlice({
     changeOwnedItems: (state) => {
       state.changed = !state.changed;
     },
+    setFollowing: (state, action) => {
+      state.following = action.payload;
+    },
+    setFollowers: (state, action) => {
+      state.followers = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -169,7 +171,9 @@ export const {
   appendFavorites,
   removeFavorite,
   changeOwnedItems,
-  setOwnedItems
+  setOwnedItems,
+  setFollowing,
+  setFollowers
 } = userSlice.actions;
 
 export default userSlice.reducer;

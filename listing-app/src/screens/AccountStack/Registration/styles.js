@@ -18,7 +18,8 @@ const styles = StyleSheet.create({
         height: height * 0.5,
         backgroundColor: colors.themeBackground,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        width: '100%'
     },
     buttonContainer: {
         flex: 1,
@@ -31,14 +32,17 @@ const styles = StyleSheet.create({
         letterSpacing: scale(5),
     },
     image: {
-        width: scale(200),
-        height: scale(100),
+        flex: 1,
+        width: '70%',
+        height: '100%',
+        resizeMode: 'contain',
+        marginBottom: '30%',
+        marginLeft: '7.5%'
     },
     imgResponsive: {
         flex: 1,
-        width: undefined,
-        height: undefined,
-        transform: [{ scale: 1.4 }]
+        width: '90%',
+        height: 'auto',
     }
 })
 export default styles

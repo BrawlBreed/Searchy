@@ -25,7 +25,7 @@ function SearchHeader(props) {
                 <TextInput
                     style={styles.inputText}
                     placeholderTextColor={colors.fontSecondColor}
-                    placeholder={`Резултати от търсенето:  ${props.searchCategory}`}
+                    placeholder={`Резултати от търсенето:  ${props.searchCategory === 'View All' ? 'Всички' : props.searchCategory}`}
                 />
             </View>
         </View>

@@ -1,7 +1,9 @@
 export const colors = {
     black: '#000',
     white: '#FFF',
-    themeBackground: '#FFF',
+    searchy1: '#fbbf04',
+    searchy2: '#4186f3',
+    themeBackground: 'transparent',
     headerbackground: '#ebeeef',
     headerText: '#002f34',
     bottomTabColor: '#ebeeef',

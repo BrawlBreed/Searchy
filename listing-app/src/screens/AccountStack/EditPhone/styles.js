@@ -3,7 +3,7 @@ import { alignment, colors, scale, textStyles } from '../../../utilities'
 
 const styles = StyleSheet.create({
     flex: {
-        flex: 1
+        flex: 1,
     },
     safeAreaView: {
         backgroundColor: colors.headerbackground

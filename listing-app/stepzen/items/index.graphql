@@ -17,8 +17,8 @@ type Item {
   likes: [String]
   views: Float
   price: Float
-  promoted: Boolean
   status: String
+  promotionScore: Float
   title: String
   subCategoryId: String
   subCategory: SubCategory
@@ -84,8 +84,8 @@ type Mutation {
     subCategoryId: String!,
     title: String!,
     userId: String!,
-    promoted: Boolean = false,
-    zoneId: String!,
+    promotionScore: Float,
+    zoneId: String,
     address: AddressInput!,
     likes: [String]
     views: Float = 0
@@ -102,6 +102,11 @@ type Mutation {
   likeItem(name: String!, likes: [String]): JSON 
   @rest(
     endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$name.json",
+    method: PATCH
+  )
+  promoteItem(id: String!, promotionScore: Float!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
     method: PATCH
   )
   deleteItem(id: String!): JSON
@@ -123,5 +128,10 @@ type Mutation {
   @rest(
     endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
     method: PATCH
+  )
+  addBatchTestItems(items: [JSON]): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
+    method: POST,
   )
 }

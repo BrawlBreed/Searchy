@@ -10,11 +10,7 @@ import useFavorites from '../../../../hooks/useFavorites';
 
 function Favourite() {
     const navigation = useNavigation()
-    const { items, loading, error } = useFavorites();
-
-    useEffect(() => {
-        console.log(items)
-    }, [items])
+    const { items, loading, error } = useFavorites({ fetchPolicy: 'network-only'});
 
     function emptyView() {
         return (

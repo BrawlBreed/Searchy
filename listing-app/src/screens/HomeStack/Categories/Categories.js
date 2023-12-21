@@ -7,7 +7,7 @@ import { alignment, colors, scale } from '../../../utilities';
 import styles from './styles';
 import useSubCategories from '../../../hooks/useSubCategories';
 
-const COLORS = ['#ffd54d', '#6df8f3', '#ff7a7a', '#d5b09f', '#eccbcb']
+const COLORS = [colors.searchy1, colors.searchy2]
 
 function Categories() {
     const navigation = useNavigation()

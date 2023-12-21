@@ -16,11 +16,13 @@ import {
   EmailAuthProvider,
   sendEmailVerification,
   sendPasswordResetEmail,
+  deleteUser,
 } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { checkUserAuth, setCreatedAt, setLoading, setRegister, setUserId } from "../store/reducers/User/userSlice";
-import { getDatabase, ref, set, orderByKey, onValue, on, orderByValue, get } from "firebase/database";
+import { getDatabase, ref, set, get, orderByChild, query as dbQuery, orderByValue, equalTo, limitToFirst, startAfter, orderByKey, limitToLast, startAt, endAt } from "firebase/database";
 import { collection, getFirestore, onSnapshot, where, query, getDocs, addDoc, doc, setDoc, orderBy, updateDoc, deleteDoc } from "firebase/firestore";
+import { nearByItems } from "../apollo/server";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB60wKug-C4eUXXKZ1f53LZUXKPNYGchPQ",
@@ -163,10 +165,14 @@ export const updateAndVerifyEmail = async (newEmail, password) => {
   }
 };
 
-export function fetchChatsByUserIDs(uid1, uid2) {
+export function fetchChatsByUserIDs(uid1, uid2, adId) {
   return new Promise((resolve, reject) => {
     const chatsRef = collection(dbFirestore, 'chats');
-    const q = query(chatsRef, where('members', 'array-contains-any', [uid1, uid2]));
+    const q = query(
+      chatsRef, 
+      where('members', 'array-contains-any', [uid1, uid2]),
+      where('adId', '==', adId) // Additional field condition
+    );
 
     getDocs(q)
       .then(querySnapshot => {
@@ -195,7 +201,6 @@ export function fetchChatsByUserID(uid1) {
           data.id = doc.id;
           allChats.push(data);
         });
-        console.log(allChats);
         resolve(allChats);
       })
       .catch(error => reject(error));
@@ -232,6 +237,32 @@ export const deleteChat = async (chatId) => {
       });
   });
 }
+
+export const deleteProfile = async () => {
+  const user = auth.currentUser;
+
+  if (user) {
+    try {
+      await deleteUser(user);
+      console.log("User account deleted successfully");
+      // Handle post-deletion logic here (e.g., redirect to a login screen)
+      return true
+    } catch (error) {
+      if (error.code === 'auth/requires-recent-login') {
+        console.log('The user must re-authenticate before this operation can be executed.');
+        // Prompt the user to sign in again
+      } else {
+        console.error('Error deleting user:', error);
+      }
+
+      return false
+    }
+  } else {
+    console.log("No user is currently signed in.");
+  }
+};
+
+
 
 export function fetchMessagesByChatId(chatId, setMessages) {
   const messagesRef = collection(dbFirestore, `chats/${chatId}/messages`);
@@ -376,3 +407,198 @@ export const sendForgotPasswordEmail = async (email) => {
 //     return { error };
 //   }
 // };
+
+// export function fetchItems(zoneId, limit = 10, uid = '', startAfterId = null ) {
+//   return new Promise((resolve, reject) => {
+//     const db = getDatabase();
+//     let itemsQuery;
+//     if (startAfterId) {
+//       // Query for fetching subsequent batches
+//       itemsQuery = dbQuery(
+//         ref(db, 'items'),
+//         orderByChild(`zoneId`),
+//         equalTo(zoneId),
+//         limitToLast(limit)
+//       );
+//     } else {
+//       // Query for fetching the initial batch
+//       itemsQuery = dbQuery(
+//         ref(db, 'items'),
+//         orderByChild('zoneId'),
+//         equalTo(zoneId),
+//         limitToLast(limit)
+//       );
+//     }
+
+//     get(itemsQuery).then((snapshot) => {
+//       if (snapshot.exists()) {
+//         const itemsObject = snapshot.val();
+//         const lastId = Object.keys(itemsObject)[Object.keys(itemsObject).length - 1]
+
+//         const itemsArray = Object.values(itemsObject);
+        
+//         const itemsList = itemsArray.map(item => ({
+//           id: item._id,
+//           title: item.title, 
+//           price: item.price,
+//           location: item.address.address,
+//           image: item.images[0],
+//           ...item,
+//         })).filter(item => item.status === 'active' && item.user?._id !== uid && Boolean(item.id) )
+//         .sort((a, b) => {
+//           return a.promotionScore - b.promotionScore;
+//         }); 
+
+//         resolve({...itemsList, lastId});
+//       } else {
+//         console.log("No data available");
+//         resolve([])
+//       }
+//     }).catch((error) => {
+//       reject(error);
+//     });
+//   })
+// }
+
+export async function fetchItems(zoneId, limit, startAfterId = null) {
+  return new Promise((resolve, reject) => {
+      const db = getDatabase();
+      const itemsQuery = dbQuery(
+          ref(db, 'items'),
+          orderByChild('zoneId'),
+          equalTo(zoneId ? zoneId : '-NhHdj8_3gWA-DyjE3GH'),
+          limitToLast(limit)
+      );
+
+        get(itemsQuery).then(async (snapshot) => {
+          if (snapshot.exists()) {
+            let items = [];
+            const itemPromises = [];
+          
+            snapshot.forEach((childSnapshot) => {
+              const itemData = childSnapshot.val();
+          
+              // Assuming user data is stored in a separate path, e.g., 'users'
+              const userPromise = get(ref(db, 'users/' + itemData.userId)).then(userSnapshot => {
+                itemData.user = userSnapshot.val();
+              });
+
+              const subCategoryPromise = get(ref(db, 'subcategories/' + itemData.subCategoryId)).then(subCatSnapshot => {
+                itemData.subCategory = subCatSnapshot.val();
+              });
+              
+              const zonePromise = get(ref(db, 'zones/' + itemData.zoneId)).then(zoneSnapshot => {
+                itemData.zone = zoneSnapshot.val();
+              })
+          
+              itemPromises.push(userPromise, subCategoryPromise, zonePromise);
+          
+              items.push(itemData);
+            });
+          
+            await Promise.all(itemPromises);
+
+            console.log(items)
+          
+            let itemsArray = Object.values(items);
+            const lastId = Object.keys(items)[Object.keys(items).length - 1]
+
+            // Sort itemsArray if needed, then filter by active status and user ID
+            itemsArray = itemsArray.map(item => ({
+              id: item._id,
+              title: item.title, 
+              price: item.price,
+              location: item.address.address,
+              image: item.images[0],
+              ...item,
+            })).filter(item => item.status === 'active' && Boolean(item.id) )
+            .sort((a, b) => {
+              return b.promotionScore - a.promotionScore;
+            }); 
+
+            // Implement client-side pagination
+            if (startAfterId) {
+                const startIndex = itemsArray?.findIndex(item => item._id === startAfterId);
+                if (startIndex >= 0) {
+                    itemsArray = itemsArray?.slice(startIndex + 1, startIndex + 1 + limit);
+                } else {
+                    itemsArray = [];
+                }
+            } else {
+                itemsArray = itemsArray?.slice(0, limit);
+            }
+
+            resolve({ items: [...itemsArray], lastId });
+          } else {
+            console.log("No data available");
+            resolve({ items: [], lastId: null });
+          }
+      }).catch((error) => {
+          reject(error);
+      });
+  });
+}
+export function fetchSearch(searchInput = null, searchSubCategory = null, limit, uid = '', startAfterId = null) {
+  return new Promise((resolve, reject) => {
+      const db = getDatabase();
+      let itemsQuery;
+      if (searchInput) {
+        const searchStr = searchInput.toLowerCase();
+        console.log(searchStr)
+        itemsQuery = dbQuery(
+          ref(db, 'items'),
+          orderByChild('title'),
+          startAt(searchStr),
+          endAt(searchStr + "\uf8ff"),
+          limitToLast(limit)
+        );
+      }else if(searchSubCategory){
+        itemsQuery = dbQuery(
+          ref(db, 'items'),
+          orderByChild('subCategoryId'),
+          equalTo(searchSubCategory),
+          limitToLast(limit)
+        );
+      }
+
+      get(itemsQuery).then((snapshot) => {
+          if (snapshot.exists()) {
+              const itemsObject = snapshot.val();
+              let itemsArray = Object.values(itemsObject);
+              const lastId = Object.keys(itemsObject)[Object.keys(itemsObject).length - 1]
+
+              // Sort itemsArray if needed, then filter by active status and user ID
+              itemsArray = itemsArray.map(item => ({
+                id: item._id,
+                title: item.title, 
+                price: item.price,
+                location: item.address.address,
+                image: item.images[0],
+                ...item,
+              })).filter(item => item.status === 'active' && item.user?._id !== uid && Boolean(item.id) )
+              .sort((a, b) => {
+                return b.promotionScore - a.promotionScore;
+              }); 
+
+              // Implement client-side pagination
+              if (startAfterId) {
+                  const startIndex = itemsArray?.findIndex(item => item._id === startAfterId);
+                  if (startIndex >= 0) {
+                      itemsArray = itemsArray?.slice(startIndex + 1, startIndex + 1 + limit);
+                  } else {
+                      itemsArray = [];
+                  }
+              } else {
+                  itemsArray = itemsArray?.slice(0, limit);
+              }
+
+              resolve({ items: [...itemsArray], lastId });
+          } else {
+              console.log("No data available");
+              resolve({ items: [], lastId: null });
+          }
+      }).catch((error) => {
+          reject(error);
+      });
+  });
+}

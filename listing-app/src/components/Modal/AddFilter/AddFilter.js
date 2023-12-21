@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FlatList, Modal, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ModalHeader from '../../Header/ModalHeader/ModalHeader';
@@ -15,9 +15,9 @@ function AddFilter(props) {
     }
 
     function OPTIONS(items) {
-        const activeItems = items?.filter(ad => ad.status === 'active')
-        const inactiveItems = items?.filter(ad => ad.status === 'inactive')
-        const soldItems = items?.filter(ad => ad.status === 'sold')
+        const activeItems = items?.filter(ad => ad?.status === 'active')
+        const inactiveItems = items?.filter(ad => ad?.status === 'inactive')
+        const soldItems = items?.filter(ad => ad?.status === 'sold')
         return([
             {
                 value: items,

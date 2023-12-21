@@ -28,11 +28,12 @@ const useFavorites = () => {
 
         // Extract the data and set the items
         const newItems = favoriteItemsResponses.map((response) => response?.data?.getItemById).reduce((unique, item) => {
-          if (item !== null && !unique.some(i => i.id === item.id)) {
+          if (item !== null && !unique.some(i => i._id === item._id)) {
             unique.push(item);
           }
           return unique;
         }, []);
+
         setItems(newItems);
         // }
       } catch (error) {

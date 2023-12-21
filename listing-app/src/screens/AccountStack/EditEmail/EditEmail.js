@@ -116,6 +116,7 @@ function EditEmail() {
     return (
         !awaitingEmailVerification ? (
             <SafeAreaView style={[styles.flex, styles.safeAreaView]}>
+                <ModalHeader type='back' title={'Промени Имейл'} closeModal={() => navigation.goBack()} />
                 <KeyboardAvoidingView contentContainerStyle={alignment.PBlarge} style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                     <TouchableOpacity activeOpacity={1}
                         style={[styles.flex, styles.mainContainer, { paddingBottom: margin ? scale(70) : scale(0) }]}

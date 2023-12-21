@@ -98,7 +98,7 @@ function LocationConfirm() {
                         }} />
                 </View>
             </View>  
-            <LocationModal setFilters={setFilters} visible={modalVisible} onModalToggle={toggleModal} />
+            <LocationModal  setFilters={setFilters} visible={modalVisible} onModalToggle={toggleModal} />
         </SafeAreaView>
     )
 }

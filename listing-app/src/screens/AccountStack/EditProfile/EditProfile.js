@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { Image, ScrollView, TextInput, TouchableOpacity, View, Text, KeyboardAvoidingView, Platform, Keyboard } from 'react-native'
-import { BackButton, DisconnectButton, EmptyButton, LeftButton, RightButton, TextDefault } from '../../../components'
+import { BackButton, DisconnectButton, EmptyButton, FlashMessage, LeftButton, RightButton, TextDefault } from '../../../components'
 import { alignment, colors, scale } from '../../../utilities'
 import styles from './styles'
 import { Entypo, Feather } from '@expo/vector-icons';
@@ -56,6 +56,13 @@ function EditProfile() {
         avatar: avatar
         },
     })
+
+    useEffect(() => {
+        if(changeResponse?.data){
+            navigation.goBack()
+            FlashMessage({ message: 'Успешно променихте профила си', type: 'success' })
+        }
+    }, [changeResponse?.data])
 
     useEffect(() => {
         async function updateAvatar() {

@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { sendForgotPasswordEmail } from '../../../firebase'
 import { validateEmailForm } from './validate'
+import { KeyboardAvoidingView } from 'react-native'
 
 const icon = require('../../../../assets/icon.png')
 
@@ -77,30 +78,37 @@ const ForgotPassword = () => {
           </View>
         </View>
       </View>
-      <View style={formStyles.container}>
-        <TextDefault textColor={emailError ? colors.google : colors.fontMainColor} H5 bold style={styles.width100}>
-          {'Вашият E-mail адрес'}
-        </TextDefault>
-        <TextInput
-          style={formStyles.input}
-          placeholder='Имейл'
-          autoCapitalize="none"
-          placeholderTextColor='#42A5F5'
-          value={email}
-          onChangeText={text => setEmail(text)}
-        />
-        {emailError &&
-          <TextDefault textColor={colors.google} style={styles.width100}>
-            {emailError}
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : false}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      >
+
+        <View style={formStyles.container}>
+          <TextDefault textColor={emailError ? colors.google : colors.fontMainColor} H5 bold style={styles.width100}>
+            {'Вашият E-mail адрес'}
           </TextDefault>
-        }
-        <Text style={{color: 'gray'}}></Text> 
-        <Button
-          title='Изпрати'
-          onPress={() => handleSubmit()}
-        />
-        <Text style={{color: 'gray'}}></Text> 
-    </View>
+          <TextInput
+            style={formStyles.input}
+            placeholder='Имейл'
+            autoCapitalize="none"
+            placeholderTextColor='#42A5F5'
+            value={email}
+            onChangeText={text => setEmail(text)}
+          />
+          {emailError &&
+            <TextDefault textColor={colors.google} style={styles.width100}>
+              {emailError}
+            </TextDefault>
+          }
+          <Text style={{color: 'gray'}}></Text> 
+          <Button
+            title='Изпрати'
+            onPress={() => handleSubmit()}
+          />
+          <Text style={{color: 'gray'}}></Text> 
+        </View>
+      </KeyboardAvoidingView>
     </>
     
 
@@ -111,7 +119,7 @@ export default ForgotPassword
 
 const formStyles = StyleSheet.create({
   input: {
-    width: 350,
+    width: '85%',
     height: 55,
     backgroundColor: 'transparent',
     margin: 10,

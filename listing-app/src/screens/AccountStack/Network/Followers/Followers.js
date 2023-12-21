@@ -5,49 +5,51 @@ import { alignment, colors } from '../../../../utilities'
 import Card from './Card'
 import styles from './styles'
 import { useLazyQuery } from '@apollo/client'
-import { FOLLOWING_USER, FOLLOW_USER, GET_AVATAR_NAME_DESCRIPTION_CREATED_AT } from '../../../../apollo/server'
-import { useSelector } from 'react-redux'
+import { GET_AVATAR_NAME_DESCRIPTION_CREATED_AT } from '../../../../apollo/server'
+import { useDispatch, useSelector } from 'react-redux'
+import { setFollowers } from '../../../../store/reducers/User/userSlice'
 
 function Followers() {
-    const [items, setItems] = useState([]);
-    const { uid } = useSelector(state => state.user);
-    const [getOwnUserData, { loading: l, error: e, data: d, refetch: r }] = useLazyQuery(GET_AVATAR_NAME_DESCRIPTION_CREATED_AT);
+    const { uid, followers } = useSelector(state => state.user);
     const [getUserById, { loading, error, data, refetch }] = useLazyQuery(GET_AVATAR_NAME_DESCRIPTION_CREATED_AT);
-     
+    const dispatch = useDispatch();   
+    
     useEffect(() => {
-        const fetchUserFollowers = async () => {
+        async function fetchData() {
             try {
-                const response = await getOwnUserData({ variables: { userId: uid } });
-                const followers = response.data.getUserById.followers || [];
+                let filteredFollowers = followers.filter(favorite => favorite !== '');
+                filteredFollowers = Array.from(new Set(filteredFollowers));
     
-                const filteredFollowers = followers.filter(followerId => followerId !== '');
-    
-                // Fetch each follower's details
-                const followersItemsPromises = filteredFollowers.map(followerId =>
-                    getUserById({ variables: { userId: followerId } }).then(response => response.data.getUserById)
+                // Fetch each favorite item details
+                const followersItemsPromises = filteredFollowers.map(followersId =>
+                    getUserById({ variables: { userId: followersId } }).then(response => response.data.getUserById)
                 );
     
                 // Wait for all the items to be fetched
-                const followersItemsResponses = await Promise.all(followersItemsPromises);
-    
-                // Process and set the items
-                const newItems = followersItemsResponses.reduce((unique, item) => {
-                    if (item && !unique.some(i => i.id === item.id)) {
-                        unique.push({ ...item, isFollowing: item.followers.includes(uid)});
+                const dataList = await Promise.all(followersItemsPromises);
+                const newItems = dataList.reduce((unique, item) => {
+                    if (item && !unique.some(i => i.id === item._id)) {
+                        unique.push(item);
                     }
                     return unique;
                 }, []);
-                setItems(newItems);
+    
+                dispatch(setFollowers(newItems));
             } catch (error) {
                 console.error('Error fetching user followers:', error);
             }
-        };
-    
-        if (uid) {
-            fetchUserFollowers();
         }
-    }, [uid, data]);
-    
+        fetchData();
+        return () => {
+            let oldFollowers = followers.map((followers) => {
+                if(followers._id) followers._id
+                else return followers 
+            });
+            oldFollowers = Array.from(new Set(oldFollowers));
+          dispatch(setFollowers(oldFollowers));
+        };
+    }, []);
+
     async function share() {
         try {
             const result = await Share.share({
@@ -95,10 +97,10 @@ function Followers() {
                 </View>
                 <View style={styles.notificationText}>
                     <TextDefault textColor={colors.buttonbackground} H5 center >
-                        {'APP is more fun shared with friends'}
+                        {'Ще е по-забавно да продаваш с приятелите си!'}
                     </TextDefault>
                     <View style={{ width: '70%' }}>
-                        <EmptyButton title='Invite Friends'
+                        <EmptyButton title='Покани приятели'
                             onPress={share} />
                     </View>
                 </View>
@@ -111,12 +113,12 @@ function Followers() {
             <FlatList
                 style={styles.flex}
                 contentContainerStyle={[styles.mainContainer, { flexGrow: 1 }]}
-                data={items}
+                data={followers}
                 ListEmptyComponent={emptyView()}
-                ListHeaderComponent={items.length > 0 && header()}
+                ListHeaderComponent={followers.length > 0 && header()}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
-                    <Card r={r} refetch={refetch} {...item} />
+                    <Card {...item} />
                 )}
             />
         </View>

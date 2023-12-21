@@ -15,7 +15,7 @@ function MainSell() {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: 'Какво продавате?',
-            headerLeft: (props) => <LeftButton icon='close' iconColor={colors.headerText} />
+            // headerLeft: (props) => <LeftButton icon='close' iconColor={colors.headerText} />
         })
 
     })
@@ -34,7 +34,7 @@ function MainSell() {
                         <View style={styles.imageView}>
                             <Image
                                 style={styles.imgResponsive}
-                                source={item.image}
+                                source={{uri: item.image}}
                                 resizeMode='cover'
                             />
                         </View>

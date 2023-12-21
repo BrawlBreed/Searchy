@@ -1,19 +1,21 @@
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 import { Image, TouchableOpacity, View } from 'react-native'
 import { TextDefault } from '../../../../components'
 import { colors, scale } from '../../../../utilities'
 import styles from '../styles'
+import { useSelector } from 'react-redux'
 
 function ProductCard(props) {
-    const [isLike, isLikeSetter] = useState(false)
+    const { uid } = useSelector(state => state.user)
     const navigation = useNavigation()
     
     return (
         <TouchableOpacity
             style={styles.searchCard}
-            onPress={() => navigation.navigate('ProductDescription', { ...props })}>
+            onPress={() => props?.user?._id === uid ? navigation.navigate('MainAds', { screen: 'Моите Обяви' })
+            : navigation.navigate('ProductDescription', { ...props })}>
             <Image
                 source={{ uri: props.images[0] }}
                 style={styles.imgResponsive}

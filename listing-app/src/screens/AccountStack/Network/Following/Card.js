@@ -25,59 +25,23 @@ function Card(props) {
         setFollowingList(prev => !prev)
     }
 
-    useEffect(() => {
-        console.log(props)
-    }, [])
-
     if (!followingList)
         return null
     
-    useEffect(() => {
-        setFollowersList(filterFalsyValues(props?.followers))
-        setFollowingList(filterFalsyValues(props?.following))
-    }, [props.refetch, props.following, props.followers])
-    
-    function unfollow () {
-        try{
-            const newFollowers = followersList.filter((item) => item !== uid)
-            const newFollowing = followingList.filter((item) => item !== props._id)
-            client.mutate({
-                mutation: FOLLOW_USER,
-                variables: {
-                    uid: props._id,
-                    followers: newFollowers.length > 0 ? newFollowers : ['']
-                }
-            }).then(() => client.mutate({
-                mutation: FOLLOWING_USER,
-                variables: {
-                    uid: uid,
-                    following: newFollowing.length > 0 ? newFollowing : ['']
-                }
-            })).then(() => { 
-                props.r()
-                props.refetch()
-            }).then(() => navigation.navigate('MainAccount'))
-        }catch(error){
-            console.log(error)
-        }
-        
-        onModalToggle()
-    }
-    
     return (
         <View style={styles.userContainer}>
-            <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate('UserProfile', { ...props })}>
+            <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate('UserProfile', { ...props, following: props.following })}>
                 <Image style={[styles.img, { borderRadius: 1000 }]} source={props.avatar ? {uri: props.avatar} : require('../../../../assets/images/avatar.png')} />
             </TouchableOpacity>
             <TextDefault textColor={colors.buttonbackground} bold style={[alignment.PLmedium, styles.flex]}>
                 {props.name}
             </TextDefault>
-            <BorderlessButton
+            {/* <BorderlessButton
                 style={alignment.Psmall}
                 onPress={onModalToggle}>
                 <Feather name="user-check" size={scale(20)} color="black" />
-            </BorderlessButton>
-            <UnfollowModal unfollow={unfollow} modalVisible={modalVisible} onModalToggle={onModalToggle} onFollowing={onFollowing} name={props.name} />
+            </BorderlessButton> */}
+            <UnfollowModal modalVisible={modalVisible} onModalToggle={onModalToggle} onFollowing={onFollowing} name={props.name} />
         </View>
     )
 }

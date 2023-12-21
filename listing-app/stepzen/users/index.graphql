@@ -101,4 +101,9 @@ type Mutation {
       endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
       method: PATCH
     )
+    deleteUser(user: ID): JSON
+    @rest( 
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$user.json",
+      method: DELETE
+    )
 }

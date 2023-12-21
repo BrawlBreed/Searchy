@@ -14,8 +14,8 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
         title
         images
         zoneId
-        promoted
         views
+        promotionScore
         zone {
           zone
           coordinates {
@@ -25,7 +25,7 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
         }
         subCategory {
           _id
-          parentCategoryId
+          categoryParent
           title
           category {
             _id
@@ -49,6 +49,7 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
           email
           active
           name 
+          ownedItems
           notifications{
             recommendations
             specialOffers
@@ -62,7 +63,8 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
       }
       name
     }
-  }`
+  }
+  `
 
   export const getCategories = gql`  query MyQuery {
     getCategories {
@@ -100,7 +102,6 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
         itemId
         likes
         price
-        promoted
         status
         title
         images
@@ -115,7 +116,7 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
         }
         subCategory {
           _id
-          parentCategoryId
+          categoryParent
           title
           category {
             _id
@@ -147,11 +148,14 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
           likes
           followers
           following
+          ownedItems
         }
       }
       name
     }
-  }`
+  }
+  
+  `
 
   export const getZones = gql`query getZones {
     getZones {
@@ -212,9 +216,9 @@ export const GET_ITEM_BY_ID = gql`
         createdAt
         description
         itemId
-        promoted
         likes
         price
+        promotionScore
         status
         title
         images
@@ -229,7 +233,7 @@ export const GET_ITEM_BY_ID = gql`
         }
         subCategory {
           _id
-          parentCategoryId
+          categoryParent
           title
           category {
             _id
@@ -253,6 +257,7 @@ export const GET_ITEM_BY_ID = gql`
           email
           active
           name
+          ownedItems
           notifications{
             recommendations
             specialOffers
@@ -283,6 +288,10 @@ export const EDIT_ITEM = gql`
     editItem(id: $id, title: $title, description: $description, price: $price, condition: $condition, images: $images, address: $address)
   }
 `
+export const PROMOTE_ITEM = gql`
+  mutation MyMutation($id: String!, $promotionScore: Float!) {
+    promoteItem(id: $id, promotionScore: $promotionScore)
+  }`
 export const INCREMENT_VIEWS = gql`
   mutation MyMutation($id: String!, $views: Float!) {
     incrementViewCount(id: $id, views: $views)
@@ -321,6 +330,7 @@ export const GET_AVATAR_NAME_DESCRIPTION_CREATED_AT = gql`
       name
       following
       followers
+      ownedItems
     }
   }
 `
@@ -341,4 +351,10 @@ export const SEND_REPORT = gql`
       sentAt: $sentAt
     )
   }
+`
+
+export const DELETE_PROFILE = gql`
+  	mutation MyMutation($uid: ID!) {
+      deleteUser(user: $uid)
+    }
 `

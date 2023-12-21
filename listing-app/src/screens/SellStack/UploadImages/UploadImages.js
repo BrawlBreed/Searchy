@@ -91,12 +91,12 @@ function UploadImages() {
                         </TextDefault>
                     </>}
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn} onPress={CaptureImage}>
+                        {/* <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn} onPress={CaptureImage}>
                             <SimpleLineIcons name='camera' size={scale(35)} color={colors.buttonText} />
                             <TextDefault textColor={colors.buttonText} bold uppercase>
                                 {'Снимай сега'}
                             </TextDefault>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn} onPress={PickImage}>
                             <SimpleLineIcons name='folder-alt' size={scale(35)} color={colors.buttonText} />
                             <TextDefault textColor={colors.buttonText} bold uppercase>

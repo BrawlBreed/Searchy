@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, TextInput, Button, Keyboard } from 'react-native'
+import { StyleSheet, TextInput, Button, Keyboard , KeyboardAvoidingView } from 'react-native'
 import styles from '../Registration/styles'
 import { ModalHeader, TextDefault } from '../../../components'
 import { useNavigation } from '@react-navigation/native'
@@ -68,7 +68,7 @@ const Entry = ({ route }) => {
       phoneCode,
       description,
       phone,
-      email,
+      email: email.trim(),
       avatar,
       createdAt,
       active,
@@ -113,7 +113,7 @@ const Entry = ({ route }) => {
       const response = route.params.email ? await createOrSignInWithEmail(email, password, dispatch, user
       ) : await createOrSignUpWithPhone(phoneCode + phone, dispatch, mutateFunction)
       
-      if(response === 'auth/invalid-login-credentials') {
+      if(response === 'auth/invalid-login-credentials' || response === 'auth/invalid-credential') {
         setErrors({ ...errors, password: 'Грешна парола!' })
       }else if(response === 'auth/user-not-found') {
         setErrors({ ...errors, email: 'Няма намерен потребител!' })
@@ -139,115 +139,122 @@ const Entry = ({ route }) => {
 
   return (
     <>
-      <View style={[
+       <View style={[
         styles.safeAreaViewStyles,
         styles.flex,
         { paddingTop: inset.top, paddingBottom: inset.bottom }]}>
-            <ModalHeader type='back' title="Вход" closeModal={() => navigation.goBack()} />
+        <ModalHeader type='back' title="Вход" closeModal={() => navigation.goBack()} />
         <View style={styles.logoContainer}>
           <View style={styles.image}>
             { !isKeyboardVisible && (
-                <Image
+              <Image
                 source={icon}
                 style={styles.imgResponsive}
-                resizeMode='contain' />
+                resizeMode='contain'
+              />
             )}
-            
           </View>
         </View>
       </View>
-      <View style={formStyles.container}>
-        {route.params.email ? (
-          <>
-            <TextDefault textColor={errors.email ? colors.google : colors.fontMainColor} H5 bold style={styles.width100}>
-              {'E-mail адрес *'}
-            </TextDefault>
-            <TextInput
-              style={formStyles.input}
-              placeholder='Имейл'
-              autoCapitalize="none"
-              placeholderTextColor='#42A5F5'
-              onChangeText={text => dispatch(changeEmail(text))}
-            />
-            {errors.email &&
-              <TextDefault textColor={colors.google} style={styles.width100}>
-                {errors.email}
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : false}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      >
+        <View style={formStyles.container}>
+          {route?.params?.email ? (
+            <>
+              <TextDefault textColor={errors.email ? colors.google : colors.fontMainColor} H5 bold style={styles.width100}>
+                {'E-mail адрес'}
               </TextDefault>
-            }
-          </>
-        ) : (
-          <>
-            <RNPhoneCodeSelect
-              visible={visible}
-              onDismiss={() => setVisible(false)}
-              onCountryPress={(country) => dispatch(changePhoneCode(country.dial_code))}
-              primaryColor="#42A5F5"
-              secondaryColor="#42A5F5"
-              buttonText="Готово"
-            />
-            <TextDefault textColor={errors.phone ? colors.google : colors.fontMainColor} H5 bold style={styles.width100}>
-              {'Телефонен номер *'}
-            </TextDefault>
-            <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity onPress={() => setVisible(true)}>
-                <Text
-                  style={[formStyles.input, {width: 80, textAlign: 'center', paddingTop: 15, marginRight: 0, color: '#42A5F5' }]}
-                  autoCapitalize="none"
-                  onPress={() => setVisible(true)}
-                >{phoneCode}</Text>
-              </TouchableOpacity>            
               <TextInput
-                style={[formStyles.input, {width: 250}]}
-                placeholder='Телефон'
+                style={formStyles.input}
+                placeholder='Имейл'
                 autoCapitalize="none"
                 placeholderTextColor='#42A5F5'
-                keyboardType='numeric'
-                maxLength={9}
-                value={phone}
-                onChangeText={text => dispatch(changePhone(text))}
+                value={email}
+                onChangeText={text => dispatch(changeEmail(text))}
               />
-            </View>
-            {errors.phone &&
-              <TextDefault textColor={colors.google} style={styles.width100}>
-                {errors.phone}
+              {errors.email &&
+                <TextDefault textColor={colors.google} style={styles.width100}>
+                  {errors.email}
+                </TextDefault>
+              }
+            </>
+          ) : (
+            <>
+              <RNPhoneCodeSelect
+                visible={visible}
+                onDismiss={() => setVisible(false)}
+                onCountryPress={(country) => dispatch(changePhoneCode(country.dial_code))}
+                primaryColor="#42A5F5"
+                secondaryColor="#42A5F5"
+                buttonText="Готово"
+              />
+              <TextDefault textColor={errors.phone ? colors.google : colors.fontMainColor} H5 bold style={styles.width100}>
+                {'Телефонен номер *'}
               </TextDefault>
-            }
-          </>
-        )}
-        <TextDefault textColor={errors.password ? colors.google : colors.fontMainColor} H5 bold 
-        // style={[styles.width100, { marginTop: 15}]} 
-        >
-          {'Парола *'}
-        </TextDefault>    
-        <TextInput
-          style={formStyles.input}
-          placeholder='Парола'
-          secureTextEntry={true}
-          autoCapitalize="none"
-          placeholderTextColor='#42A5F5'
-          onChangeText={text => dispatch(changePassword(text))}
-        />
-        {errors.password &&
-          <TextDefault textColor={colors.google} style={[styles.width100, { marginBottom: 10 }]}>
-            {errors.password}
-          </TextDefault>
-        }
-        <Button
-          title='Вход'
-          onPress={() => handleSubmit()}
-        />
-        <Text style={{color: 'gray'}}></Text> 
-        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={{ marginBottom: 30}}>
-          <Text 
-            style={{     
-              borderBottomRadius: 3,
-              borderBottomWidth: 2,
-              borderBottomColor: `#42A5F5`,
-              paddingBottom: 3.5
-            }}>Забравена парола?</Text>
-        </TouchableOpacity>
-        
-      </View>
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity onPress={() => setVisible(true)}>
+                  <Text
+                    style={[formStyles.input, {width: 80, textAlign: 'center', paddingTop: 15, marginRight: 0, color: '#42A5F5' }]}
+                    autoCapitalize="none"
+                    onPress={() => setVisible(true)}
+                  >{phoneCode}</Text>
+                </TouchableOpacity>            
+                <TextInput
+                  style={[formStyles.input, {width: 250}]}
+                  placeholder='Телефон'
+                  autoCapitalize="none"
+                  placeholderTextColor='#42A5F5'
+                  keyboardType='numeric'
+                  maxLength={9}
+                  value={phone}
+                  onChangeText={text => dispatch(changePhone(text))}
+                />
+              </View>
+              {errors.phone &&
+                <TextDefault textColor={colors.google} style={styles.width100}>
+                  {errors.phone}
+                </TextDefault>
+              }
+            </>
+          )}
+          <TextDefault textColor={errors.password ? colors.google : colors.fontMainColor} H5 bold 
+          // style={[styles.width100, { marginTop: 15}]} 
+          >
+            {'Парола'}
+          </TextDefault>    
+          <TextInput
+            style={formStyles.input}
+            placeholder='Парола'
+            secureTextEntry={true}
+            autoCapitalize="none"
+            placeholderTextColor='#42A5F5'
+            onChangeText={text => dispatch(changePassword(text))}
+          />
+          {errors.password &&
+            <TextDefault textColor={colors.google} style={[styles.width100, { marginBottom: 10 }]}>
+              {errors.password}
+            </TextDefault>
+          }
+          <Button
+            title='Вход'
+            onPress={() => handleSubmit()}
+          />
+          <Text style={{color: 'gray'}}></Text> 
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={{ marginBottom: 30}}>
+            <Text 
+              style={{     
+                borderBottomRadius: 3,
+                borderBottomWidth: 2,
+                borderBottomColor: `#42A5F5`,
+                paddingBottom: 3.5
+              }}>Забравена парола?</Text>
+          </TouchableOpacity>
+          
+        </View>
+      </KeyboardAvoidingView>
     </>
   )
 } 
@@ -256,7 +263,7 @@ export default Entry
 
 const formStyles = StyleSheet.create({
   input: {
-    width: 350,
+    width: '85%',
     height: 55,
     backgroundColor: 'transparent',
     margin: 10,
@@ -272,7 +279,6 @@ const formStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.themeBackground,
   },
   button: {
     backgroundColor: '#42A5F5',

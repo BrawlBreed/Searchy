@@ -57,21 +57,23 @@ function EditPhone() {
                 <TouchableOpacity activeOpacity={1}
                     style={[styles.flex, styles.mainContainer]}
                     onPress={() => Keyboard.dismiss()}>
-                    <ModalHeader closeModal={() => navigation.goBack()} />
+                    <ModalHeader type='back' title={'Промени Телефон'} closeModal={() => navigation.goBack()} />
                     <View style={[styles.flex, styles.basicInfoContainer]}>
-                        <View style={styles.imageContainer}>
-                            <Image
-                                style={styles.imgResponsive}
-                                source={avatar ? {uri: avatar } : require('../../../assets/images/avatar.png')}
-                                resizeMode='cover'
-                            />
+                        <View style={{ alignItems: 'center'}}>
+                            <View style={styles.imageContainer}>
+                                <Image
+                                    style={styles.imgResponsive}
+                                    source={avatar ? {uri: avatar } : require('../../../assets/images/avatar.png')}
+                                    resizeMode='cover'
+                                />
+                            </View>
+                            <TextDefault textColor={colors.fontMainColor} bold H4 style={[alignment.MTlarge, alignment.PLsmall]}>
+                                {'Промени телефона си'}
+                            </TextDefault>
+                            <TextDefault textColor={colors.fontSecondColor} style={[alignment.MTsmall, alignment.PLsmall, { textAlign: 'center'}]}>
+                                {'Добавяйки телефон, ще можеш да се свържеш с други потребители'}
+                            </TextDefault>
                         </View>
-                        <TextDefault textColor={colors.fontMainColor} bold H4 style={[alignment.MTlarge, alignment.PLsmall]}>
-                            {'Промени телефон'}
-                        </TextDefault>
-                        <TextDefault textColor={colors.fontSecondColor} style={[alignment.MTsmall, alignment.PLsmall]}>
-                            {'Добавяйки телефон, ще можеш да се свържеш с други потребители'}
-                        </TextDefault>
                         <View style={styles.phoneRow}>
                             <View style={styles.countryBox}>
                                 <RNPhoneCodeSelect

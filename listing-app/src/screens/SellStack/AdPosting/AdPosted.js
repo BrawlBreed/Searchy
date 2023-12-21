@@ -14,7 +14,8 @@ import { ADD_ID_TO_ITEM, ADD_OWNED_ITEM } from '../../../apollo/server';
 
 const AdPosted = () => {
     const item = useSelector(state => state.addItem)
-    const { title, description, price, condition, images, createdAt, subCategoryId, zoneId, address, userId } = item
+    const { uid } = useSelector(state => state.user)
+    const { title, description, price, condition, images, createdAt, subCategoryId, zoneId, address } = item
     const { ownedItems } = useSelector(state => state.user)
     const navigation = useNavigation()
     const dispatch = useDispatch()
@@ -43,7 +44,7 @@ const AdPosted = () => {
             const response = await client.mutate({
                 mutation: ADD_OWNED_ITEM,
                 variables: { 
-                    uid: userId,
+                    uid: uid,
                     ownedItems: newOwnedItems
                 }
             })
@@ -95,7 +96,7 @@ const AdPosted = () => {
             price,
             subCategoryId,
             title,
-            userId,
+            userId: uid,
             zoneId,
             address: {
                 address: address.address,

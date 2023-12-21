@@ -4,7 +4,7 @@ export function dateStringToDDMMYYYY(dateString) {
   
     // Validate the date object
     if (isNaN(date)) {
-      throw new Error('Input string is not a valid Date');
+      return;
     }
   
     // Extract the day, month, and year from the Date object
@@ -20,3 +20,26 @@ export function dateStringToDDMMYYYY(dateString) {
     return Array.from(new Set(array?.filter(item => item) || ['']));
   }
   
+  export function calculatePromotionScore(amountPaid) {
+    // Get the current date and time
+    const currentDate = new Date();
+
+    // Convert the current date to a numeric value (like a timestamp)
+    const numericDate = currentDate.getTime();
+
+    // Scale down the numeric date to ensure it adds a small value
+    // The scaling factor can be adjusted as needed
+    const dateScore = numericDate * 0.0000000001;
+
+    // Add the scaled date score to the amount paid
+    const score = amountPaid + dateScore;
+
+    return score;
+  }
+
+  export function getRemainingCountOrTen(arrayLength) {
+    if (arrayLength === 0) return 0; // If no items, return 0
+    const remaining = arrayLength % 10;
+    return remaining === 0 ? 10 : remaining;
+  }
+    

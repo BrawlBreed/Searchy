@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
         // alignItems: "center"
     },
     safeAreaViewStyles: {
-        backgroundColor: colors.headerbackground
+        backgroundColor: colors.white,
     },
     mainContainer: {
         backgroundColor: colors.themeBackground,

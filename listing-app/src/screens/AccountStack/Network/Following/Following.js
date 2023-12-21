@@ -1,5 +1,5 @@
-import { useNavigation } from '@react-navigation/native'
-import React, { useEffect, useLayoutEffect, useState } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { FlatList, Image, Share, View } from 'react-native'
 import { EmptyButton, FlashMessage, TextDefault } from '../../../../components'
 import { alignment, colors } from '../../../../utilities'
@@ -7,18 +7,21 @@ import Card from './Card'
 import styles from './styles'
 import { GET_AVATAR_NAME_DESCRIPTION_CREATED_AT } from '../../../../apollo/server'
 import { useLazyQuery } from '@apollo/client'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { setFollowing } from '../../../../store/reducers/User/userSlice'
 
 function Following() {
-    const [items, setItems] = useState([]);
-    const { uid } = useSelector(state => state.user);
-    const [getOwnUserData, { loading: l, error: e, data: d, refetch: r}] = useLazyQuery(GET_AVATAR_NAME_DESCRIPTION_CREATED_AT);
-    const [getUserById, { loading, error, data, refetch }] = useLazyQuery(GET_AVATAR_NAME_DESCRIPTION_CREATED_AT);
-     
+    const { uid, following } = useSelector(state => state.user);
+    const [getUserById, { loading, error, data, refetch }] = useLazyQuery(GET_AVATAR_NAME_DESCRIPTION_CREATED_AT, {
+        fetchPolicy: 'network-only'
+    });
+    const dispatch = useDispatch();
+
     useEffect(() => {
-        const fetchUserFollowing = async (following) => {
+        async function fetchData() {
             try {
-                const filteredFollowing = following.filter(favorite => favorite !== '');
+                let filteredFollowing = following.filter(favorite => favorite !== '');
+                filteredFollowing = Array.from(new Set(filteredFollowing));
     
                 // Fetch each favorite item details
                 const followingItemsPromises = filteredFollowing.map(followingId =>
@@ -34,28 +37,28 @@ function Following() {
                     return unique;
                 }, []);
     
-                setItems(newItems);
+                dispatch(setFollowing(newItems));
             } catch (error) {
                 console.error('Error fetching user following:', error);
             }
-        };
-    
-        if (uid) {
-            r().then(() => refetch()).then(() =>
-                getOwnUserData({ variables: { userId: uid } }).then(async (response) => {
-                    const following = response.data.getUserById.following;
-                    await fetchUserFollowing(Array.from(new Set(following)));
-                })
-            );
         }
-    }, [uid]); // Ensure uid and getOwnUserData are in the dependency array
-    
+        fetchData();
+        return () => {
+            let oldFollowing = following.map((following) => {
+                if(following._id) following._id
+                else return following 
+            });
+            oldFollowing = Array.from(new Set(oldFollowing));
+          dispatch(setFollowing(oldFollowing));
+        };
+      }, []);
+                
     async function share() {
         try {
             const result = await Share.share({
                 title: 'Покани приятели',
                 message:
-                    'Инсталирай приложението и се присъедини към нас!',
+                    'Използвай този линк за да се присъединиш към Searchy!',
             });
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {
@@ -115,13 +118,13 @@ function Following() {
             <FlatList
                 style={styles.flex}
                 contentContainerStyle={[styles.mainContainer, { flexGrow: 1 }]}
-                data={items}
+                data={following}
                 ListEmptyComponent={emptyView()}
-                ListHeaderComponent={items.length > 0 && header()}
+                ListHeaderComponent={following.length > 0 && header()}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                     item.following &&
-                    <Card r={r} refetch={refetch} {...item} />
+                    <Card {...item} />
                 )}
             />
         </View>

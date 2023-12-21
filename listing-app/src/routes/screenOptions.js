@@ -29,25 +29,44 @@ function StackOptions() {
 
 function TopBarOptions() {
     return ({
-        activeTintColor: colors.fontMainColor,
-        inactiveTintColor: colors.fontSecondColor,
-        style: {
-            backgroundColor: colors.headerbackground
+        labelStyle: {
+            fontSize: 16,
+            paddingTop: 8,
+            fontWeight: 'bold',
+            textShadowColor: 'black',
+            textShadowOpacity: 0.1,
+            textShadowOffset: { width: 1, height: 1 },
+            textShadowRadius: 4,
         },
-        indicatorStyle: {
-            backgroundColor: colors.buttonbackground,
-            height: scale(2)
-        }
+        indicatorStyle: { height: 0 }, // Removes the tab indicator line
+        underlineColor: 'transparent', // Makes sure no underline color
+        activeTintColor: colors.searchy1,
+        inactiveTintColor: colors.white,
+        style: {
+            height: scale(60),
+            backgroundColor: colors.searchy2,
+            borderTopWidth: 0,
+            borderTopColor: 'transparent',
+            borderBottomWidth: 0,
+            borderBottomColor: 'transparent',
+            elevation: 0, // For Android shadow
+            shadowColor: 'transparent', // For iOS shadow color
+            shadowOffset: { width: 0, height: 0 }, // For iOS shadow offset
+            shadowRadius: 0, // For iOS shadow radius
+            shadowOpacity: 0, // For iOS shadow opacity
+        },
     })
 }
 
 function tabOptions() {
     return ({
-        activeTintColor: colors.buttonbackground,
-        inactiveTintColor: colors.fontSecondColor,
+        showLabel: false,
+        activeTintColor: colors.searchy1,
+        inactiveTintColor: colors.searchy2,
         keyboardHidesTabBar: true,
         tabStyle: {
             backgroundColor: colors.bottomTabColor,
+            padding: scale(5),
             justifyContent: "center",
             alignItems: "center",
         },
@@ -55,11 +74,10 @@ function tabOptions() {
             ...textStyles.Bold,
             ...textStyles.UpperCase,
             justifyContent: "center",
-
         },
         style: {
-            backgroundColor: colors.bottomTabColor
-        }
+            backgroundColor: colors.bottomTabColor,
+        },
     })
 }
 

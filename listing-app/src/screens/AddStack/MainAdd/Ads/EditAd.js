@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Share, Button } from 'react-native'
+import { View, Text, TouchableOpacity, Share, Button, KeyboardAvoidingView } from 'react-native'
 import React, { useEffect, useReducer, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
@@ -50,11 +50,12 @@ const CONDITIONS = [
     },
 ]
 const EditAd = ({route}) => {
-    const { refetch, title, price, likes, _id, description, zone, location, images, user, createdAt, condition, subCategory, subCategoryId, address, navigation } = route.params
+    const { refetch, title, price, likes, _id, description, zone, location, images, user, createdAt, condition, subCategory, subCategoryId, address } = route.params
     const [reportModal, setReportModal] = useState(false);
     const [active, setActive] = useState(false)
     const [errors, setErrors] = useState(initalState)
     const [state, dispatch] = useReducer(reducer, { ...initialState, ...route.params });
+    const navigation = useNavigation()
 
     const initialState = {
         title: title,
@@ -190,7 +191,7 @@ const EditAd = ({route}) => {
             const res = await client.mutate({
                 mutation: EDIT_ITEM,
                 variables: {
-                    id: state._id,
+                    id: state?._id,
                     title: state.title,
                     price: Number(state.price),
                     condition: state.condition,
@@ -204,158 +205,170 @@ const EditAd = ({route}) => {
                     },
                     images: state.images
                 }
-            }).then(() => refetch()) 
-        }
+            })
+            .then(() => refetch())
+            .then(() => {
+                FlashMessage({ message: 'Успешно редактирахте обявата си!', type: 'success' })
+                navigation.goBack()
+            })
+        } 
     }
 
     return (
         <SafeAreaView style={[styles.flex, styles.safeAreaview]}>
-            <ScrollView style={[styles.flex, styles.mainContainer]}
-                contentContainerStyle={styles.contentContainer}
-                showsVerticalScrollIndicator={false}
+            <KeyboardAvoidingView 
+                style={{ flex: 1, backgroundColor: 'white' }}
+                behavior={Platform.OS === "ios" ? "padding" : false}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
             >
-                {/* Modal */}
-                <ReportModal visible={reportModal} onModalToggle={toggleModal} />
 
-                <View style={styles.swiperContainer}>
-                    {images.length ? 
-                        <Slider images={state.images} /> :
-                        <>
-                            <View style={s1.imgResponsive}>
-                                <Image style={styles.img}
-                                    source={require('../../../../assets/images/emptyView/photo-album.png')} />
-                            </View>
-                            <TextDefault H5 center>
-                                {'Добавянето на повечето снимки подобрява шансовете за продажба'}
-                            </TextDefault>
-                        </>
-                    }
-                    <View style={[styles.buttonContainer, { borderWidth: 1, borderColor: colors.fontPlaceholder,backgroundColor: colors.buttonbackground, borderLeftWidth: 0, borderRightWidth: 0, zIndex: 1000}]}>
-                        <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn} onPress={CaptureImage}>
-                            <SimpleLineIcons name='camera' size={scale(25)} color={colors.containerTheme} />
-                            <TextDefault textColor={colors.fontPlaceholder} bold uppercase>
-                                {'Снимай сега'}
-                            </TextDefault>
-                        </TouchableOpacity>
-                        <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn} onPress={PickImage}>
-                            <SimpleLineIcons name='folder-alt' size={scale(25)} color={colors.containerTheme} />
-                            <TextDefault textColor={colors.fontPlaceholder} bold uppercase>
-                                {'Избери от галерията'}
-                            </TextDefault>
-                        </TouchableOpacity>
+                <ScrollView style={[styles.flex, styles.mainContainer]}
+                    contentContainerStyle={styles.contentContainer}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {/* Modal */}
+                    <ReportModal visible={reportModal} onModalToggle={toggleModal} />
+
+                    <View style={styles.swiperContainer}>
+                        {images.length ? 
+                            <Slider images={state.images} /> :
+                            <>
+                                <View style={s1.imgResponsive}>
+                                    <Image style={styles.img}
+                                        source={require('../../../../assets/images/emptyView/photo-album.png')} />
+                                </View>
+                                <TextDefault H5 center>
+                                    {'Добавянето на повечето снимки подобрява шансовете за продажба'}
+                                </TextDefault>
+                            </>
+                        }
+                        <View style={[styles.buttonContainer, { borderWidth: 1, borderColor: colors.fontPlaceholder,backgroundColor: colors.buttonbackground, borderLeftWidth: 0, borderRightWidth: 0, zIndex: 1000}]}>
+                            {/* <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn} onPress={CaptureImage}>
+                                <SimpleLineIcons name='camera' size={scale(25)} color={colors.containerTheme} />
+                                <TextDefault textColor={colors.fontPlaceholder} bold uppercase>
+                                    {'Снимай сега'}
+                                </TextDefault>
+                            </TouchableOpacity> */}
+                            <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn} onPress={PickImage}>
+                                <SimpleLineIcons name='folder-alt' size={scale(25)} color={colors.containerTheme} />
+                                <TextDefault textColor={colors.fontPlaceholder} bold uppercase>
+                                    {'Избери от галерията'}
+                                </TextDefault>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
-                <View style={[styles.priceContainer, { marginTop: '12%' }]}>
-                    <TextDefault textColor={errors.price ? colors.google : colors.black} bold H5 style={[alignment.MBsmall]}>
-                        {'Цена'}
-                    </TextDefault>
-                    {errors.price &&
-                        <TextDefault textColor={colors.google} style={styles.width100}>
-                            {errors.price}
+                    <View style={[styles.priceContainer, { marginTop: '12%' }]}>
+                        <TextDefault textColor={errors.price ? colors.google : colors.black} bold H5 style={[alignment.MBsmall]}>
+                            {'Цена'}
                         </TextDefault>
-                    }
-                    <View style={[styles.buttonContainer, { width: '40%'}]}>
-                        <TextInput keyboardType='numeric' H4 bold style={{ fontSize: 20 }} value={String(state.price)} onChangeText={(newPrice) => updateProperty('price', newPrice)}/> 
-                        <TextDefault bold H5 style={[alignment.MBsmall]}>лв.</TextDefault>
-                    </View>
-                    <TextDefault bold H5 textColor={errors.title ? colors.google : colors.black} style={[alignment.MBsmall]}>
-                        {'Заглавие'}
-                    </TextDefault>
-                    <TextInput style={{ fontSize: 20 }} value={state.title} onChangeText={(newTitle) => updateProperty('title', newTitle)}/>
-                    {errors.title &&
-                        <TextDefault textColor={colors.google} style={styles.width100}>
-                            {errors.title}
+                        {errors.price &&
+                            <TextDefault textColor={colors.google} style={styles.width100}>
+                                {errors.price}
+                            </TextDefault>
+                        }
+                        <View style={[styles.buttonContainer, { width: '40%'}]}>
+                            <TextInput keyboardType='numeric' H4 bold style={{ fontSize: 20 }} value={String(state.price)} onChangeText={(newPrice) => updateProperty('price', newPrice)}/> 
+                            <TextDefault bold H5 style={[alignment.MBsmall]}>лв.</TextDefault>
+                        </View>
+                        <TextDefault bold H5 textColor={errors.title ? colors.google : colors.black} style={[alignment.MBsmall]}>
+                            {'Заглавие'}
                         </TextDefault>
-                    }
-                    <View style={styles.locationRow}>
-                        <MaterialIcons name='location-on' size={scale(15)} color={colors.headerText} />
-                        <TextInput numberOfLines={1} style={styles.locationText}>
-                            {state.address.address}
-                        </TextInput>
+                        <TextInput style={{ fontSize: 20 }} value={state.title} onChangeText={(newTitle) => updateProperty('title', newTitle)}/>
+                        {errors.title &&
+                            <TextDefault textColor={colors.google} style={styles.width100}>
+                                {errors.title}
+                            </TextDefault>
+                        }
+                        <View style={styles.locationRow}>
+                            <MaterialIcons name='location-on' size={scale(15)} color={colors.headerText} />
+                            <TextInput numberOfLines={1} style={styles.locationText}>
+                                {state.address.address}
+                            </TextInput>
+                        </View>
+                        <MapView
+                            onDoublePress={(e) => {
+                                updateProperty('address', {
+                                    coordinates:{
+                                        latitude: e.nativeEvent.coordinate.latitude,
+                                        longitude: e.nativeEvent.coordinate.longitude 
+                                    }
+                                })
+                            }}
+                            initialRegion={{
+                                latitude: state.address.coordinates.latitude,
+                                longitude: state.address.coordinates.longitude,
+                                latitudeDelta: 0.005,
+                                longitudeDelta: 0.005
+                            }}
+                                style={{width: '100%', height: 200, flexGrow: 1}}
+                            >
+                                {state.address.coordinates.latitude && state.address.coordinates.longitude &&
+                                    <Marker
+                                        coordinate={{ latitude: state.address.coordinates.latitude, longitude: state.address.coordinates.longitude }}
+                                        title='Местоположение'
+                                        description={state.address.address}
+                                        identifier='местоположение'
+                                    />}
+                        </MapView>
                     </View>
-                    <MapView
-                        onDoublePress={(e) => {
-                            updateProperty('address', {
-                                coordinates:{
-                                    latitude: e.nativeEvent.coordinate.latitude,
-                                    longitude: e.nativeEvent.coordinate.longitude 
+                    <View style={styles.conditionContainer}>
+                        <TextDefault textColor={errors.condition ? colors.google : colors.black} bold H5 style={alignment.MBsmall}>
+                            {'Състояние'}
+                        </TextDefault>
+                        <View style={styles.row}>
+                            <View style={s.subContainerRow}>
+                                {CONDITIONS.map((item, index) => (
+                                    <TouchableOpacity key={item.value}
+                                        style={[s.conditionBox, s.boxContainer, item.title === state.condition ? s.selected : s.notSelected]}
+                                        onPress={() => updateProperty('condition', item.title)} 
+                                        >
+                                        <TextDefault style={item.value === state.condition ? s.selectedText : s.unSelectedText}>
+                                            {item.title}
+                                        </TextDefault>
+                                    </TouchableOpacity>
+                                ))
                                 }
-                            })
-                        }}
-                        initialRegion={{
-                            latitude: state.address.coordinates.latitude,
-                            longitude: state.address.coordinates.longitude,
-                            latitudeDelta: 0.005,
-                            longitudeDelta: 0.005
-                        }}
-                            style={{width: '100%', height: 200, flexGrow: 1}}
-                        >
-                            {state.address.coordinates.latitude && state.address.coordinates.longitude &&
-                                <Marker
-                                    coordinate={{ latitude: state.address.coordinates.latitude, longitude: state.address.coordinates.longitude }}
-                                    title='Местоположение'
-                                    description={state.address.address}
-                                    identifier='местоположение'
-                                />}
-                    </MapView>
-                </View>
-                <View style={styles.conditionContainer}>
-                    <TextDefault textColor={errors.condition ? colors.google : colors.black} bold H5 style={alignment.MBsmall}>
-                        {'Състояние'}
-                    </TextDefault>
-                    <View style={styles.row}>
-                        <View style={s.subContainerRow}>
-                            {CONDITIONS.map((item, index) => (
-                                <TouchableOpacity key={item.value}
-                                    style={[s.conditionBox, s.boxContainer, item.title === state.condition ? s.selected : s.notSelected]}
-                                    onPress={() => updateProperty('condition', item.title)} 
-                                    >
-                                    <TextDefault style={item.value === state.condition ? s.selectedText : s.unSelectedText}>
-                                        {item.title}
-                                    </TextDefault>
-                                </TouchableOpacity>
-                            ))
+                            </View>
+                            {errors.condition &&
+                                <TextDefault textColor={colors.google} style={styles.width100}>
+                                    {errors.condition}
+                                </TextDefault>
                             }
                         </View>
-                        {errors.condition &&
+                    </View>
+                    <View style={styles.conditionContainer}>
+                        <TextDefault textColor={errors.description ? colors.google : colors.black} bold H5 style={alignment.MBsmall}>
+                            {'Описание'}
+                        </TextDefault>
+                        <TextInput value={state.description} onChangeText={newDescription => updateProperty('description', newDescription)}/>
+                        {errors.description &&
                             <TextDefault textColor={colors.google} style={styles.width100}>
-                                {errors.condition}
+                                {errors.description}
                             </TextDefault>
                         }
                     </View>
-                </View>
-                <View style={styles.conditionContainer}>
-                    <TextDefault textColor={errors.description ? colors.google : colors.black} bold H5 style={alignment.MBsmall}>
-                        {'Описание'}
-                    </TextDefault>
-                    <TextInput value={state.description} onChangeText={newDescription => updateProperty('description', newDescription)}/>
-                    {errors.description &&
-                        <TextDefault textColor={colors.google} style={styles.width100}>
-                            {errors.description}
-                        </TextDefault>
-                    }
-                </View>
-                {/* Header */}
-                <View style={styles.headerView}>
-                    <TouchableOpacity activeOpacity={0.7}>
-                        {LeftButton({ iconColor: colors.white, icon: 'back' })}
-                    </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.7} onPress={share}>
-                        {RightButton({ iconColor: colors.white, icon: 'share' })}
-                    </TouchableOpacity>
-                </View>
-                <View style={[styles.buttonView, { marginVertical: 10 }]}>
-                    <Button
-                        style={{backgroundColor: colors.buttonbackground }}
-                        disabled={!images.length && active}
-                        color={images.length && active ? colors.buttonbackground : colors.fontThirdColor}
-                        title='Запази промените'
-                        onPress={() => {
-                            
-                            images.length && active && handleEditAd()
-                        }} />
-                </View>
-            </ScrollView>
+                    {/* Header */}
+                    <View style={styles.headerView}>
+                        <TouchableOpacity activeOpacity={0.7}>
+                            {LeftButton({ iconColor: colors.white, icon: 'back' })}
+                        </TouchableOpacity>
+                        <TouchableOpacity activeOpacity={0.7} onPress={share}>
+                            {RightButton({ iconColor: colors.white, icon: 'share' })}
+                        </TouchableOpacity>
+                    </View>
+                    <View style={[styles.buttonView, { marginVertical: 10 }]}>
+                        <Button
+                            style={{backgroundColor: colors.buttonbackground }}
+                            disabled={!images.length && active}
+                            color={images.length && active ? colors.buttonbackground : colors.fontThirdColor}
+                            title='Запази промените'
+                            onPress={() => {
+                                
+                                images.length && active && handleEditAd()
+                            }} />
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView> 
         </SafeAreaView >
         // <></>
     )

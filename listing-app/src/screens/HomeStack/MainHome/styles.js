@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
         borderWidth: scale(1),
         borderRadius: scale(5),
         borderColor: colors.medHorizontalLine,
+        backgroundColor: colors.containerBox,
         alignItems: "center",
         ...alignment.PTxSmall,
         ...alignment.PBxSmall,

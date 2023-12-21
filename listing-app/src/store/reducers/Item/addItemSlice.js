@@ -12,7 +12,7 @@ const initialState = {
   subCategoryId: '',
   title: '',
   userId: '',
-  zoneId: '',
+  zoneId: '-NhHdj8_3gWA-DyjE3GH',
   zone: {
     zone: '',
     coordinates: {
@@ -47,6 +47,7 @@ export const addItemSlice = createSlice({
       state.title = ''
       state.userId = ''
       state.zoneId = ''
+      state.currentLocation = ''
       state.zone = {
         zone: '',
         coordinates: {

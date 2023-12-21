@@ -11,8 +11,15 @@ const CATEGORY = ['Мобилни Устройства', 'Недвижими И�
 
 function SearchModal(props) {
     const [ input, setInput ] = useState('')
+    const [popularCategories, setPopularCategories] = useState(props.categories)
     const inset = useSafeAreaInsets()
     const navigation = useNavigation()
+
+    useEffect(() => {
+        setPopularCategories(props.categories.filter((item) => {
+            return item.title.toLowerCase().includes(input?.toLowerCase())
+        }).slice(0, 5))
+    }, [input, props.categories])
 
     function navigate(input) {
         navigation.navigate('ProductListing', { search: input ?? 'View All', input: input ?? null })
@@ -71,11 +78,14 @@ function SearchModal(props) {
                     {header()}
                     <View style={styles.body}>
                         <TextDefault textColor={colors.fontSecondColor} light uppercase>
-                            {'Popular categories'}
+                            {'Популярни категории'}
                         </TextDefault>
-                        {CATEGORY.map((item, index) => (
+                        {popularCategories.map((item, index) => (
                             <TouchableOpacity
-                                onPress={() => navigate(item)}
+                                onPress={() => {
+                                    navigation.navigate('ProductListing', { search: 'View All', category: item.title })
+                                    props.onModalToggle()
+                                }}
                                 style={styles.category}
                                 key={index}>
                                 <Ionicons
@@ -84,7 +94,7 @@ function SearchModal(props) {
                                     color={colors.buttonbackground}
                                 />
                                 <TextDefault textColor={colors.fontSecondColor} H5 style={styles.fontText}>
-                                    {item}
+                                    {item.title}
                                 </TextDefault>
                             </TouchableOpacity>
                         )

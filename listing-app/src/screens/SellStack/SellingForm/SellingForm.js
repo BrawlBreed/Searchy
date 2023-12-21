@@ -44,7 +44,7 @@ function SellingForm({ route }) {
     useEffect(() => {
         Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
         Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
-        dispatch(setSubCategoryId(route.params.types._id))
+        dispatch(setSubCategoryId(route.params.types?._id))
 
         // cleanup function
         return () => {
@@ -159,7 +159,7 @@ function SellingForm({ route }) {
                                               // For now, let's not update the state
                                             }
                                         }}  
-                                        value={String(price)}
+                                        value={String(price) == 0 ? '' : String(price)}
                                         placeholderTextColor={colors.fontSecondColor}
                                         placeholder={'Цена на обявата'}
                                     />

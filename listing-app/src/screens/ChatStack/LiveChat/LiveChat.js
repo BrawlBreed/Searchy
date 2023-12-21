@@ -13,7 +13,7 @@ function LiveChat({ route }) {
     const navigation = useNavigation()
     const [messages, setMessages] = useState([])
     const user = useSelector(state => state.user)
-    const { id, image, name, avatar, uid, adId, description, createdAt } = route.params
+    const { id, image, name, avatar, uid, adId, description, createdAt, ownedItems } = route.params
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -27,7 +27,8 @@ function LiveChat({ route }) {
             avatar,
             adId,
             description, 
-            createdAt
+            createdAt,
+            ownedItems
         })
     }, [navigation])
 

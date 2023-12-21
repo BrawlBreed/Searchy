@@ -1,15 +1,19 @@
  import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
  //import { createMaterialTopTabNavigator  } from '@react-navigation/material-top-tabs';
- import { NavigationContainer } from '@react-navigation/native';
+ import { getFocusedRouteNameFromRoute, NavigationContainer, useNavigation } from '@react-navigation/native';
  import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
- import React from 'react';
+ import React, { useState } from 'react';
  import { AccountScreens, AddScreens, ChatScreens, HomeScreens, SellScreens } from '../screens';
  import { colors, scale } from '../utilities';
  import { StackOptions, tabIcon, tabOptions, TopBarOptions } from './screenOptions';
 import { useSelector } from 'react-redux';
 import EditAd from '../screens/AddStack/MainAdd/Ads/EditAd';
+import { Text, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
  const Tabs = createBottomTabNavigator()
+ const TopTabs = createMaterialTopTabNavigator()
  const MainStack = createStackNavigator()
  const HomeStack = createStackNavigator()
  const AccountStack = createStackNavigator()
@@ -19,9 +23,8 @@ import EditAd from '../screens/AddStack/MainAdd/Ads/EditAd';
  const SellStack = createStackNavigator()
  const FilterStack = createStackNavigator()
  const AccountTOP = createBottomTabNavigator()
- const ChatTOP = createBottomTabNavigator()
  const AdsTOP = createBottomTabNavigator()
- const AdStack = createStackNavigator();
+ const HomeTOP = createBottomTabNavigator()
 
 function NetworkTabs() {
     return (
@@ -40,28 +43,7 @@ function AdsTabs() {
         </AdsTOP.Navigator>        
     )
 }
-
-function AdStackScreen() {
-    return (
-      <AdStack.Navigator>
-        <AdStack.Screen name="Ads" component={AddScreens.Ads} />
-        <AdStack.Screen name="EditAd" component={EditAd} />
-      </AdStack.Navigator>
-    );
-  }
   
-function InboxTabs() {
-    return (
-        <ChatTOP.Navigator initialRouteName='All'
-            tabBarOptions={TopBarOptions()}
-        >
-            <ChatTOP.Screen name='All' options={{tabBarButton: () => null, title: '', tabBarStyle: { display: 'none' }}} component={ChatScreens.All} />
-            {/* <ChatTOP.Screen name='Buying' component={ChatScreens.Buying} />
-            <ChatTOP.Screen name='Selling' component={ChatScreens.Selling} /> */}
-        </ChatTOP.Navigator>
-    )
-}
-
 function FilterScreen() {
     return (
         <FilterStack.Navigator initialRouteName='FilterModal' headerMode='screen' screenOptions={StackOptions()}>
@@ -87,7 +69,7 @@ function HomeTabs() {
 function ChatTabs() {
     return (
         <ChatStack.Navigator initialRouteName='MainChat' headerMode='screen' screenOptions={StackOptions()}>
-            <ChatStack.Screen name='MainChat' component={InboxTabs} options={{
+            <ChatStack.Screen name='MainChat' component={ChatScreens.All} options={{
                 title: 'Съобщения',
                 headerStyle: {
                     backgroundColor: colors.headerbackground,
@@ -96,7 +78,6 @@ function ChatTabs() {
                     marginLeft: scale(0),
                 },
             }} />
-            {/* <ChatStack.Screen name='LiveChat' component={ChatScreens.LiveChat} /> */}
         </ChatStack.Navigator>
     )
 }
@@ -105,17 +86,66 @@ function SellTabs() {
     return ( 
         <SellStack.Navigator initialRouteName='Home' screenOptions={StackOptions()}>
             <SellStack.Screen name='Home' component={SellScreens.MainSell} />
-            <SellStack.Screen name='Categories' component={SellScreens.Categories} options={{ title: 'Choose a category' }} />
+            <SellStack.Screen name='Categories' component={SellScreens.Categories} options={{ title: 'Изберете категория' }} />
             <SellStack.Screen name='SubCategories' component={SellScreens.SubCategories} />
             <SellStack.Screen name='SellingForm' component={SellScreens.SellingFrom} options={{ title: 'Повече информация' }} />
             <SellStack.Screen name='UploadImage' component={SellScreens.UploadImage} />
             <SellStack.Screen name='Price' component={SellScreens.Price} />
             <SellStack.Screen name='LocationConfirm' component={SellScreens.LocationConfirm} />
             <SellStack.Screen name='AdPosting' component={SellScreens.AdPosting} />
-            <SellStack.Screen name='AdPosted' component={SellScreens.AdPosted} />
+            <SellStack.Screen name='AdPosted' component={SellScreens.AdPosted} options={{ title: '' }}  />
         </SellStack.Navigator>
     )
 }
+
+function CustomTabBar({ activeTab, setActiveTab }) {
+    const textStyle = {
+        fontSize: 16,
+        fontWeight: 'bold',
+        textShadowColor: 'black',
+        textShadowOpacity: 0.1,
+        // textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 4,
+        padding: scale(10),
+        color: colors.white
+        // backgroundColor: colors.buttonbackground,
+    }
+    return (
+        <TouchableOpacity onPress={() => setActiveTab(activeTab === 'Търся си' ? 'Продавам' : 'Търся си')}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', 
+            backgroundColor: activeTab === 'Търся си' ? colors.searchy2 : colors.searchy1}}>
+            {activeTab === 'Търся си' ? (
+                <Text style={textStyle}>Продавам</Text>
+            ) : (
+                <Text style={textStyle}>Търся си</Text>
+            )}
+        </View>
+        </TouchableOpacity>
+      
+    );
+  }
+  
+  function CombinedTabs() {
+    const [activeTab, setActiveTab] = useState('Търся си');
+    const navigation = useNavigation();
+    const { uid, isLoggedIn } = useSelector(state => state.user)
+  
+    return (
+      <Tabs.Navigator
+        tabBar={(props) => <CustomTabBar {...props} activeTab={activeTab} setActiveTab={setActiveTab} />}
+        screenOptions={{
+          tabBarVisible: false, // This will hide the default tab bar
+        }}
+      >
+        {/* Always render both tabs but switch visibility based on activeTab */}
+        { activeTab === 'Търся си' ? (
+            <Tabs.Screen name="Търся си" component={HomeTabs} options={{ unmountOnBlur: true }} />
+            ) : <Tabs.Screen name="Продавам" component={isLoggedIn ? SellTabs : AccountScreens.Registration} options={[{ unmountOnBlur: true }, !isLoggedIn && { tabBarButton: () => null, tabBarVisible: false }]} initialParams={{ hideBackButton: true }}/>    
+        }
+      </Tabs.Navigator>
+    );
+  }
+    
 function AddTabs() {
     return (
         <AddStack.Navigator initialRouteName='MainAds' screenOptions={StackOptions()}>
@@ -141,13 +171,13 @@ function AccountTabs() {
     return (
         <AccountStack.Navigator initialRouteName='MainAccount' headerMode='screen' screenOptions={StackOptions()}>
             <AccountStack.Screen name='MainAccount' component={AccountScreens.MainAccount} options={{ title: 'Моят Акаунт' }} />
-            <AccountStack.Screen name='Help' component={AccountScreens.Help} options={{ title: 'Help and Support' }} />
-            <AccountStack.Screen name='Settings' component={AccountScreens.Settings} />
+            <AccountStack.Screen name='Help' component={AccountScreens.Help} options={{ title: 'Информация' }} />
+            <AccountStack.Screen name='Settings' component={AccountScreens.Settings} options={{ title: 'Настройки' }}/>
             <AccountStack.Screen name='Profile' component={AccountScreens.Profile} />
             <AccountStack.Screen name='UserProfile' component={HomeScreens.UserProfile} />
             <AccountStack.Screen name='Privacy' component={AccountScreens.Privacy} />
             <AccountStack.Screen name='Notifications' component={AccountScreens.Notifications} />
-            <AccountStack.Screen name='HelpBrowser' component={AccountScreens.HelpBrowser} />
+            <AccountStack.Screen name='HelpBrowser' component={AccountScreens.HelpBrowser} options={{ title: 'За Нас'}}/>
             <AccountStack.Screen name='Network' component={NetworkTabs} options={{
                 title: 'Моята социална мрежа',
                 headerStyle: {
@@ -164,13 +194,17 @@ function BottomTabs() {
     const { isLoggedIn } = user
     return (
         <Tabs.Navigator initialRouteName='Home' backBehavior='history' tabBarOptions={tabOptions()}
-            screenOptions={({ route }) => tabIcon(route)}>
-            <Tabs.Screen name='Home' component={HomeTabs} />
+        screenOptions={({ route }) => ({
+            ...tabIcon(route)
+          })}
+        >
+            <Tabs.Screen name='Home' component={CombinedTabs} />
+            {/* <Tabs.Screen name='Home' component={HomeTabs} /> */}
             <Tabs.Screen name='Chat' component={isLoggedIn ? ChatTabs : AccountScreens.Registration} options={{ tabBarVisible: isLoggedIn ? true : false }} />
-            <Tabs.Screen name='Sell' component={isLoggedIn ? SellTabs : AccountScreens.Registration} options={{
-                tabBarVisible: false
-            }} />
             <Tabs.Screen name='Add' component={isLoggedIn ? AddTabs : AccountScreens.Registration} options={{ tabBarVisible: isLoggedIn ? true : false }} />
+            {/* <Tabs.Screen name='Sell' component={isLoggedIn ? SellTabs : AccountScreens.Registration} options={{
+                tabBarVisible: false
+            }} /> */}
             <Tabs.Screen name='Account' component={AccountTabs} />
             <Tabs.Screen name='ProductDescription' component={HomeScreens.ProductDescription} options={{ tabBarButton: () => null, tabBarVisible: false }} />
             <Tabs.Screen name='EditProfile' component={isLoggedIn ? EditAccount : AccountScreens.Registration} options={{ tabBarButton: () => null, tabBarVisible: false }} />
@@ -189,7 +223,8 @@ function AppContainer() {
                 <MainStack.Screen name='Registration' component={AccountScreens.Registration} options={{ headerShown: false }} />
                 <MainStack.Screen name='Entry' component={AccountScreens.Entry} options={{ headerShown: false }}/>
                 <MainStack.Screen name='ForgotPassword' component={AccountScreens.ForgotPassword}  options={{ headerShown: false }}/>
-                <MainStack.Screen name='EditAd' component={EditAd}/>
+                <MainStack.Screen name='EditAd' options={{ title: 'Редактирай Обява'}} component={EditAd}/>
+                <MainStack.Screen name='Promote' component={AddScreens.Promote} options={{ title: 'Промотирай'}} />
                 <MainStack.Screen name='FilterModal' component={FilterScreen} options={{
                     headerShown: false,
                     ...TransitionPresets.ModalSlideFromBottomIOS

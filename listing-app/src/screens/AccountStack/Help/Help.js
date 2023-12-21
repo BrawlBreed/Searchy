@@ -8,26 +8,8 @@ import { Entypo } from '@expo/vector-icons'
 
 const links = [
     {
-        title: 'Product Page',
-        description: 'Experience our product Demo',
-        url:
-            'https://market.nativebase.io/view/react-native-food-delivery-backend-app'
-    },
-    {
-        title: 'Docs',
-        url: 'https://enatega.gitbook.io/enatega-full-app/',
-        description: 'Docs related to product'
-    },
-    {
-        title: 'Blog',
-        description: 'Blog related to our product',
-        url:
-            'https://blog.nativebase.io/enatega-full-food-delivery-app-is-finally-here-a6039de4a09d'
-    },
-    {
-        title: 'About Us',
-        url: 'https://ninjascode.com/pages/ourteam.html',
-        description: 'Connect to our team'
+        title: 'За нас',
+        description: 'Кои сме ние и какво правим'
     }
 ]
 
@@ -98,10 +80,10 @@ function Help() {
             <TouchableOpacity style={styles.smallContainer} onPress={share}>
                 <View style={[styles.flex]}>
                     <TextDefault bold H5 style={alignment.PLlarge}>
-                        {'Invite friends to APP'}
+                        {'Покани приятели'}
                     </TextDefault>
                     <TextDefault light style={[alignment.PLlarge, alignment.MTxSmall]}>
-                        {'Invite your friends to buy and sell'}
+                        {'Покани приятелите си да се присъединят към нас!'}
                     </TextDefault>
                 </View>
                 <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />
@@ -109,7 +91,7 @@ function Help() {
             <View style={styles.smallContainer}>
                 <View style={[styles.flex]}>
                     <TextDefault bold H5 style={alignment.PLlarge}>
-                        {'Version'}
+                        {'Версия на приложението'}
                     </TextDefault>
                     <TextDefault light style={[alignment.PLlarge, alignment.MTxSmall]}>
                         {'11.46.0 (435)'}

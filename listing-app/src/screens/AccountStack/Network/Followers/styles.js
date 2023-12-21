@@ -33,7 +33,8 @@ const styles = StyleSheet.create({
     img: {
         flex: 1,
         height: undefined,
-        width: undefined
+        width: undefined,
+        borderRadius: scale(35)
     },
     notificationText: {
         justifyContent: "center",

@@ -16,7 +16,8 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        display: "flex",
     },
     swiperContainer: {
         height: height * 0.4,
@@ -45,7 +46,18 @@ const styles = StyleSheet.create({
         backgroundColor: colors.containerBox,
         width: scale(50),
         height: scale(50),
-        borderRadius: scale(25),
+        borderRadius: scale(25),	
+        overflow: 'hidden'
+    },
+    imgResponsive: {
+        flex: 1,
+        width: undefined,
+        height: undefined,
+        transform: [{ scale: 1.4 }]
+    },
+    icon: {
+        width: scale(200),
+        height: scale(200),
         overflow: 'hidden'
     },
     image: {

@@ -35,7 +35,7 @@ function ALL() {
                     const addPic = chat.image;
                     const adId = chat.adId;
                     const userId = chat.members.filter((member) => member !== uid)[0];
-                    const res = await getAvatarAndName({ variables: { userId: userId } });
+                    const res = await getAvatarAndName({ variables: { userId: userId ?? '' } });
     
                     return {
                         id,
@@ -46,9 +46,10 @@ function ALL() {
                         adId,
                         addPic,
                         imaga: res?.data?.getUserById?.avatar,
-                        username: res.data.getUserById.name,
-                        createdAt: res.data.getUserById?.createdAt,
-                        description: res.data.getUserById?.description,
+                        username: res?.data.getUserById?.name,
+                        createdAt: res?.data.getUserById?.createdAt,
+                        description: res?.data.getUserById?.description,
+                        ownedItems: res?.data.getUserById?.ownedItems,
                         userId
                     };
                 });
@@ -92,7 +93,6 @@ function ALL() {
 
     return (
         <View style={[styles.flex, styles.mainContainer]}>
-            {/* {emptyView()} */}
             <FlatList
                 data={chats}
                 style={styles.flex}
@@ -107,7 +107,7 @@ function ALL() {
                         activeOpacity={0.07}
                         style={styles.messageContainer}
                         onPress={() => {
-                            navigation.navigate('LiveChat', { id: item.id, name: item.username, image: item.addPic, avatar: item.imaga, uid: item.userId, adId: item.adId, description: item.description, createdAt: item.createdAt })
+                            navigation.navigate('LiveChat', { id: item.id, name: item.username, image: item.addPic, avatar: item.imaga, uid: item.userId, adId: item.adId, description: item.description, createdAt: item?.createdAt, ownedItems: item.ownedItems })
                         }}>
                         <View style={styles.imgResposive}>
                             <Image

@@ -12,25 +12,29 @@ import { setZone } from '../../../store/reducers/Item/addItemSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkUserAuth, setCurrentUser } from '../../../store/reducers/User/userSlice';
 import { ScrollView } from 'react-native-gesture-handler';
-const COLORS = ['#ffd54d', '#6df8f3', '#ff7a7a', '#d5b09f', '#eccbcb']
+import { getRemainingCountOrTen } from '../../../utilities/methods';
+import { ActivityIndicator } from 'react-native';
+const COLORS = [colors.searchy1, colors.searchy2]
 
 function MainHome() {
   const navigation = useNavigation()
+  const [previousLength, setPreviousLength] = useState(0);
+  const [loadingFooter, setLoadingFooter] = useState(false)
   const [modalVisible, setModalVisible] = useState(false);
   const [searchVisible, setSerachVisible] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const { zone, userId } = useSelector(state => state.addItem)
+  const { loading: loadingCategories, error: errorCategories, categories } = useCategories()
+  const { zone } = useSelector(state => state.addItem)
   const dispatch = useDispatch()
-  const { refetch, loading, error, items } = useMainHome();
+  const { loading, items, refreshing, setRefreshing, fetchItems, setCurrentLimit, currentLimit, lastId, getItems } = useMainHome(refreshing);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    refetch().then(() => {
+    fetchItems().then(() => {
       setRefreshing(false);
     }).catch(() => {
       setRefreshing(false);
     });
-  }, [refetch]);
+  }, [refreshing]);
  
   useEffect(() => {
     dispatch(checkUserAuth())
@@ -81,6 +85,10 @@ function MainHome() {
         <TextDefault center light>
           Моля свържете се с оператор!
         </TextDefault>
+
+                    {/* Modal */}
+        <LocationModal visible={modalVisible} onModalToggle={toggleModal}/>
+        <SearchModal categories={categories} visible={searchVisible} onModalToggle={toggleSearch} />
       </ScrollView>
     )
   }
@@ -98,14 +106,29 @@ function MainHome() {
       </View>
     )
   }
- 
-  function renderHeader() {
-    const { loading, error, categories } = useCategories()
 
+  const fetchAnother10 = async () => {
+    const length = getRemainingCountOrTen(items.length)
+    if(length === 0) return;
+    setLoadingFooter(true);
+    await getItems();
+    setLoadingFooter(false);
+
+    setCurrentLimit(items.length + length)
+  }
+
+  function renderHeader() {
+    function navigateScreen(category) {
+        navigation.navigate('ProductListing', { search: 'View All', category: category })
+    }
     return (
+      // <></>
       <>
-        {loading ? <TextDefault>Зарежда се...</TextDefault> : 
-        error ? <TextDefault center>Грешка!</TextDefault> :
+        {loadingCategories ?       
+        <View style={[styles.flex, styles.container]}>
+          <ActivityIndicator size={100} color={colors.searchy1} />
+        </View> : 
+        errorCategories ? <TextDefault center>Грешка!</TextDefault> :
         categories.length === 0 ? emptyView() : 
         <>
           <ScrollView style={styles.headerContainer} 
@@ -123,7 +146,7 @@ function MainHome() {
                 <TouchableOpacity 
                   activeOpacity={0.5}
                   style={styles.cardContainer}
-                  onPress={() => navigation.navigate('SubCategories', { headerTitle: item.title })}>
+                  onPress={() => navigateScreen(item.title)}>
                   <View style={styles.textViewContainer}>
                     <View style={[styles.iconContainer, { backgroundColor: COLORS[index % 5] }]}>
                       <Image
@@ -141,7 +164,7 @@ function MainHome() {
           </ScrollView>
           <View style={styles.spacer} />
           <View style={styles.headerTitle}>
-            <TextDefault H5 bold>
+            <TextDefault center H5 bold>
               {'Предложения за теб'}
             </TextDefault>
           </View>
@@ -151,10 +174,13 @@ function MainHome() {
     )
   }
   return (
-    <>
+  <>
     {
-      loading ? <TextDefault>Зарежда се...</TextDefault> :
-      error ? <TextDefault center>Грешка!</TextDefault> :
+      loading ?         
+      <View style={[styles.flex, styles.container]}>
+        <ActivityIndicator color={colors.searchy2} />
+      </View> :
+      // error ? <TextDefault center>Грешка!</TextDefault> :
       items.length === 0 ? emptyView() : 
         <View style={[styles.flex, styles.container]}>
             {/* Browser Container */}
@@ -166,23 +192,24 @@ function MainHome() {
               showsVerticalScrollIndicator={false}
               refreshing={refreshing}
               onRefresh={onRefresh}
+              onEndReached={() => fetchAnother10()}
+              onEndReachedThreshold={0.5} // You can adjust this value  
               ListEmptyComponent={emptyView}
               ListHeaderComponent={renderHeader}
+              ListFooterComponent={<></>}
               numColumns={2}
               renderItem={({ item }) => (
-                <Card refetch={refetch} {...item} /> 
+                <Card {...item} /> 
               )}
             />
 
             {/* Modal */}
             <LocationModal visible={modalVisible} onModalToggle={toggleModal}/>
-            <SearchModal visible={searchVisible} onModalToggle={toggleSearch} />
+            <SearchModal categories={categories} visible={searchVisible} onModalToggle={toggleSearch} />
           </View>
     }
-      
-    </>
-    
-  );
-}
+  </>
 
+  )
+}
 export default MainHome

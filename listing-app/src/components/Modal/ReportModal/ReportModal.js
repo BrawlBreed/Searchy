@@ -30,15 +30,18 @@ const REPORT_OPTIONS = [
     {
         value: 4,
         title: 'Друго'
-    },
+    }, 
 ]
 
-function ReportModal(props) {
+function ReportModal({ uid, adId, id, ...props}) {
     const inset = useSafeAreaInsets()
     const [check, setCheck] = useState(null)
     const [additionalInfo, setAdditionalInfo] = useState('')
     const [margin, marginSetter] = useState(false)
-    const { userId, adId, itemId } = props
+
+    useEffect(() => {
+        console.log(uid, adId, id)
+    }, [])
 
     async function Send() {
         if(check === null) {
@@ -48,9 +51,9 @@ function ReportModal(props) {
                 await client.mutate({
                     mutation: SEND_REPORT,
                     variables: {
-                        userId: userId,
-                        adId: adId,
-                        itemId: itemId,
+                        userId: uid,
+                        adId,
+                        itemId: id,
                         reason: REPORT_OPTIONS[check].title,
                         additionalInfo: additionalInfo,
                         sentAt: new Date().toISOString()
@@ -83,14 +86,15 @@ function ReportModal(props) {
 
     function footerView() {
         return (
-            <View style={styles.footerView}>
+            <View style={[styles.footerView, { marginBottom: 20 } ]}>
                 <TextInput
                     style={styles.textInput}
+                    placeholderTextColor={colors.fontThirdColor}
                     placeholder='Допълнителна информация'
                     value={additionalInfo}
                     onChangeText={(text) => setAdditionalInfo(text)}
                 />
-                <View style={styles.buttonsRow}>
+                <View style={[styles.buttonsRow]}>
                     <TouchableOpacity style={styles.button} onPress={() => props.onModalToggle()}>
                         <View style={styles.buttonText}>
                             <TextDefault>
@@ -118,7 +122,7 @@ function ReportModal(props) {
         >
             <SafeAreaView edges={['top', 'bottom']} style={[
                 styles.safeAreaViewStyles,
-                styles.flex]}>
+                styles.flex, { paddingTop: 30}]}>
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={styles.flex}>

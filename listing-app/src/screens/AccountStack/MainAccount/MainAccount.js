@@ -42,7 +42,7 @@ function MainAccount() {
                 </View> 
                 <View style={[styles.flex, styles.profileInfo]}>
                     <TextDefault H4 bold style={alignment.MBmedium}>
-                        {isLoggedIn ? name ? name : email.split('@')[0] : 'Гост'}
+                        {isLoggedIn ? name ? name : email?.split('@')[0] : 'Гост'}
                     </TextDefault>
                     <TouchableOpacity
                         activeOpacity={0.5}
@@ -61,7 +61,7 @@ function MainAccount() {
                 </View>
             </View>
             {isLoggedIn && <>
-                {/* <TouchableOpacity style={styles.smallContainer} onPress={() => navigation.navigate('Network')}>
+                <TouchableOpacity style={styles.smallContainer} onPress={() => navigation.navigate('Network')}>
                     <FontAwesome5 name="users" size={scale(20)} color={colors.buttonbackground} />
                     <View style={[styles.flex]}>
                         <TextDefault bold H5 style={alignment.PLlarge}>
@@ -72,15 +72,15 @@ function MainAccount() {
                         </TextDefault>
                     </View>
                     <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />
-                </TouchableOpacity> */}
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.smallContainer} onPress={() => navigation.navigate('Settings')}>
                     <AntDesign name="setting" size={scale(22)} color={colors.buttonbackground} />
                     <View style={[styles.flex]}>
                         <TextDefault bold H5 style={alignment.PLlarge}>
-                            {'Settings'}
+                            {'Настройки'}
                         </TextDefault>
                         <TextDefault light style={[alignment.PLlarge, alignment.MTxSmall]}>
-                            {'Privacy and logout'}
+                            {'Излез от профил, изтрий профил'}
                         </TextDefault>
                     </View>
                     <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />
@@ -91,10 +91,10 @@ function MainAccount() {
                 <Ionicons name="ios-help-circle-outline" size={scale(22)} color={colors.buttonbackground} />
                 <View style={[styles.flex]}>
                     <TextDefault bold H5 style={alignment.PLlarge}>
-                        {'Help and Support'}
+                        {'Помощ'}
                     </TextDefault>
                     <TextDefault light style={[alignment.PLlarge, alignment.MTxSmall]}>
-                        {'Help center, Terms and conditions, Privacy policy'}
+                        {'Помощ и поддръжка'}
                     </TextDefault>
                 </View>
                 <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />

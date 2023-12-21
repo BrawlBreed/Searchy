@@ -12,122 +12,82 @@ import * as Device from 'expo-device';
 import Slider from './Slider'
 import MapView, { Marker } from 'react-native-maps'
 import { useDispatch, useSelector } from 'react-redux'
-import { ADD_TO_FAVORITES, GET_ZONES_QUERY, INCREMENT_VIEWS, LIKE_ITEM_MUTATION } from '../../../apollo/server'
+import { ADD_TO_FAVORITES, GET_ITEM_BY_ID, GET_ZONES_QUERY, INCREMENT_VIEWS, LIKE_ITEM_MUTATION } from '../../../apollo/server'
 import { client } from '../../../apollo'
 import { dateStringToDDMMYYYY } from '../../../utilities/methods'
 import { appendFavorites, removeFavorite, setFavorites } from '../../../store/reducers/User/userSlice'
 import { useLazyQuery } from '@apollo/client'
 import { fetchChatsByUserIDs, addChat } from '../../../firebase'
 import { generateRandomId } from '../../../store/reducers/Item/helpers'
-
+import { set } from 'react-native-reanimated'
+ 
 function ProductDescription({ route, preview }) {  
-    const { refetch, title, price, likes, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address, views } = route ? route?.params : preview
-    const [isLike, isLikeSetter] = useState(isLike)
+    const { refetch, title, price, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address, views } = route ? route?.params : preview
+    const [isLike, setIsLike] = useState(false);
     const navigation = useNavigation() 
-    const { isLoggedIn, uid, favorites } = useSelector(state => state.user)
+    const { isLoggedIn, uid } = useSelector(state => state.user)
     const [reportModal, setReportModal] = useState(false);
     const [fetched, setFetched] = useState(false);
-    const [getUser] = useLazyQuery(GET_ZONES_QUERY);
     const [likesList, setLikesList] = useState([]);
-    const [favoritesList, setFavoritesList] = useState([]);
     const dispatch = useDispatch();
-
-    const likeItem = async () => {
-        const newLikes = isLike ? [...(likesList || []), uid] : (likesList || []).filter(like => like !== uid) || [''];
-        try {    
-            // Perform the mutation
-            const response = await client.mutate({
-                mutation: LIKE_ITEM_MUTATION,
-                variables: {
-                    name: id,
-                    likes: newLikes
-                },
-            }).then(({data}) => {
-                setLikesList(data.likeItem.likes)
-
-                return data.likeItem.likes === null ? [] : data.likeItem.likes
-            });
-    
-            return response
-        } catch (error) {
-            console.error('Error liking the item:', error);
-            throw error;
-        }
-    };
+    const { favorites } = useSelector(state => state.user)
 
     useEffect(() => {
-        const likeList = Array.from(new Set(likes)).filter(like => like !== '' && like !== uid);
-        setLikesList(likeList)
-    }, [likes, isLike])
+        client.query({
+            query: GET_ZONES_QUERY,
+            variables: { userId: uid }
+        })
+        .then(({ data }) => {
+            const newFavoritesList = Array.from(new Set(data.getUserById.favorites))
+            dispatch(setFavorites(newFavoritesList))
+        }).then(() => setFetched(true)).then(() => refetch())
+
+        client.query({
+            query: GET_ITEM_BY_ID,
+            variables: { id: id }
+        }).then(({ data }) => {
+            const newLikesList = Array.from(new Set(data.getItemById.likes))
+            setLikesList(newLikesList)
+        }).then(() => refetch())
+    }, [uid]);
 
     useEffect(() => {
-        const favList = favorites?.filter(favorite => favorite !== '') || [''];
-        setFavoritesList(favList);
-    }, [favorites])
+        setIsLike(favorites?.includes(id));
+    }, [id, favorites]) 
 
-    useEffect(() => {
-        const fetchUser = async () => {
-          try {
-            const response = await getUser({ variables: { userId: uid } });
-            if (response.data?.getUserById) {
-                return { ...response.data.getUserById, favorites: response.data.getUserById.favorites || [''] } ;
-            }
-          } catch (error) {
-            console.error('Error fetching user:', error);
-          }
-        };
-      
-        fetchUser().then(user => {
-            if (user?.favorites ) {
-                dispatch(setFavorites(user.favorites));
-                isLikeSetter(user.favorites.includes(id));
-                setFetched(true);
-            }
-        });
-    }, [dispatch, getUser, uid, refetch, likes]);
-              
-    useEffect(() => {
-        // Do nothing if not logged in
-        if (!isLoggedIn) {
-            isLikeSetter(false)
-            navigation.navigate('Registration')
-            return
-        };
-        const toggleFavorite = async () => {
-            if(!fetched) return
-            try {
-                const response = await likeItem();
-                if(!fetched) return
-                if (!response) return;
-                    const newFavorites = isLike ? [...(favoritesList || []), id] : (favoritesList || []).filter(fav => fav !== id) || [''];
-                    await client.mutate({
-                        mutation: ADD_TO_FAVORITES,
-                        variables: { uid: uid, favorites: newFavorites },
-                    })
-                    isLike ? dispatch(appendFavorites(id)) : dispatch(removeFavorite(id));
-            } catch (error) {
-                console.error('Error toggling favorite:', error);
-            }
-        };
-
-        // If fetched is true, call the function to toggle favorite
-        if (fetched) {
-            toggleFavorite();
-        }
-    }, [isLike]);
-
-    useEffect(() => {
-        if(uid !== user?._id){
+    const handleLike = async () => {
+        try{
+            setIsLike(prev => !prev)
+            const newFavorites = favorites?.includes(id) ? favorites?.filter(item => item !== id) : [...favorites, id];
+            const newLikes = likesList?.includes(uid) ? likesList?.filter(item => item !== uid) : [...likesList, uid];
             client.mutate({
-                mutation: INCREMENT_VIEWS,
-                variables: { id: id, views: Number(views + 1)}
+                mutation: ADD_TO_FAVORITES,
+                variables: { uid: uid, favorites: Array.from(new Set(newFavorites)) }
             }).then(() => {
-                refetch()
+                dispatch(setFavorites(Array.from(new Set(newFavorites))))
+            }).then(() => {
+                client.mutate({
+                    mutation: LIKE_ITEM_MUTATION,
+                    variables: { likes: Array.from(new Set(newLikes)), name: id }
+                }).then(() => {
+                    setLikesList(Array.from(new Set(newLikes)))
+                    refetch()
+                })
             })
-
+        }catch(err){
+            console.log(err)
         }
-    }, [route])
+    }
     
+    useEffect(() => {
+        if (!isLoggedIn) {
+            setIsLike(false);
+            navigation.navigate('Registration');
+            return;
+        }
+
+    }, [isLike]);
+            
     useLayoutEffect(() => {
         navigation.setOptions({
             header: () => null
@@ -138,13 +98,23 @@ function ProductDescription({ route, preview }) {
         setReportModal(prev => !prev)
     }
 
+    useEffect(() => {
+        if (uid !== user?._id) {
+            client.mutate({
+                mutation: INCREMENT_VIEWS,
+                variables: { id: id, views: views + 1 }
+            }).then(refetch);
+        }
+    }, [uid, user?._id, id, views, client, refetch]);
+    
     async function chatCheck(){
-        if (!isLoggedIn) navigation.navigate('Registration')
+        if(user._id === uid) navigation.navigate('MainAccount')
+        else if (!isLoggedIn) navigation.navigate('Registration')
         else{
             const chatObj = {
-                name: user.name, image: images[0], avatar: user.avatar, uid: user._id, adId: id
+                name: user.name, image: images[0], avatar: user.avatar, uid: user?._id, adId: id
             }
-            const chats = await fetchChatsByUserIDs(uid, id);
+            const chats = await fetchChatsByUserIDs(uid, user?._id, id);
             if(chats.length){ 
                 navigation.navigate('LiveChat', { id: chats[0].id, ...chatObj } ) 
             } else{
@@ -153,7 +123,7 @@ function ProductDescription({ route, preview }) {
                     id: generateRandomId(28),
                     members: [
                         uid,
-                        user._id
+                        user?._id
                     ],
                     adId: id,
                     image: images[0],
@@ -234,15 +204,13 @@ function ProductDescription({ route, preview }) {
                             {price} лв.
                         </TextDefault>
                         { route && (
-                            <TouchableOpacity activeOpacity={0} onPress={() => {
-                                isLikeSetter(prev => !prev)}
-                            }>
+                        <TouchableOpacity activeOpacity={0} onPress={() => handleLike()}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             {isLike ? 
                                 <FontAwesome name="heart" size={scale(20)} color="black" /> :
                                 <FontAwesome name="heart-o" size={scale(20)} color="black" />
                             }
-                            <TextDefault style={{ marginLeft: 5 }}>{likesList?.length ? likesList.length : '0'}</TextDefault>
+                            {/* <TextDefault style={{ marginLeft: 5 }}>{likesList?.length ? likesList.length : '0'}</TextDefault> */}
                             </View>
                         </TouchableOpacity>
                         )}
@@ -317,7 +285,7 @@ function ProductDescription({ route, preview }) {
                                 borderless={false}
                                 style={styles.profileContainer}
                                 onPress={() => {
-                                    if(user._id === uid){
+                                    if(user?._id === uid){
                                         navigation.navigate('MainAccount')
                                     }else{
                                         navigation.navigate('UserProfile', { ...user })                                    
@@ -333,7 +301,7 @@ function ProductDescription({ route, preview }) {
                                         {user.name}
                                     </TextDefault>
                                     <TextDefault light small>
-                                        {`Член от ${dateStringToDDMMYYYY(user.createdAt)}`}
+                                        {`Член от ${dateStringToDDMMYYYY(user?.createdAt)}`}
                                     </TextDefault>
                                     <TextDefault textColor={colors.spinnerColor} bold style={alignment.MTxSmall}>
                                         {'Виж профил'}
@@ -380,28 +348,32 @@ function ProductDescription({ route, preview }) {
                             {'Чат'}
                         </TextDefault>
                     </TouchableOpacity>
+                    { user?.phone && (
+                        <>
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                style={styles.button}
+                                onPress={Sms}
+                            >
+                                <SimpleLineIcons name='envelope' size={scale(20)} color={colors.white} />
+                                <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
+                                    {'Съобщение'}
+                                </TextDefault>
+                            </TouchableOpacity>
 
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        style={styles.button}
-                        onPress={Sms}
-                    >
-                        <SimpleLineIcons name='envelope' size={scale(20)} color={colors.white} />
-                        <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
-                            {'Съобщение'}
-                        </TextDefault>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        style={styles.button}
-                        onPress={dialCall}
-                    >
-                        <SimpleLineIcons name='phone' size={scale(20)} color={colors.white} />
-                        <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
-                            {'Обади се'}
-                        </TextDefault>
-                    </TouchableOpacity>
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                style={styles.button}
+                                onPress={dialCall}
+                            >
+                                <SimpleLineIcons name='phone' size={scale(20)} color={colors.white} />
+                                <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
+                                    {'Обади се'}
+                                </TextDefault>
+                            </TouchableOpacity>
+                        </>
+                    )}
+                    
                 </View>
             )}
         </SafeAreaView >

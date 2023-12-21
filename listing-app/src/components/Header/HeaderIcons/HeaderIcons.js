@@ -10,7 +10,7 @@ import { StackActions, useNavigation } from '@react-navigation/native'
 import { HeaderBackButton } from '@react-navigation/stack'
 import PropTypes from 'prop-types'
 import { alignment, colors, scale } from '../../../utilities'
-import { View, TouchableOpacity, Modal, Dimensions } from 'react-native'
+import { View, TouchableOpacity, Modal, Dimensions, Share } from 'react-native'
 import { BorderlessButton } from 'react-native-gesture-handler'
 import { TextDefault } from '../../Text'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -134,23 +134,47 @@ function RightButton(props) {
       />
     )
   } else if (props.icon === 'dots') {
+    async function share() {
+      try {
+        const result = await Share.share({
+            title: 'App link',
+            message:
+                'Изтегли приложението от тук: ',
+        });
+        if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+                // shared with activity type of result.activityType
+                FlashMessage({ message: 'Линка беше изпратен!', type: 'success' });
+            } else {
+                // shared
+            }
+        } else if (result.action === Share.dismissedAction) {
+            // dismissed
+        }
+      } catch (error) {
+          FlashMessage({ message: error.message, type: 'warning' });
+      } finally {
+          togglePassword()
+      }
+    }
+
     return (
       <View>
         {password ? (
           <Modal
             animationType="fade"
             transparent={true}
+            onDismiss={togglePassword}
             visible={password}
-            onRequestClose={() => setPassword(false)}
           >
-            <TouchableOpacity activeOpacity={1} style={{ flex: 1 }} onPress={() => setPassword(false)} >
+            <TouchableOpacity activeOpacity={1} style={{ flex: 1 }} onPress={share} >
               <BorderlessButton
                 onPress={props.onPress}
                 borderless={false}
                 style={[styles.shareBtn, { top: inset.top }]}
               >
                 <TextDefault textColor={colors.headerText} H5 bold style={styles.flex}>
-                  {'Share Profile'}
+                  {'Сподели'}
                 </TextDefault>
               </BorderlessButton>
             </TouchableOpacity>

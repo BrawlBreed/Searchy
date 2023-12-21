@@ -1,11 +1,11 @@
 type SubCategory {
   _id: String
-  parentCategoryId: ID
+  categoryParent: ID
   category: Category
     @materializer(
       query: "getCategoryById",
       arguments: [
-        { name: "id", field: "parentCategoryId" }
+        { name: "id", field: "categoryParent" }
       ]
     )
   title: String
@@ -18,11 +18,11 @@ type SubCategoriesList {
 type Query {
     getSubCategoryById(subCategory: ID): SubCategory
     @rest(
-      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/subCategories/$subCategory.json"
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/subcategories/$subCategory.json"
     )
     getSubCategories: [SubCategoriesList]
     @rest(
-      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/subCategories.json",
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/subcategories.json",
       transforms: [{ pathpattern: [], editor: "objectToArray"}]
     )
 }

@@ -15,8 +15,8 @@ function LoginButton(props) {
             style={StyleSheet.compose(styles.emptyButton, props.style )}
             onPress={props.onPress}>
             {props.icon &&
-                <SimpleLineIcons name={props.icon} size={scale(30)} color={colors.buttonbackground} />}
-            <TextDefault textColor={colors.buttonbackground} H4 style={[styles.flex, alignment.PLmedium, { fontSize: 25 }]}>
+                <SimpleLineIcons name={props.icon} size={scale(30)} color={colors.white} />}
+            <TextDefault textColor={colors.white} H4 style={[styles.flex, alignment.PLmedium, { fontSize: Platform.OS === "ios" ? 20 : 25 }]}>
                 {props.title}
             </TextDefault>
         </TouchableOpacity>

@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: 'row',
-        backgroundColor: colors.themeBackground,
+        backgroundColor: colors.searchy1,
         borderRadius: scale(5),
         borderColor: colors.buttonbackground,
         borderWidth: scale(1),

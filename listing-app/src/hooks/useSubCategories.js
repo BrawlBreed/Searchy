@@ -32,10 +32,13 @@ const useSubCategories = () => {
             
             // Convert the map of unique categories back to an array
             const uniqueCategoryArray = Array.from(uniqueCategories.values());
-
             setSubCategories(uniqueCategoryArray)
         }
     }, [data])
+
+    useEffect(() => {
+        console.log(error)
+    }, [error])
 
   return ({ loading, error, subCategories })
 }

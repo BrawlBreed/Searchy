@@ -10,14 +10,13 @@ import styles from './styles'
 
 function MainHeader(props) { 
     const inset = useSafeAreaInsets()
-    const navigation = useNavigation() 
     return (
         <View style={[styles.headerBackground, { paddingTop: inset.top }]} >
             <TouchableOpacity
                 activeOpacity={1}
                 onPress={() => props.onModalToggle()}
                 style={styles.row}>
-                <MaterialIcons name='location-on' size={scale(25)} color={colors.headerText} />
+                <MaterialIcons name='location-on' size={scale(25)} color={colors.searchy2} />
                 <TextDefault numberOfLines={1} textColor={colors.headerText} H5 style={styles.title}>
                     {props.locationText}
                 </TextDefault>
@@ -47,3 +46,5 @@ function MainHeader(props) {
 
 }
 export default MainHeader
+
+//<HomeStack.Screen name='Main' component={HomeScreens.MainHome} />

@@ -5,15 +5,18 @@ import { Image, TouchableOpacity, View } from 'react-native';
 import { TextDefault } from '../../../../components';
 import { colors, scale } from '../../../../utilities';
 import styles from '../styles';
+import { useSelector } from 'react-redux';
  
 function Card(props) {
     const navigation = useNavigation()
+    const { uid } = useSelector(state => state.user)
     const [isLike, isLikeSetter] = useState(null) 
 
     return (
         <TouchableOpacity activeOpacity={1}
             style={styles.productCardContainer}
-            onPress={() => navigation.navigate('ProductDescription', { ...props, isLike, isLikeSetter })}>
+            onPress={() => props?.user._id === uid ? navigation.navigate('Add')
+            : navigation.navigate('ProductDescription', { ...props, isLike, isLikeSetter })}>
             <View style={styles.topCardContainer}>
                 <Image
                     source={{ uri: props.image }}

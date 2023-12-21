@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     smallContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.themeBackground,
+        backgroundColor: colors.white,
         borderBottomColor: colors.horizontalLine,
         borderBottomWidth: StyleSheet.hairlineWidth,
         ...alignment.Pmedium

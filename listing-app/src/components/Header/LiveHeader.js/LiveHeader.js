@@ -46,7 +46,6 @@ function ModalHeader() {
         if (!Device.isDevice)
             FlashMessage({ message: 'This function is not working on Simulator/Emulator', type: 'warning' })
         else {
-            let phoneNumber = '';
             if (Platform.OS === 'android') {
                 phoneNumber = `tel:${phoneNumber}`;
             }
@@ -98,7 +97,7 @@ function ModalHeader() {
     return (
         <SafeAreaView edges={['top']} style={styles.safeAreaContainer}>
             <View style={styles.headerContainer}>
-                <ReportModal userId={uid} adId={adId} itemId={id} visible={reportModal} onModalToggle={toggleModal} />
+                <ReportModal {...route.params} visible={reportModal} onModalToggle={toggleModal} />
                 <View style={styles.headerContents}>
                     <LeftButton icon='back' iconColor={colors.headerText} />
                     <View style={[styles.flex, styles.titleContainer]}>
@@ -111,33 +110,35 @@ function ModalHeader() {
                                 source={typeof avatar === 'string' && avatar === 'false' || !avatar ? require('../../../assets/images/avatar.png') : { uri: avatar }}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { ...route.params, _id: uid})} style={styles.infoContainer}>
+                        <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { ...route.params, _id: uid, })} style={styles.infoContainer}>
                             <TextDefault bold H5>
                                 {name} 
                             </TextDefault>
                         </TouchableOpacity>
-                        <View style={styles.iconContainer}>
-                            <TouchableOpacity
-                                style={alignment.PxSmall}
-                                borderless={false}
-                                onPress={dialCall}>
-                                <View accessible>
-                                    <Feather name="phone" size={scale(20)} color={colors.headerText} />
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={alignment.PxSmall}
-                                borderless={false}
-                                onPress={Sms}>
-                                <MaterialCommunityIcons name="message-text-outline" size={scale(20)} color={colors.headerText} />
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => setOpen(true)}
-                                style={alignment.PxSmall}
-                                borderless={false}>
-                                <MaterialCommunityIcons name="dots-vertical" size={scale(20)} color={colors.headerText} />
-                            </TouchableOpacity>
-                        </View>
+                        {phoneNumber && (
+                            <View style={styles.iconContainer}>
+                                <TouchableOpacity
+                                    style={alignment.PxSmall}
+                                    borderless={false}
+                                    onPress={dialCall}>
+                                    <View accessible>
+                                        <Feather name="phone" size={scale(20)} color={colors.headerText} />
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={alignment.PxSmall}
+                                    borderless={false}
+                                    onPress={Sms}>
+                                    <MaterialCommunityIcons name="message-text-outline" size={scale(20)} color={colors.headerText} />
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                        <TouchableOpacity
+                            onPress={() => setOpen(true)}
+                            style={alignment.PxSmall}
+                            borderless={false}>
+                            <MaterialCommunityIcons name="dots-vertical" size={scale(20)} color={colors.headerText} />
+                        </TouchableOpacity>
                     </View>
                     {open &&
                         <Modal

@@ -1,6 +1,6 @@
 import { useFonts, Roboto_100Thin, Roboto_300Light, Roboto_400Regular, Roboto_500Medium, Roboto_700Bold, } from '@expo-google-fonts/roboto';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text } from 'react-native';
 import FlashMessage from 'react-native-flash-message';
 import { LogBox } from 'react-native';
@@ -12,7 +12,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { ApolloProvider } from '@apollo/client';
 import { client } from './src/apollo';
 import store from './src/store/store';
+import { StripeProvider } from '@stripe/stripe-react-native';
 import { Provider } from 'react-redux';
+import { PUBLISHABLE_KEY } from '@env';
 LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
 LogBox.ignoreAllLogs();//Ignore all log notifications
 
@@ -35,9 +37,11 @@ export default function App() {
     return (
       <Provider store={store}>
         <ApolloProvider client={client}>
-          <AppContainer />
-          <StatusBar style="dark" backgroundColor={colors.buttonbackground} />
-          <FlashMessage position="top" />
+          <StripeProvider merchantIdentifier='merchant.com.{{Searchy}}' publishableKey={process.env.PUBLISHABLE_KEY}>
+            <AppContainer />
+            <StatusBar style="dark" backgroundColor={colors.buttonbackground} />
+            <FlashMessage position="top" />
+          </StripeProvider>
         </ApolloProvider>
       </Provider>
     )

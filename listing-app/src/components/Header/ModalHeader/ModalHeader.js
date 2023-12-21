@@ -11,7 +11,7 @@ function ModalHeader(props) {
             <View style={styles.headerContents}> 
                 <LeftButton icon={props.type} iconColor={colors.headerText} navigate={props.closeModal} />
                 {props.title &&
-                    <TextDefault textColor={colors.headerText} style={[{ width: '50%', textAlign: 'center'}]} bolder H3>
+                    <TextDefault textColor={colors.headerText} style={[{ width: '63.3%', textAlign: 'center'}, props.style]} bolder H3>
                         {props.title}
                     </TextDefault>
                 }

@@ -12,17 +12,17 @@ import useItems from '../../../hooks/useItems'
 
 function ProductListing() {  
     const navigation = useNavigation()
-    const route = useRoute()
+    const route = useRoute() 
     const searchSubCategory = route.params?.search
     const searchCategory = route.params?.category ?? ''
     const searchInput = route.params?.input ?? ''
 
-    const { loading, error, items } = useItems(searchSubCategory, searchCategory, searchInput)
+    const { loading, items, error } = useItems(searchSubCategory, searchCategory, searchInput)
     const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         console.log(items)
-    })
+    }, [items])
 
     useLayoutEffect(() => {
         navigation.setOptions(
@@ -40,13 +40,13 @@ function ProductListing() {
                 <TextDefault >
                     {items.length} оферти
                 </TextDefault>
-                <TouchableOpacity style={styles.filterBtn}
+                {/* <TouchableOpacity style={styles.filterBtn}
                     onPress={() => navigation.navigate('FilterModal', { visible: modalVisible, searchCategory: searchCategory })}>
                     <MaterialIcons name='tune' size={scale(20)} color={colors.buttonbackground} />
                     <TextDefault style={styles.fontText} right>
                         Филтър
                     </TextDefault>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         )
     }
