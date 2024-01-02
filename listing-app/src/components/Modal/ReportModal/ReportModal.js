@@ -48,12 +48,12 @@ function ReportModal({ uid, adId, id, ...props}) {
             FlashMessage({ message: 'Не сте дали причина за докладване на потребителя!', type: 'danger' })
         }else{
             try{
+                console.log(uid, adId, id)
                 await client.mutate({
                     mutation: SEND_REPORT,
                     variables: {
                         userId: uid,
-                        adId,
-                        itemId: id,
+                        itemId: adId,
                         reason: REPORT_OPTIONS[check].title,
                         additionalInfo: additionalInfo,
                         sentAt: new Date().toISOString()

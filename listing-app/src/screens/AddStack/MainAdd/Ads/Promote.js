@@ -67,7 +67,6 @@ const Promote = ({route}) => {
                     <Text style={[{textAlign: 'center', padding: 10, fontSize: 25, fontWeight: '500'}]}>Избери пакет</Text>
                     {TIERS.map((item, index) => (
                     <View style={styles.cardContainer}>
-                        <ImageBackground style={[styles.card]} source={item.background}>
                             <View style={styles.wrapper}>
                                 {item.best && <Text style={styles.label}>Най-продаван</Text>}
                                 <Text selectionColor='blue' style={[styles.title]}>{item.title}</Text>
@@ -96,7 +95,6 @@ const Promote = ({route}) => {
                                 /> 
                                 {error && item.input && <Text style={{ color: 'red', textAlign: 'center', padding: 10 }}>{error}</Text>}
                             </View>
-                        </ImageBackground>
                     </View>    
                 ))}
                 <ModalComponent id={id} promotionScore={promotionScore} subtotal={subtotal} paymentCard={paymentCard} setPaymentCard={setPaymentCard}/>

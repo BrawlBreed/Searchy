@@ -151,7 +151,7 @@ function MainHome() {
                     <View style={[styles.iconContainer, { backgroundColor: COLORS[index % 5] }]}>
                       <Image
                         style={styles.imgResponsive}
-                        source={item.image}
+                        source={{uri: item.image}}
                       />
                     </View>
                     <TextDefault numberOfLines={1} uppercase small light>

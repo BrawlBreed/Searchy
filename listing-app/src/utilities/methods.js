@@ -29,10 +29,11 @@ export function dateStringToDDMMYYYY(dateString) {
 
     // Scale down the numeric date to ensure it adds a small value
     // The scaling factor can be adjusted as needed
-    const dateScore = numericDate * 0.0000000001;
+    const dateScore = numericDate * 0.000000000001;
 
     // Add the scaled date score to the amount paid
     const score = amountPaid + dateScore;
+    console.log(dateScore)
 
     return score;
   }

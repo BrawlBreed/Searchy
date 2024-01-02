@@ -171,7 +171,7 @@ export function fetchChatsByUserIDs(uid1, uid2, adId) {
     const q = query(
       chatsRef, 
       where('members', 'array-contains-any', [uid1, uid2]),
-      where('adId', '==', adId) // Additional field condition
+      where('adId', '==', adId)
     );
 
     getDocs(q)
@@ -180,9 +180,13 @@ export function fetchChatsByUserIDs(uid1, uid2, adId) {
         querySnapshot.forEach(doc => {
           const data = doc.data();
           data.id = doc.id;
+
           // Check if both user IDs are in the 'members' array
-          allChats.push(data);
+          if (data.members.includes(uid1) && data.members.includes(uid2)) {
+            allChats.push(data);
+          }
         });
+
         resolve(allChats);
       })
       .catch(error => reject(error));
@@ -498,23 +502,25 @@ export async function fetchItems(zoneId, limit, startAfterId = null) {
           
             await Promise.all(itemPromises);
 
-            console.log(items)
+            console.log('Items: ', items)
           
             let itemsArray = Object.values(items);
             const lastId = Object.keys(items)[Object.keys(items).length - 1]
 
             // Sort itemsArray if needed, then filter by active status and user ID
-            itemsArray = itemsArray.map(item => ({
+            itemsArray = itemsArray.filter((item => Boolean(item._id))).map(item => ({
               id: item._id,
               title: item.title, 
               price: item.price,
               location: item.address.address,
               image: item.images[0],
               ...item,
-            })).filter(item => item.status === 'active' && Boolean(item.id) )
+            })).filter(item => item.status === 'active')
             .sort((a, b) => {
               return b.promotionScore - a.promotionScore;
             }); 
+
+            console.log('Items: ', itemsArray)
 
             // Implement client-side pagination
             if (startAfterId) {

@@ -227,7 +227,7 @@ const EditAd = ({route}) => {
                     showsVerticalScrollIndicator={false}
                 >
                     {/* Modal */}
-                    <ReportModal visible={reportModal} onModalToggle={toggleModal} />
+                    {/* <ReportModal visible={reportModal} onModalToggle={toggleModal} /> */}
 
                     <View style={styles.swiperContainer}>
                         {images.length ? 

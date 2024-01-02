@@ -77,7 +77,7 @@ function UserProfile({ route }) {
                         unique.push(item);
                     }
                     return unique;
-                }, []);
+                }, []).filter((item) => item.status === 'active');
 
                 setItems(newItems)
             } catch (error) {

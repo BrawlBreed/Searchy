@@ -23,10 +23,9 @@ function Card(props) {
     const rateStyle= {width: 40, height: 40, padding: 5, resizeMode: 'contain', filter: 'grayscale(100%)'}
 
     function getPromotionRate() {
-        const promotionIndex = calculatePromotionScore(props?.promotionScore);
-        if (promotionIndex < 5) {
+        if (props?.promotionScore <= calculatePromotionScore(4.99) + 1) {
             return promotionRate_Low;
-        } else if (promotionIndex < 18) {
+        } else if (props?.promotionScore <= calculatePromotionScore(10.99)) {
             return promotionRate_Medium;
         } else {
             return promotionRate_High;

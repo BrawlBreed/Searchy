@@ -56,6 +56,7 @@ function ProductDescription({ route, preview }) {
     }, [id, favorites]) 
 
     const handleLike = async () => {
+        if(!isLoggedIn) return navigation.navigate('Registration')
         try{
             setIsLike(prev => !prev)
             const newFavorites = favorites?.includes(id) ? favorites?.filter(item => item !== id) : [...favorites, id];
@@ -108,7 +109,7 @@ function ProductDescription({ route, preview }) {
     }, [uid, user?._id, id, views, client, refetch]);
     
     async function chatCheck(){
-        if(user._id === uid) navigation.navigate('MainAccount')
+        if(user?._id === uid) navigation.navigate('Account')
         else if (!isLoggedIn) navigation.navigate('Registration')
         else{
             const chatObj = {
@@ -193,8 +194,9 @@ function ProductDescription({ route, preview }) {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Modal */}
-                <ReportModal visible={reportModal} onModalToggle={toggleModal} />
-
+                { route && (
+                    <ReportModal adId={id} uid={user?._id} visible={reportModal} onModalToggle={toggleModal} />
+                )}
                 <View style={styles.swiperContainer}>
                     <Slider images={images} />
                 </View>
@@ -286,7 +288,7 @@ function ProductDescription({ route, preview }) {
                                 style={styles.profileContainer}
                                 onPress={() => {
                                     if(user?._id === uid){
-                                        navigation.navigate('MainAccount')
+                                        navigation.navigate('Account')
                                     }else{
                                         navigation.navigate('UserProfile', { ...user })                                    
                                     }

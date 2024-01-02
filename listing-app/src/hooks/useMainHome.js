@@ -24,7 +24,6 @@ const useMainHome = () => {
     if(loading) return;
     setLoading(loadingFlag);
     const { items, lastId } = await fetchItems(zoneId, currentLimit, lastId)
-    console.log(items)
     setItems(prevItems => {
       if (!items || items.length === 0) {
         return prevItems;
