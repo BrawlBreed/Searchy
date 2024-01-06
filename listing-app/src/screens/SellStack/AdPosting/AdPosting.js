@@ -43,30 +43,33 @@ function AdPosting() {
     return (
         <SafeAreaView style={[styles.safeAreaViewStyles, styles.flex]}>
             <View style={[styles.flex, styles.mainContainer]}>
-                <View style={styles.buttonContainer}>
-                    <View style={styles.imgContainer}>
+                <View style={styles.previewContainer}>
+                    {/* <View style={styles.imgContainer}> */}
                         <ProductDescription preview={item}/>
-                        {error ? <TextDefault center style={{color: colors.google, fontWeight: 'bold'}}>{error}</TextDefault> : (
+                        {/* {error ? <TextDefault center style={{color: colors.google, fontWeight: 'bold'}}>{error}</TextDefault> : (
                             <>
                             <View style={[styles.imgResponsive, { marginTop: 10 }]}>
                                 <Image style={styles.img}
                                     source={require('../../../assets/images/emptyView/price-tag.png')} />
                             </View>
-                            <TextDefault bold H5>
-                                {'Продай по-бързо'}
-                            </TextDefault>
+                            <EmptyButton
+                                title='Промотиране'
+                                onPress={() => active && NavigateScreen()}
+                                disabled={!active}
+                            />
                             <TextDefault light style={[alignment.MTxSmall, {textAlign: 'center'}]}>
                                 {'Промотирането на офертите ви помага да достигнете повече купувачи и да продавате по-бързо.'}
                             </TextDefault>
                             </>
-                        )}
-                    </View>
+                        )} */}
+                    {/* </View> */}
+                </View>
+                <View style={[alignment.MxSmall]}>
                     <EmptyButton
                         title='Публикуване'
                         onPress={() => active && NavigateScreen()}
                         disabled={!active}
                     />
-
                 </View>
             </View>
         </SafeAreaView>

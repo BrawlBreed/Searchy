@@ -259,7 +259,7 @@ const EditAd = ({route}) => {
                     </View>
                     <View style={[styles.priceContainer, { marginTop: '12%' }]}>
                         <TextDefault textColor={errors.price ? colors.google : colors.black} bold H5 style={[alignment.MBsmall]}>
-                            {'Цена'}
+                            {'Цена (лв.)'}
                         </TextDefault>
                         {errors.price &&
                             <TextDefault textColor={colors.google} style={styles.width100}>

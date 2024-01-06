@@ -136,7 +136,7 @@ function SellingForm({ route }) {
                             </View>
                             <View style={styles.subContainer}>
                                 <TextDefault textColor={errors.title ? colors.google : adColor} H5 bold style={styles.width100}>
-                                    {'Цена *'}
+                                    {'Цена (лв.) *'}
                                 </TextDefault>
                                 <View style={[styles.textContainer, { borderColor: adColor }]}>
                                     <TextInput

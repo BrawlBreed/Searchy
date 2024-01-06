@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { FlatList, Image, TouchableOpacity, View, RefreshControl } from 'react-native';
+import { FlatList, Image, TouchableOpacity, View, RefreshControl, Platform } from 'react-native';
 import { LocationModal, MainHeader, TextDefault } from '../../../components';
 import SearchModal from '../../../components/Modal/SearchModal/SearchModal';
 import { alignment, colors } from '../../../utilities';
@@ -14,6 +14,8 @@ import { checkUserAuth, setCurrentUser } from '../../../store/reducers/User/user
 import { ScrollView } from 'react-native-gesture-handler';
 import { getRemainingCountOrTen } from '../../../utilities/methods';
 import { ActivityIndicator } from 'react-native';
+// import { AppOpenAd, InterstitialAd, RewardedAd, BannerAd, TestIds, BannerAdSize } from 'react-native-google-mobile-ads';
+
 const COLORS = [colors.searchy1, colors.searchy2]
 
 function MainHome() {
@@ -26,6 +28,7 @@ function MainHome() {
   const { zone } = useSelector(state => state.addItem)
   const dispatch = useDispatch()
   const { loading, items, refreshing, setRefreshing, fetchItems, setCurrentLimit, currentLimit, lastId, getItems } = useMainHome(refreshing);
+  const adUnitId = Platform.OS === 'ios' ? 'ca-app-pub-6009235772551043~5795958407' : 'ca-app-pub-6009235772551043~3123878820';
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -148,7 +151,7 @@ function MainHome() {
                   style={styles.cardContainer}
                   onPress={() => navigateScreen(item.title)}>
                   <View style={styles.textViewContainer}>
-                    <View style={[styles.iconContainer, { backgroundColor: COLORS[index % 5] }]}>
+                    <View style={[styles.iconContainer, { backgroundColor: COLORS[Math.round(Math.random())] }]}>
                       <Image
                         style={styles.imgResponsive}
                         source={{uri: item.image}}
@@ -183,7 +186,6 @@ function MainHome() {
       // error ? <TextDefault center>Грешка!</TextDefault> :
       items.length === 0 ? emptyView() : 
         <View style={[styles.flex, styles.container]}>
-            {/* Browser Container */}
             <FlatList
               data={items}
               style={[styles.flex, styles.flatList]}
@@ -202,7 +204,15 @@ function MainHome() {
                 <Card {...item} /> 
               )}
             />
-
+            {/* <BannerAd
+              unitId={adUnitId}
+              size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+              requestOptions={{
+                networkExtras: {
+                  collapsible: 'bottom',
+                },
+              }}
+            /> */}
             {/* Modal */}
             <LocationModal visible={modalVisible} onModalToggle={toggleModal}/>
             <SearchModal categories={categories} visible={searchVisible} onModalToggle={toggleSearch} />

@@ -43,7 +43,7 @@ const ModalComponent = ({ paymentCard, setPaymentCard, subtotal, id, promotionSc
 
     const createPaymentIntent = async () => {
         const ip = Platform.OS === "ios" ? '192.168.x.x' : '10.0.2.2'; // Replace with your actual IP address for iOS
-        const response = await fetch(`https://a238-2a01-5a8-308-37c9-dc2d-a9eb-8842-6ce0.ngrok-free.app/create-payment-intent`, {
+        const response = await fetch(`https://599f-151-251-249-129.ngrok-free.app/create-payment-intent`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -57,7 +57,6 @@ const ModalComponent = ({ paymentCard, setPaymentCard, subtotal, id, promotionSc
     const handlePayment = async () => {
         try {
             setLoading(true);
-            console.log(clientSecret)
             const {data, loadingPayment, error} = await confirmPayment(clientSecret, {
                 paymentMethodType: 'Card',
                 billingDetails,
@@ -84,8 +83,6 @@ const ModalComponent = ({ paymentCard, setPaymentCard, subtotal, id, promotionSc
                 if(data === undefined){
                     setPaymentCard(false)
                     FlashMessage({message: 'Плащането беше успешно!', type: 'success'})
-                    console.log(subtotal)
-                    console.log(calculatePromotionScore(subtotal, new Date().toISOString().split('T')[0]))
                     client.mutate({
                         mutation: PROMOTE_ITEM,
                         variables: {

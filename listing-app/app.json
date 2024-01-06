@@ -25,6 +25,15 @@
     },
     "android": {
       "package": "com.brawl_breed.listingapp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "bdb8f198-a74f-4109-96df-af856897f4cd"
+      }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-6009235772551043~3123878820",
+    "ios_app_id": "ca-app-pub-6009235772551043~5795958407"
   }
 }

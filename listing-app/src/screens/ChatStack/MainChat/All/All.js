@@ -35,7 +35,6 @@ function ALL() {
                     const addPic = chat.image;
                     const adId = chat.adId;
                     const userId = chat.members.filter((member) => member !== uid)[0];
-                    console.log(userId)
                     const res = await getAvatarAndName({ variables: { userId: userId ?? '' } });
     
                     return {

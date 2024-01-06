@@ -20,10 +20,6 @@ function ProductListing() {
     const { loading, items, error } = useItems(searchSubCategory, searchCategory, searchInput)
     const [modalVisible, setModalVisible] = useState(false);
 
-    useEffect(() => {
-        console.log(items)
-    }, [items])
-
     useLayoutEffect(() => {
         navigation.setOptions(
             navigationOption({ searchCategory: searchSubCategory })

@@ -33,7 +33,6 @@ export function dateStringToDDMMYYYY(dateString) {
 
     // Add the scaled date score to the amount paid
     const score = amountPaid + dateScore;
-    console.log(dateScore)
 
     return score;
   }

@@ -69,7 +69,6 @@ export async function uploadImage(image, path) {
     const response = await fetch(image);
     image = await response.blob();
     const reference = storageRef(storage, `${path}`);
-    console.log(reference)
     await uploadBytes(reference, image);
     return getDownloadURL(reference);;
   } catch (error) {
@@ -125,7 +124,6 @@ export const logout = async (dispatch) => {
 
 export async function createUserWithCustomKey( childId, data ){
   const { password, isLoggedIn, loading, uid, userId, ...dataWithoutPassword } = data;
-  console.log(dataWithoutPassword)
 
   try{
     const res = await set(ref(db, 'users/' + childId), dataWithoutPassword)

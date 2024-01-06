@@ -46,10 +46,10 @@ function Categories() {
                         // onPress={() => navigation.dispatch(StackActions.push('SubCategories', { headerTitle: item.title, screen: screen }))}>
                         onPress={() => navigation.navigate('SubCategories', { headerTitle: title, screen: screen, subCategories: subCategories })}>
                         <View style={styles.rowContainer}>
-                            <View style={[styles.image, { backgroundColor: COLORS[index % 5] }]}>
+                            <View style={[styles.image, { backgroundColor: COLORS[Math.round(Math.random())] }]}>
                                 <Image
                                     style={styles.imgResponsive}
-                                    source={image}
+                                    source={{uri: image }}
                                 />
                             </View>
                             <TextDefault H5 style={styles.fontText}>

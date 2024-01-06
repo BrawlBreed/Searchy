@@ -27,6 +27,12 @@ const styles = StyleSheet.create({
         backgroundColor: colors.themeBackground,
         ...alignment.Plarge
     },
+    previewContainer: {
+        flex: 1,
+        justifyContent: 'space-between',
+        alignItems: "center",
+        backgroundColor: colors.themeBackground,
+    },
     imgResponsive: {
         height: scale(60),
         width: scale(60),
