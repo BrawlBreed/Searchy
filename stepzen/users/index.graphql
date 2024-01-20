@@ -1,0 +1,109 @@
+type User {
+  name: String!,
+  phoneCode: String,
+  callingCode: String,
+  description: String,
+  phone: String,
+  email: String,
+  avatar: String,
+  createdAt: String,
+  active: Boolean,
+  followers: [String],
+  following: [String],
+  favorites: [String],
+  ownedItems: [String],
+  notifications: Notifications,
+  likes: [String],
+  _id: String,
+}
+
+type Notifications { 
+  recommendations: Boolean
+  specialOffers: Boolean
+}
+
+type UserList { 
+  name: ID,
+  value: User
+}
+
+type Query {
+  getUserById(user: ID): User
+    @rest( 
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$user.json"
+    )
+  getUsers: [UserList]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    )
+}
+
+input NotificationsInput {
+  recommendations: Boolean
+  specialOffers: Boolean
+}
+
+type Mutation {
+  register(
+    avatar: String
+    description: String
+    callingCode: String
+    createdAt: String
+    email: String
+    followers: [String]
+    following: [String]
+    favorites: [String]
+    likes: [String]
+    name: String
+    notifications: NotificationsInput
+    phone: String
+    active: Boolean
+    phoneCode: String
+    _id: String
+  ): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users.json",
+      method: POST
+    )
+    changePhone(uid: String!, phone: String!, phoneCode: String!): JSON 
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    changeEmail(uid: String!, email: String!): JSON 
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    changeEssentials(uid: String!, name: String, description: String!, avatar: String!): JSON 
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    addToFavorites(uid: String!, favorites: [String!]): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    addOwnedItem(uid: String!, ownedItems: [String!]): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    followUser(uid: String!, followers: [String!]): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    followingUser(uid: String!, following: [String!]): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$uid.json",
+      method: PATCH
+    )
+    deleteUser(user: ID): JSON
+    @rest( 
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/users/$user.json",
+      method: DELETE
+    )
+}

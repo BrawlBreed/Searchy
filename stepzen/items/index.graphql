@@ -1,0 +1,137 @@
+type Coordinates{
+  latitude: Float
+  longitude: Float
+}
+type Address {
+  address: String
+  coordinates: Coordinates
+}
+
+type Item {
+  _id: String
+  condition: String
+  createdAt: String
+  description: String
+  images: [String]
+  itemId: String
+  likes: [String]
+  views: Float
+  price: Float
+  status: String
+  promotionScore: Float
+  title: String
+  subCategoryId: String
+  subCategory: SubCategory
+    @materializer(
+      query: "getSubCategoryById",
+      arguments: [{ name: "subCategory", field: "subCategoryId"}]
+    )
+  userId: String
+  user: User
+    @materializer(
+      query: "getUserById",
+      arguments: [{ name: "user", field: "userId"}]
+    )
+  address: Address
+  zoneId: String
+  zone: Zone
+    @materializer(
+      query: "getZoneById",
+      arguments: [{ name: "zone", field: "zoneId"}]
+    )
+}
+
+type ItemList {
+  name: ID
+  value: Item
+}
+
+type Query {
+  getItemById(id: String!): Item
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    )
+  getItems: [ItemList]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    )
+  nearByItems(zone: String): [ItemList]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    )
+}
+
+input AddressInput {
+  address: String!
+  coordinates: CoordinatesInput!
+}
+
+input CoordinatesInput {
+  latitude: Float!
+  longitude: Float!
+}
+
+type Mutation { 
+  addItem(
+    condition: String!,
+    createdAt: String!,
+    description: String!,
+    images: [String]!,
+    price: Float!,
+    status: String!,
+    subCategoryId: String!,
+    title: String!,
+    userId: String!,
+    promotionScore: Float,
+    zoneId: String,
+    address: AddressInput!,
+    likes: [String]
+    views: Float = 0
+  ): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
+    method: POST,
+  ) 
+  addIdToItem(id: String!, _id: String!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: PATCH
+  )
+  likeItem(name: String!, likes: [String]): JSON 
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$name.json",
+    method: PATCH
+  )
+  promoteItem(id: String!, promotionScore: Float!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: PATCH
+  )
+  deleteItem(id: String!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: DELETE
+  )
+  editItem(id: String!, title: String!, description: String!, price: Float!, images: [String!]!, condition: String!, address: AddressInput!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: PATCH
+  )
+  incrementViewCount(id: String!, views: Float!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: PATCH
+  )
+  deactivateItem(id: String!, status: String!): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items/$id.json",
+    method: PATCH
+  )
+  addBatchTestItems(items: [JSON]): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/items.json",
+    method: POST,
+  )
+}

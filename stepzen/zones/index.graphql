@@ -1,0 +1,32 @@
+type Zone {
+  zone: String,
+  coordinates: Coordinates
+}
+
+type ZonesList {
+  name: ID
+  value: Zone
+}
+
+type Query {
+  getZoneById(zone: String): Zone
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/zones/$zone.json"
+  )
+  getZones: [ZonesList]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/zones.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    ) 
+}
+
+type Mutation { 
+  addZone(
+    zone: String!
+    coordinates: CoordinatesInput!
+  ): JSON
+  @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/zones.json",
+      method: POST,
+  )
+}

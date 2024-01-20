@@ -1,0 +1,22 @@
+type Category {
+  _id: String
+  image: String
+  title: String
+}
+
+type CategoriesList {
+  name: ID
+  value: Category
+}
+
+type Query {
+  getCategoryById(id: ID): Category
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/categories/$id.json"
+    )
+  getCategories: [CategoriesList]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/categories.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    )
+}

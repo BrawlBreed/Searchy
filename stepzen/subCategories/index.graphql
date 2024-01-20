@@ -1,0 +1,28 @@
+type SubCategory {
+  _id: String
+  categoryParent: ID
+  category: Category
+    @materializer(
+      query: "getCategoryById",
+      arguments: [
+        { name: "id", field: "categoryParent" }
+      ]
+    )
+  title: String
+}
+type SubCategoriesList {
+  name: ID,
+  value: SubCategory
+}
+
+type Query {
+    getSubCategoryById(subCategory: ID): SubCategory
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/subcategories/$subCategory.json"
+    )
+    getSubCategories: [SubCategoriesList]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/subcategories.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    )
+}

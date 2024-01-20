@@ -1,0 +1,80 @@
+import { Entypo } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useLayoutEffect } from 'react';
+import { FlatList, Image, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { TextDefault } from '../../../components';
+import { alignment, colors, scale } from '../../../utilities';
+import styles from './styles';
+import useCategories from '../../../hooks/useCategories';
+import useSubCategories from '../../../hooks/useSubCategories';
+
+
+const category = [
+    { id: '0', title: 'Mobiles', image: require('../../../assets/icons/categoryIcon/mobile.png') },
+    { id: '1', title: 'Vehicles', image: require('../../../assets/icons/categoryIcon/car.png') },
+    { id: '2', title: 'Animals', image: require('../../../assets/icons/categoryIcon/pet(1).png') },
+    { id: '3', title: 'Kids', image: require('../../../assets/icons/categoryIcon/stroller.png') },
+    { id: '4', title: 'Property For Sale', image: require('../../../assets/icons/categoryIcon/sale.png') },
+    { id: '5', title: 'Electronics', image: require('../../../assets/icons/categoryIcon/monitor.png') },
+    { id: '6', title: 'Bikes', image: require('../../../assets/icons/categoryIcon/motorcycle.png') },
+    { id: '7', title: 'Jobs', image: require('../../../assets/icons/categoryIcon/work.png') },
+]
+
+function Categories() {
+    const navigation = useNavigation()
+    const { loading, error, subCategories } = useSubCategories()
+
+    function emptyView() {
+        return (
+            <View style={[styles.flex, styles.emptyContainer]}>
+                <Image
+                    style={styles.emptyImage}
+                    source={require('../../../assets/images/emptyView/noData.png')}
+                />
+                <TextDefault H5 center bold style={alignment.MTlarge}>
+                    {'Не намерихме нищо..'}
+                </TextDefault>
+            </View>
+        )
+    }
+
+    return (
+        <SafeAreaView edges={['bottom']} style={[styles.flex, styles.safeAreaview]}>
+            <View style={[styles.flex, styles.container]}>
+                <FlatList
+                    data={subCategories}
+                    style={styles.flatList}
+                    contentContainerStyle={styles.categoryContainer}
+                    ListEmptyComponent={loading ? <View><Text>Loading...</Text></View> : emptyView}
+                    showsHorizontalScrollIndicator={false}
+                    ItemSeparatorComponent={() => <View style={styles.spacer} />}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            activeOpacity={0.5}
+                            style={styles.categoryRow}
+                            onPress={() => navigation.navigate('SubCategories', { headerTitle: item.title })}>
+                            <View style={styles.rowContainer}>
+                                <View style={styles.image}>
+                                    <Image
+                                        style={styles.imgResponsive}
+                                        source={item.image}
+                                    />
+                                </View>
+                                <TextDefault H5 style={styles.fontText}>
+                                    {item.title}
+                                </TextDefault>
+                                <View style={styles.rightIcon}>
+                                    <Entypo name='chevron-small-right' size={scale(20)} color={colors.buttonbackground} />
+                                </View>
+                            </View>
+
+                        </TouchableOpacity>
+                    )}
+                />
+            </View>
+        </SafeAreaView>
+    );
+}
+
+export default Categories

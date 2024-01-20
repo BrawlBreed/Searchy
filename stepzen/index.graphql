@@ -1,0 +1,15 @@
+schema
+  @sdl(
+    files: [
+      "items/index.graphql"
+      "users/index.graphql"
+      "categories/index.graphql"
+      "subCategories/index.graphql"
+      "zones/index.graphql"
+      "configuration/index.graphql"
+      "reports/index.graphql"
+    ]
+  ) {
+  query: Query
+}
+ 

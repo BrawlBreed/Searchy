@@ -1,0 +1,48 @@
+type Report {
+  id: String
+  userId: String
+  itemId: String
+  reason: String
+  additionalInfo: String
+  date: String
+  dismissed: Boolean
+  user: User
+    @materializer(
+      query: "getUserById",
+      arguments: [{ name: "user", field: "userId"}]
+    )
+  item: Item
+    @materializer(
+      query: "getItemById",
+      arguments: [{ name: "id", field: "itemId"}]
+    )
+}
+
+type Query {
+  getReports: [Report]
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/reports.json",
+      transforms: [{ pathpattern: [], editor: "objectToArray"}]
+    )
+}
+
+type Mutation {
+  sendReport(
+    userId: String!,
+    itemId: String!,
+    reason: String!,
+    additionalInfo: String,
+    sentAt: String!
+  ): JSON
+    @rest(
+      endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/reports.json",
+      method: POST
+    )
+  dismissReport(
+    reportId: String!
+  ): JSON
+  @rest(
+    endpoint: "https://delivery-firm-default-rtdb.firebaseio.com/reports/$reportId.json",
+    method: DELETE
+  )
+}
