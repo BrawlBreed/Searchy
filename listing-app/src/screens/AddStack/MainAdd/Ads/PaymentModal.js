@@ -43,7 +43,7 @@ const ModalComponent = ({ paymentCard, setPaymentCard, subtotal, id, promotionSc
 
     const createPaymentIntent = async () => {
         const ip = Platform.OS === "ios" ? '192.168.x.x' : '10.0.2.2'; // Replace with your actual IP address for iOS
-        const response = await fetch(`https://599f-151-251-249-129.ngrok-free.app/create-payment-intent`, {
+        const response = await fetch(`https://searchy.fun/create-payment-intent`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
