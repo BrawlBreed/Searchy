@@ -58,6 +58,7 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
           likes
           followers
           following
+          blockedUsers
           favorites
         }
       }
@@ -147,6 +148,7 @@ export const nearByItems = gql` query MyQuery($zone: String!) {
           phone
           likes
           followers
+          blockedUsers
           following
           ownedItems
         }
@@ -180,6 +182,7 @@ export const GET_ZONES_QUERY = gql`
       description
       followers
       following
+      blockedUsers
       favorites
       ownedItems
       active 
@@ -266,6 +269,7 @@ export const GET_ITEM_BY_ID = gql`
           likes
           followers
           following
+          blockedUsers
         }
     }
   }
@@ -307,6 +311,11 @@ export const FOLLOW_USER = gql`
     followUser(uid: $uid, followers: $followers)
   }
 `
+export const BLOCK_USER = gql`
+  mutation MyMutation($uid: String!, $blockedUsers: [String!]) {
+    blockUser(uid: $uid, blockedUsers: $blockedUsers)
+  }
+`
 export const FOLLOWING_USER = gql`
   mutation MyMutation($uid: String!, $following: [String!]) {
     followingUser(uid: $uid, following: $following)
@@ -331,6 +340,7 @@ export const GET_AVATAR_NAME_DESCRIPTION_CREATED_AT = gql`
       following
       followers
       ownedItems
+      blockedUsers
     }
   }
 `

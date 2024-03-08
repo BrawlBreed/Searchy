@@ -37,7 +37,9 @@ export default function App() {
     return (
       <Provider store={store}>
         <ApolloProvider client={client}>
-          <StripeProvider merchantIdentifier='merchant.com.{{Searchy}}' publishableKey={process.env.PUBLISHABLE_KEY}>
+          <StripeProvider
+            merchantIdentifier='merchant.com.{{Searchy}}'
+            publishableKey={"pk_live_51OLvKBINs8xtGITd7pAjYiLdPklxAqro7flcvqHO2xiYKRH64diCRwfFV1tZD9ch2mEAQGBVxDmXcbNjHfkn0YQs00GN6hpNum"}>
             <AppContainer />
             <StatusBar style="dark" backgroundColor={colors.buttonbackground} />
             <FlashMessage position="top" />

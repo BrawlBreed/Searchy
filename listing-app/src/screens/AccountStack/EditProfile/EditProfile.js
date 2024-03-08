@@ -84,15 +84,26 @@ function EditProfile() {
     }, [navigation])
 
     async function PickImage() {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            quality: 1
-        })
-        if (result.assets.length > 0) {
-            setImage(result.assets[0].uri)
+        // Ask for the permission to access the media library
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+        if (permissionResult.granted === false) {
+            FlashMessage({message: 'Съжаляваме, но не можете да продължите без разрешение за достъп до снимка.', type: 'danger'})
+            return;
         }
-    }
-    useEffect(() => {
+      
+        // If permission is granted, continue to pick the image
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 1
+        });
+      
+        // Check if any images were picked and update the state
+        if (!result.cancelled && result.assets && result.assets.length > 0) {
+          setImage(result.assets[0].uri);
+        }
+      }
+          useEffect(() => {
         Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
         Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
 

@@ -42,7 +42,7 @@ const Promote = ({route}) => {
     const [subtotal, setSubtotal] = useState(0)
     const rateStyle= {width: 60, height: 35, padding: 5, resizeMode: 'contain'}
 
-    const handlePackage = (item) => {
+    const handlePackage = (item) => { 
         setSubtotal(item.subtotal)
         setPaymentCard(true)
     }

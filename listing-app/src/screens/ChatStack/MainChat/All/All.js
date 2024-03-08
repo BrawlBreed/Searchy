@@ -15,7 +15,7 @@ import { useLazyQuery } from '@apollo/client';
 function ALL() {
     const navigation = useNavigation()
     const isFocused = useIsFocused()
-    // const [filter, setFilter] = useState(FILTERS[0].value)
+    const { blockedUsers } = useSelector(state => state.user)
     const [ chats, setChats ] = useState([]);
     const { uid } = useSelector(state => state.user);
     const [getAvatarAndName, { data }] = useLazyQuery(GET_AVATAR_NAME_DESCRIPTION_CREATED_AT);
@@ -50,14 +50,12 @@ function ALL() {
                         createdAt: res?.data.getUserById?.createdAt,
                         description: res?.data.getUserById?.description,
                         ownedItems: res?.data.getUserById?.ownedItems,
+                        blockedUsers: res?.data.getUserById?.blockedUsers,
                         userId
                     };
                 });
     
-                // Wait for all chatListPromises to resolve
                 const chatList = await Promise.all(chatListPromises);
-    
-                // Now that all promises have resolved, set the state
                 setChats(chatList);
             } catch (error) {
                 console.error('Error fetching messages:', error);
@@ -69,7 +67,7 @@ function ALL() {
             fetchMessagesByChatId();
         }
     }, [isFocused, uid]); // Add uid to the dependency array if it's a state or prop
-    
+
     function emptyView() {
         return (
             <View style={[styles.flex, styles.emptyContainer]}>
@@ -107,7 +105,7 @@ function ALL() {
                         activeOpacity={0.07}
                         style={styles.messageContainer}
                         onPress={() => {
-                            navigation.navigate('LiveChat', { id: item.id, name: item.username, image: item.addPic, avatar: item.imaga, uid: item.userId, adId: item.adId, description: item.description, createdAt: item?.createdAt, ownedItems: item.ownedItems })
+                            navigation.navigate('LiveChat', { id: item.id, name: item.username, image: item.addPic, avatar: item.imaga, uid: item.userId, adId: item.adId, description: item.description, createdAt: item?.createdAt, ownedItems: item.ownedItems, blockedUsers: item?.blockedUsers })
                         }}>
                         <View style={styles.imgResposive}>
                             <Image

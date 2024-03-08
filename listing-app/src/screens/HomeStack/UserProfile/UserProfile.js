@@ -6,18 +6,20 @@ import { alignment, colors } from '../../../utilities'
 import styles from './styles'
 import s from '../MainHome/styles'
 import btnStyles from '../../../components/Buttons/EmptyButton/styles';
-import { dateStringToDDMMYYYY, filterFalsyValues } from '../../../utilities/methods'
+import { dateStringToDDMMYYYY, filterFalsyValues, toggleStringInArray } from '../../../utilities/methods'
 import { useSelector } from 'react-redux'
 import { client } from '../../../apollo'
 import { FOLLOWING_USER, FOLLOW_USER, GET_ITEM_BY_ID, GET_ZONES_QUERY } from '../../../apollo/server'
 import { useLazyQuery } from '@apollo/client'
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler'
 import Card from '../MainHome/Card/Card'
+import BlockModal from '../../../components/Modal/BlockModal/BlockModal'
+import { UserButton } from '../../../components/Header/HeaderIcons/HeaderIcons'
 
 function UserProfile({ route }) {
     const navigation = useNavigation()
     const { _id, avatar, name, createdAt, description, ownedItems } = route.params
-    const user = useSelector(state => state.user)
+    const { blockedUsers, ...user} = useSelector(state => state.user)
     const [ followersList, setFollowersList ] = useState([])
     const [ followingList, setFollowingList ] = useState([])
     const [ items, setItems ] = useState([])
@@ -41,7 +43,9 @@ function UserProfile({ route }) {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: null,
-            headerRight: () => <RightButton iconColor={colors.headerText} icon='dots' />
+            headerRight: () => <UserButton isBlocked={blockedUsers?.includes(_id)} blockedUsers={
+                toggleStringInArray([...blockedUsers || '' ], _id)} 
+                iconColor={colors.headerText} icon='dots' />
         })
     }, [navigation])
 

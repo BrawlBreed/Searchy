@@ -13,5 +13,6 @@ import Registration from './Registration/Registration'
 import Entry from './FormPages/Entry'
 import ForgotPassword from './FormPages/ForgotPassword'
 import HelpBrowser from './HelpBrowser/HelpBrowser'
+import Blocked from './Blocked/Blocked'
 
-export { MainAccount, Help, Settings, Entry, ForgotPassword, Followers, Following, Profile, EditProfile, EditPhone, EditEmail, Privacy, Notifications, Registration, HelpBrowser }
+export { Blocked, MainAccount, Help, Settings, Entry, ForgotPassword, Followers, Following, Profile, EditProfile, EditPhone, EditEmail, Privacy, Notifications, Registration, HelpBrowser }

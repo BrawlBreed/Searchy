@@ -42,4 +42,16 @@ export function dateStringToDDMMYYYY(dateString) {
     const remaining = arrayLength % 10;
     return remaining === 0 ? 10 : remaining;
   }
-    
+
+  export function toggleStringInArray(array, string) {
+    const index = array.indexOf(string);
+  
+    if (index > -1) {
+      array.splice(index, 1);
+    } else {
+      array.push(string);
+    }
+  
+    return Array.from(new Set(array));
+  }
+  

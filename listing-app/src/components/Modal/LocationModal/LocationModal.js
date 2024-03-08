@@ -1,6 +1,6 @@
 import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { FlatList, Modal, TextInput, TouchableOpacity, View, KeyboardAvoidingView } from 'react-native';
+import { FlatList, Modal, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Alert, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { alignment, colors, scale } from '../../../utilities';
 import ModalHeader from '../../Header/ModalHeader/ModalHeader';
@@ -9,10 +9,11 @@ import styles from './styles';
 import addZone from '../../../hooks/addZone';
 import { setZone, setZoneId } from '../../../store/reducers/Item/addItemSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import Geolocation from 'react-native-geolocation-service';
 
 function LocationModal(props) {
     const [input, setInput] = useState('') 
-    const [zones, setZones] = useState()
+    const [zones, setZones] = useState([])
     const dispatch = useDispatch()
     const { data, loading, error } = addZone()
 
@@ -26,10 +27,6 @@ function LocationModal(props) {
         setZones(data?.getZones)
     }, [data])
 
-    useEffect(() => {
-        setCurrentLocation()
-    }, [])
-
     function btnLocation(zone) {
         dispatch(setZoneId(zone?.name))
         dispatch(setZone({
@@ -40,9 +37,47 @@ function LocationModal(props) {
     }
 
     async function setCurrentLocation () {
-        fetch('https://geolocation-db.com/json/')
-        .then(response => response.json())
-        .then((data) => {
+        if(Platform.OS === "ios"){
+            Geolocation.requestAuthorization("whenInUse").then((status) => {
+                if (status !== 'granted') {
+                  const defaultZone = zones[0];
+                  btnLocation({
+                    name: defaultZone.name,
+                    zone: defaultZone.value.zone,
+                    coordinates: {
+                      latitude: defaultZone.coordinates.latitude, // Default latitude from zones
+                      longitude: defaultZone.coordinates.longitude // Default longitude from zones
+                    }
+                  });
+                  return;
+                }    
+                fetch('https://geolocation-db.com/json/')
+                  .then(response => response.json())
+                  .then((data) => {
+                    console.log('Zones: ', zones)
+                    const name = zones?.filter(({ value, name }) => {
+                      if (value.zone === data.city) {
+                        return name;
+                      }
+                    })[0]?.name ?? data.city;
+            
+                    btnLocation({
+                      name: name,
+                      zone: data.city,
+                      coordinates: {
+                        latitude: data.latitude, // Data from the API
+                        longitude: data.longitude // Data from the API
+                      }
+                    });
+                  })
+                  .catch(error => console.error("Failed to fetch location from API:", error));
+              }).catch((error) => {
+                FlashMessage({message: 'Съжаляваме, но не успяхме да се свържем с вашето местоположение', type: 'danger'})
+              });    
+        }else{
+            fetch('https://geolocation-db.com/json/')
+            .then(response => response.json())
+            .then((data) => {
             const name = zones.filter(({ value, name }) => {
                 if(value.zone === data.city){
                     return name
@@ -58,6 +93,8 @@ function LocationModal(props) {
             })
         })
         .catch(error => console.log(error))  
+
+        }
     }
 
     return (

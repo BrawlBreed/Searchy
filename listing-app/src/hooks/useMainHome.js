@@ -2,7 +2,7 @@ import { gql, useLazyQuery } from '@apollo/client';
 import { GET_ZONES_QUERY, nearByItems } from '../apollo/server';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setFavorites, setLoading, setOwnedItems } from '../store/reducers/User/userSlice';
+import { setBlockedUsers, setFavorites, setLoading, setOwnedItems } from '../store/reducers/User/userSlice';
 import { calculatePromotionScore } from '../utilities/methods';
 import { fetchItems } from '../firebase';
 
@@ -12,8 +12,8 @@ const useMainHome = () => {
   const [lastId, setLastId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentLimit, setCurrentLimit] = useState(10);
-  const { zone, zoneId } = useSelector((state) => state.addItem);
-  const { uid } = useSelector((state) => state.user);
+  const { zoneId } = useSelector((state) => state.addItem);
+  const { uid, blockedUsers } = useSelector((state) => state.user);
   const dispatch = useDispatch(); 
   const prevZone = useRef(zoneId); // Store the previous value of zone
   const [getUser] = useLazyQuery(GET_ZONES_QUERY, {
@@ -23,7 +23,10 @@ const useMainHome = () => {
   async function getItems(loadingFlag = false) {
     if(loading) return;
     setLoading(loadingFlag);
-    const { items, lastId } = await fetchItems(zoneId, currentLimit, lastId)
+    let { items, lastId } = await fetchItems(zoneId, currentLimit, lastId)
+    items = items.filter(item => {
+      return !blockedUsers?.includes(item?.user?._id) && !item?.user?.blockedUsers?.includes(uid);
+    }) || [];
     setItems(prevItems => {
       if (!items || items.length === 0) {
         return prevItems;
@@ -32,7 +35,7 @@ const useMainHome = () => {
         return items;
       }
       const existingIds = new Set(prevItems?.map(item => item.id));
-      const newItems = items.filter(item => !existingIds.has(item.id));
+      const newItems = items.filter(item => !existingIds.has(item.id))
       return [...prevItems, ...newItems];
     });
     setLoading(false);
@@ -40,7 +43,7 @@ const useMainHome = () => {
 
   useLayoutEffect(() => {
     getItems(true)
-  }, [zoneId, refreshing]);
+  }, [zoneId, refreshing, blockedUsers]);
 
   useEffect(() => {
     setLastId(null)
@@ -67,14 +70,13 @@ const useMainHome = () => {
       if(user?.ownedItems){
         dispatch(setOwnedItems(user.ownedItems));
       }
+      if(user?.blockedUsers){
+        dispatch(setBlockedUsers(user.blockedUsers))
+      }
     });
     
   }, [uid]);
 
-  // useEffect(() => {
-  //   if(error) console.log(error)
-  // }, [error])
-  
   // Expose the refetch function to allow manual refreshing of the query
   return { loading, items, refreshing, setRefreshing, setCurrentLimit, currentLimit, fetchItems, lastId, getItems };
 };

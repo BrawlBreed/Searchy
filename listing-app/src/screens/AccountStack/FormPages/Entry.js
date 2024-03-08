@@ -29,7 +29,7 @@ const Entry = ({ route }) => {
   const inset = useSafeAreaInsets()
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
-  const { name, phoneCode, description, phone, email, password, avatar, createdAt, active, followers, following, notifications, userId, favorites } = useSelector(state => state.user)
+  const { name, phoneCode, description, phone, email, password, avatar, createdAt, active, followers, following, notifications, userId, favorites, blockedUsers } = useSelector(state => state.user)
   const [mutateFunction, { data, loading, error }] = useMutation(gql`
   mutation MyMutation(
       $name: String!,
