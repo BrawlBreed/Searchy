@@ -6,7 +6,7 @@ const { height } = Dimensions.get('window')
 const styles = StyleSheet.create({
   text: {
     ...textStyles.H5,
-    ...textStyles.Center
+    ...textStyles.Center,
   },
 })
 export default styles
