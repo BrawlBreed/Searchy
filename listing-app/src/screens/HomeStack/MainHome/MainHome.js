@@ -14,15 +14,15 @@ import { checkUserAuth, setCurrentUser } from '../../../store/reducers/User/user
 import { ScrollView } from 'react-native-gesture-handler';
 import { getRemainingCountOrTen } from '../../../utilities/methods';
 import { ActivityIndicator } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
 // import { AppOpenAd, InterstitialAd, RewardedAd, BannerAd, TestIds, BannerAdSize } from 'react-native-google-mobile-ads';
 
 const COLORS = [colors.searchy1, colors.searchy2]
 
 function MainHome() {
   const navigation = useNavigation()
-  const [previousLength, setPreviousLength] = useState(0);
   const [loadingFooter, setLoadingFooter] = useState(false)
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(true);
   const [searchVisible, setSerachVisible] = useState(false);
   const { loading: loadingCategories, error: errorCategories, categories } = useCategories()
   const { zone } = useSelector(state => state.addItem)
@@ -49,21 +49,6 @@ function MainHome() {
     })
   }, [navigation, zone.zone])
 
-  useEffect(() => {
-    fetch('https://geolocation-db.com/json/')
-      .then(response => response.json())
-      .then((data) => {
-        dispatch(setZone({
-          zone: data.city,
-          coordinates: {
-            latitude: data.latitude,
-            longitude: data.longitude
-          }
-        }))
-      })
-      .catch(error => console.log(error))  
-  }, [])
-
   function toggleModal() {
     setModalVisible(prev => !prev)
   }
@@ -78,20 +63,19 @@ function MainHome() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         contentContainerStyle={[styles.emptyContainer, {height: '100%'}]} style={[styles.flex]}> 
+                    <LocationModal visible={modalVisible} onModalToggle={toggleModal}/>
+            <SearchModal categories={categories} visible={searchVisible} onModalToggle={toggleSearch} />              
+
         <Image
           style={styles.emptyImage}
-          source={require('../../../assets/images/emptyView/noData.png')}
+          source={require('../../../assets/images/emptyView/emptyBox1.png')}
         />
         <TextDefault H5 center bold style={alignment.MTlarge}>
-          Не намерихме нищо!
+          Продължавай да търсиш...
         </TextDefault>
         <TextDefault center light>
-          Моля свържете се с оператор!
+          Не намерихме нищо във вашия регион.
         </TextDefault>
-
-                    {/* Modal */}
-        <LocationModal visible={modalVisible} onModalToggle={toggleModal}/>
-        <SearchModal categories={categories} visible={searchVisible} onModalToggle={toggleSearch} />
       </ScrollView>
     )
   }
@@ -186,6 +170,8 @@ function MainHome() {
       // error ? <TextDefault center>Грешка!</TextDefault> :
       items.length === 0 ? emptyView() : 
         <View style={[styles.flex, styles.container]}>
+            <LocationModal visible={modalVisible} onModalToggle={toggleModal}/>
+            <SearchModal categories={categories} visible={searchVisible} onModalToggle={toggleSearch} />              
             <FlatList
               data={items}
               style={[styles.flex, styles.flatList]}
@@ -195,7 +181,7 @@ function MainHome() {
               refreshing={refreshing}
               onRefresh={onRefresh}
               onEndReached={() => fetchAnother10()}
-              onEndReachedThreshold={0.5} // You can adjust this value  
+              onEndReachedThreshold={0.5}
               ListEmptyComponent={emptyView}
               ListHeaderComponent={renderHeader}
               ListFooterComponent={<></>}
@@ -213,9 +199,6 @@ function MainHome() {
                 },
               }}
             /> */}
-            {/* Modal */}
-            <LocationModal visible={modalVisible} onModalToggle={toggleModal}/>
-            <SearchModal categories={categories} visible={searchVisible} onModalToggle={toggleSearch} />
           </View>
     }
   </>

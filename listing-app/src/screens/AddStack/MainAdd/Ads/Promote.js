@@ -1,10 +1,9 @@
-import { View, Text, Button, StyleSheet, ImageBackground, KeyboardAvoidingView, Platform } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, Button, StyleSheet, ImageBackground, KeyboardAvoidingView, Platform  } from 'react-native'
+import React, {useEffect, useState} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler'
 import { Image } from 'react-native'
 import ModalComponent from './PaymentModal'
-import { FlashMessage } from '../../../../components'
 
 const TIERS = [
     {
@@ -36,55 +35,47 @@ const TIERS = [
     },
 ]
 
-const Promote = ({ route }) => {
+const Promote = ({route}) => {
     const { id, promotionScore } = route.params
     const [paymentCard, setPaymentCard] = useState(false)
     const [error, setError] = useState('')
     const [subtotal, setSubtotal] = useState(0)
-    const rateStyle = { width: 60, height: 35, padding: 5, resizeMode: 'contain' }
+    const rateStyle= {width: 60, height: 35, padding: 5, resizeMode: 'contain'}
 
-    const handlePackage = (item) => {
-        if (item?.subtotal < 1) {
-            FlashMessage({ message: 'Минималната сума е 1 лв.', type: 'warning' })
-            return
-        }
+    const handlePackage = (item) => { 
         setSubtotal(item.subtotal)
         setPaymentCard(true)
     }
 
     const handleCustom = (item) => {
-        if (item?.subtotal < 1) {
-            FlashMessage({ message: 'Минималната сума е 1 лв.', type: 'warning' })
-            return
-        }
         setSubtotal(item.subtotal)
-        if (!item.subtotal) {
+        if(!item.subtotal){
             setError('Моля въведете сума!')
-        } else {
+        }else{
             setPaymentCard(true)
         }
     }
 
     return (
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
+        <KeyboardAvoidingView 
+            style={{ flex: 1 }} 
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
         >
             <View style={styles.row}>
                 <ScrollView style={styles.container}>
-                    <Text style={[{ textAlign: 'center', padding: 10, fontSize: 25, fontWeight: '500' }]}>Избери пакет</Text>
+                    <Text style={[{textAlign: 'center', padding: 10, fontSize: 25, fontWeight: '500'}]}>Избери пакет</Text>
                     {TIERS.map((item, index) => (
-                        <View style={styles.cardContainer}>
+                    <View style={styles.cardContainer}>
                             <View style={styles.wrapper}>
                                 {item.best && <Text style={styles.label}>Най-продаван</Text>}
                                 <Text selectionColor='blue' style={[styles.title]}>{item.title}</Text>
                                 <Image source={item.image} style={rateStyle} />
                                 {item.input ? (
-                                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                                         <Text style={[styles.price, { marginTop: 20, textAlign: 'center', marginTop: 20 }]}>Цена: </Text>
                                         <TextInput
-                                            style={[styles.inputText, styles.price, { width: 100 }, { borderBottomWidth: 1, textAlign: 'center', borderBottomColor: '#ccc', marginTop: 20 }]}
+                                            style={[styles.inputText, styles.price, {width: 100}, { borderBottomWidth: 1, textAlign: 'center', borderBottomColor: '#ccc', marginTop: 20 }]}
                                             maxLength={70}
                                             onChangeText={(text) => setSubtotal(text)}
                                             value={subtotal}
@@ -93,22 +84,22 @@ const Promote = ({ route }) => {
                                         />
                                         <Text style={[styles.price, { marginTop: 20, textAlign: 'center', marginTop: 20 }]}>лв.</Text>
                                     </View>
-                                ) : (
+                                ): (
                                     <Text style={[styles.price, { marginTop: 20 }]}>Цена: {item.subtotal} лв.</Text>
                                 )}
-                                <Button
+                                <Button  
                                     color={item.color}
-                                    title="Купи"
-                                    onPress={() => item.input ? handleCustom({ ...item, subtotal: subtotal }) :
-                                        handlePackage({ ...item, subtotal: item.subtotal })}
-                                />
+                                    title="Купи" 
+                                    onPress={() => item.input ? handleCustom({ ...item, subtotal: subtotal}) : 
+                                    handlePackage({ ...item, subtotal: item.subtotal })}
+                                /> 
                                 {error && item.input && <Text style={{ color: 'red', textAlign: 'center', padding: 10 }}>{error}</Text>}
                             </View>
-                        </View>
-                    ))}
-                    <ModalComponent id={id} promotionScore={promotionScore} subtotal={subtotal} paymentCard={paymentCard} setPaymentCard={setPaymentCard} />
+                    </View>    
+                ))}
+                <ModalComponent id={id} promotionScore={promotionScore} subtotal={subtotal} paymentCard={paymentCard} setPaymentCard={setPaymentCard}/>
                 </ScrollView>
-            </View>
+            </View>            
         </KeyboardAvoidingView>
     )
 }
@@ -129,7 +120,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
-        overflow: 'hidden',
+        overflow: 'hidden', 
     },
     label: {
         position: 'absolute',
@@ -158,7 +149,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'grey',
         marginBottom: 20,
-    },
+    }, 
     wrapper: {
         backgroundColor: 'white',
         justifyContent: 'center',

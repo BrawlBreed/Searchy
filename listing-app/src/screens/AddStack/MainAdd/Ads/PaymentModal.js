@@ -70,8 +70,7 @@ const ModalComponent = ({ paymentCard, setPaymentCard, subtotal, id, promotionSc
                 switch(error.stripeErrorCode){
                     case 'card_declined':
                         setPaymentCard(false)
-                        FlashMessage({
-                            message: 'Вашата карта беше отказана', type: 'danger'})
+                        FlashMessage({message: 'Вашата карта беше отказана', type: 'danger'})
                         break;
                     default:
                         FlashMessage({message: 'Възникна грешка, моля опитайте по-късно', type: 'danger'})

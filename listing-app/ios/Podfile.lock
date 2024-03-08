@@ -272,6 +272,8 @@ PODS:
   - React-jsinspector (0.70.8)
   - React-logger (0.70.8):
     - glog
+  - react-native-geolocation-service (5.3.1):
+    - React
   - react-native-maps (1.9.1):
     - React-Core
   - react-native-restart (0.0.27):
@@ -448,6 +450,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -555,6 +558,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-geolocation-service:
+    :path: "../node_modules/react-native-geolocation-service"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
   react-native-restart:
@@ -641,6 +646,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: bc8556d76f83a1a9075cdee207aad7c0b7b30a33
   React-jsinspector: 5e5497c844f2381e8648ec3a7d0ad25b3f27f23e
   React-logger: b277ad8f4473f2506fb30b762b6348534a3de10e
+  react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-maps: 4f45622710094c3603b262279c40026750579b1f
   react-native-restart: 7595693413fe3ca15893702f2c8306c62a708162
   react-native-safe-area-context: 99b24a0c5acd0d5dcac2b1a7f18c49ea317be99a
@@ -672,4 +678,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 79e2e591284232005286ea4024eb2a408be9e61b
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.15.2

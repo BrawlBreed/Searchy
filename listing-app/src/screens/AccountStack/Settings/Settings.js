@@ -45,6 +45,12 @@ function Settings() {
                 <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />
             </TouchableOpacity> */}
             <TouchableOpacity style={styles.smallContainer}
+                onPress={() => navigation.navigate('Blocked')}>
+                <TextDefault bold H5 style={[alignment.PLlarge, styles.flex]}>
+                    {'Блокирани потребители'}
+                </TextDefault> 
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.smallContainer}
                 onPress={() => {
                     logout(dispatch)
                     navigation.dispatch(StackActions.popToTop())

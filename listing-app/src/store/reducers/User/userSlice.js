@@ -49,6 +49,7 @@ export const initialState = {
   followers: [''],
   following: [''],
   likedItems: [''],
+  blockedUsers: [''],
   ownedItems: [''],
   notifications: {
     recommendations: false,
@@ -137,6 +138,9 @@ const userSlice = createSlice({
     },
     setFollowers: (state, action) => {
       state.followers = action.payload;
+    },
+    setBlockedUsers: (state, action) => {
+      state.blockedUsers = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -173,7 +177,8 @@ export const {
   changeOwnedItems,
   setOwnedItems,
   setFollowing,
-  setFollowers
+  setFollowers,
+  setBlockedUsers
 } = userSlice.actions;
 
 export default userSlice.reducer;

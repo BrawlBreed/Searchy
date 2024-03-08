@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Ionicons,
   EvilIcons,
@@ -14,7 +14,11 @@ import { View, TouchableOpacity, Modal, Dimensions, Share } from 'react-native'
 import { BorderlessButton } from 'react-native-gesture-handler'
 import { TextDefault } from '../../Text'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-
+import BlockModal from '../../Modal/BlockModal/BlockModal'
+import { FlashMessage } from '../../FlashMessage/FlashMessage'
+import { updateUserProperty } from '../../../firebase'
+import { setBlockedUsers } from '../../../store/reducers/User/userSlice'
+import { useDispatch, useSelector } from 'react-redux'
 
 function BackButton(props) {
   if (props.icon === 'leftArrow') {
@@ -103,14 +107,6 @@ function LeftButton(props) {
             props.navigate()
           else
             navigation.goBack()
-          // navigation.dispatch(state => {
-          //   const routes = state.routes.filter(r => r.name === 'Menu')
-          //   return CommonActions.reset({
-          //     ...state,
-          //     routes,
-          //     index: 0
-          //   })
-          // })
         }}
       />
     )
@@ -157,29 +153,93 @@ function RightButton(props) {
           togglePassword()
       }
     }
+  }
+}
+export function UserButton(props) {
+  const navigation = useNavigation()
+  const [password, setPassword] = useState(false)
+  const inset = useSafeAreaInsets()
+  const [modalVisible, setModalVisible] = useState(false)
+  const dispatch = useDispatch()
+  const { uid } = useSelector(state => state.user)
 
+  async function handleUnblockUser() {
+    try {
+        await updateUserProperty(uid, 'blockedUsers', props.blockedUsers)
+        .then((res) => {
+            if (!res) {
+                throw new Error('Failed to delete user profile');
+            }          
+        })
+        .then(() => {
+            dispatch(setBlockedUsers(props.blockedUsers))
+            console.log(props.blockedUsers)
+            FlashMessage({ message: 'Потребителя е успешно отблокиран.', type: 'success' })
+        })
+        .finally(() => {
+            navigation.goBack()
+        })
+        .catch((error) => {
+            throw new Error('Failed to delete user profile');
+        })
+    } catch (error) {
+        FlashMessage({ message: 'Нещо се обърка! Опитайте отново по-късно.', type: 'danger' })
+        console.error('Error during profile blocking process:', error);
+    }
+  }
+  
+  function onModalToggle(){
+    setPassword(false)
+    setModalVisible(!modalVisible)
+  }
+
+  function togglePassword() {
+    setPassword(prev => !prev)
+  }
+  if (props.icon === 'share') {
+    return (
+      <HeaderBackButton
+        labelVisible={false}
+        backImage={() =>
+          BackButton({ iconColor: props.iconColor, icon: 'share' })
+        }
+      />
+    )
+  } else if (props.icon === 'dots') {
     return (
       <View>
+        { modalVisible && <BlockModal blockedUsers={props.blockedUsers} onModalToggle={onModalToggle}/>}
         {password ? (
-          <Modal
-            animationType="fade"
-            transparent={true}
-            onDismiss={togglePassword}
-            visible={password}
-          >
-            <TouchableOpacity activeOpacity={1} style={{ flex: 1 }} onPress={share} >
-              <BorderlessButton
-                onPress={props.onPress}
-                borderless={false}
-                style={[styles.shareBtn, { top: inset.top }]}
-              >
-                <TextDefault textColor={colors.headerText} H5 bold style={styles.flex}>
-                  {'Сподели'}
-                </TextDefault>
-              </BorderlessButton>
-            </TouchableOpacity>
-          </Modal>
-
+            <Modal
+              animationType="fade"
+              transparent={true}
+              onRequestClose={togglePassword}  
+              visible={password}
+            >
+              {props.isBlocked ? (
+                <TouchableOpacity activeOpacity={1} onPress={handleUnblockUser} >
+                <BorderlessButton
+                  onPress={props.onPress}
+                  borderless={false}
+                  style={[styles.shareBtn, { top: inset.top }]}
+                >
+                  <TextDefault textColor={colors.headerText} H5 bold style={styles.flex}>
+                    {'Отблокирай'}
+                  </TextDefault>
+                </BorderlessButton>
+              </TouchableOpacity>
+              ) : (<TouchableOpacity activeOpacity={1} onPress={onModalToggle} >
+                <BorderlessButton
+                  onPress={props.onPress}
+                  borderless={false}
+                  style={[styles.shareBtn, { top: inset.top }]}
+                >
+                  <TextDefault textColor={colors.headerText} H5 bold style={styles.flex}>
+                    {'Блокирай'}
+                  </TextDefault>
+                </BorderlessButton>
+              </TouchableOpacity>)}
+            </Modal>
         ) : (
             <HeaderBackButton
               labelVisible={false}

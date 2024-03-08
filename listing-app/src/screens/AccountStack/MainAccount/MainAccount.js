@@ -80,7 +80,7 @@ function MainAccount() {
                             {'Настройки'}
                         </TextDefault>
                         <TextDefault light style={[alignment.PLlarge, alignment.MTxSmall]}>
-                            {'Излез от профил, изтрий профил'}
+                            {'Излез от профил, изтрий профил, блокирани потребители'}
                         </TextDefault>
                     </View>
                     <Entypo name="chevron-small-right" size={scale(30)} color={colors.buttonbackground} />

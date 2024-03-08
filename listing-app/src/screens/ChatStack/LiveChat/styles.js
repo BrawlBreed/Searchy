@@ -18,6 +18,19 @@ const styles = StyleSheet.create({
         height: 100,
         width: 100,
         backgroundColor: 'red'
-    }
+    },
+    noMoreRepliesContainer: {
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      noMoreRepliesText: {
+        textAlign: 'center',
+        color: '#666', // Example color
+        // Add more styling as needed
+      },
+      chatListView: {
+        // Add styles for the chat list view if needed
+      },    
 })
 export default styles

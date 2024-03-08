@@ -184,6 +184,7 @@ function AccountTabs() {
                     backgroundColor: colors.headerbackground,
                 },
             }} />
+            <AccountStack.Screen options={{ title: false }} name='Blocked' component={AccountScreens.Blocked} />
         </AccountStack.Navigator>
     )
 }

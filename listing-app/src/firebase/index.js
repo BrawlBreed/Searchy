@@ -20,7 +20,7 @@ import {
 } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { checkUserAuth, setCreatedAt, setLoading, setRegister, setUserId } from "../store/reducers/User/userSlice";
-import { getDatabase, ref, set, get, orderByChild, query as dbQuery, orderByValue, equalTo, limitToFirst, startAfter, orderByKey, limitToLast, startAt, endAt } from "firebase/database";
+import { getDatabase, ref, set, get, orderByChild, query as dbQuery, orderByValue, equalTo, limitToFirst, startAfter, orderByKey, limitToLast, startAt, endAt, update } from "firebase/database";
 import { collection, getFirestore, onSnapshot, where, query, getDocs, addDoc, doc, setDoc, orderBy, updateDoc, deleteDoc } from "firebase/firestore";
 import { nearByItems } from "../apollo/server";
 
@@ -127,10 +127,40 @@ export async function createUserWithCustomKey( childId, data ){
 
   try{
     const res = await set(ref(db, 'users/' + childId), dataWithoutPassword)
-    console.log('Response: ', res)
   }catch(error){
     console.error('Error: ', error)
     return error
+  }
+}
+
+export async function updateUserProperty(childId, property, value) {
+  const updates = {};
+  updates['/users/' + childId + '/' + property] = value;
+
+  try {
+    await update(ref(db), updates);
+    return true
+  } catch (error) {
+    console.error('Error updating user property: ', error);
+    return false;
+  }
+}
+
+export async function fetchBlockedUsers(userId) {
+  const blockedUsersRef = ref(db, `users/${userId}/blockedUsers`);
+
+  try {
+    const snapshot = await get(blockedUsersRef);
+    if (snapshot.exists()) {
+      const blockedUsers = snapshot.val();
+      return blockedUsers; // Returns the blockedUsers array or object
+    } else {
+      console.log('No blockedUsers data available');
+      return null; // No data found
+    }
+  } catch (error) {
+    console.error('Error fetching blockedUsers:', error);
+    return null; // Error case
   }
 }
 
@@ -162,6 +192,28 @@ export const updateAndVerifyEmail = async (newEmail, password) => {
     return error;
   }
 };
+
+export async function fetchObjectsByUids(uidArray) {
+  const db = getDatabase();
+  const fetchedObjects = [];
+
+  for (const uid of uidArray) {
+    const objectRef = ref(db, '/users/' + uid);
+    
+    try {
+      const snapshot = await get(objectRef);
+      if (snapshot.exists()) {
+        fetchedObjects.push(snapshot.val());
+      } else {
+        console.log('No data available for uid:', uid);
+      }
+    } catch (error) {
+      console.error('Failed to fetch object for uid:', uid, error);
+    }
+  }
+
+  return fetchedObjects;
+}
 
 export function fetchChatsByUserIDs(uid1, uid2, adId) {
   return new Promise((resolve, reject) => {
@@ -317,23 +369,6 @@ export function saveMessage({ id, createdAt, text, user }) {
     }
   });
 }
-
-// export const updateAndVerifyEmail = async (newEmail, password) => {
-//   const credential = EmailAuthProvider.credential(auth.currentUser.email, password)
-//   const res = await reauthenticateWithCredential(auth.currentUser, credential)
-//   console.log(res)
-//   if(res?.user){
-//     try{
-//       const res = await verifyBeforeUpdateEmail(auth.currentUser, newEmail);
-//       console.log(res)
-//       return res
-//     } catch(error){
-//       return error
-//     }
-//   }
-
-//   return res
-// }
 
 export async function updateEmail(email) {
   try{
@@ -500,7 +535,6 @@ export async function fetchItems(zoneId, limit, startAfterId = null) {
           
             await Promise.all(itemPromises);
 
-            console.log('Items: ', items)
           
             let itemsArray = Object.values(items);
             const lastId = Object.keys(items)[Object.keys(items).length - 1]
@@ -517,8 +551,6 @@ export async function fetchItems(zoneId, limit, startAfterId = null) {
             .sort((a, b) => {
               return b.promotionScore - a.promotionScore;
             }); 
-
-            console.log('Items: ', itemsArray)
 
             // Implement client-side pagination
             if (startAfterId) {
@@ -548,7 +580,6 @@ export function fetchSearch(searchInput = null, searchSubCategory = null, limit,
       let itemsQuery;
       if (searchInput) {
         const searchStr = searchInput.toLowerCase();
-        console.log(searchStr)
         itemsQuery = dbQuery(
           ref(db, 'items'),
           orderByChild('title'),
@@ -598,7 +629,6 @@ export function fetchSearch(searchInput = null, searchSubCategory = null, limit,
 
               resolve({ items: [...itemsArray], lastId });
           } else {
-              console.log("No data available");
               resolve({ items: [], lastId: null });
           }
       }).catch((error) => {
