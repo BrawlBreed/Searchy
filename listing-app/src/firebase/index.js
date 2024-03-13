@@ -547,7 +547,7 @@ export async function fetchItems(zoneId, limit, startAfterId = null) {
               location: item.address.address,
               image: item.images[0],
               ...item,
-            })).filter(item => item.status === 'active')
+            })).filter(item => item.status === 'active' && Boolean(item?.user) )
             .sort((a, b) => {
               return b.promotionScore - a.promotionScore;
             }); 

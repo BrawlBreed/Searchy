@@ -18,7 +18,7 @@ import { deleteChat } from '../../../firebase'
 
 const { width, height } = Dimensions.get('window')
 
-function ModalHeader() {
+function ModalHeader({ blocked }) {
     const [open, setOpen] = useState(false)
     const [reportModal, setReportModal] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState('')
@@ -84,7 +84,7 @@ function ModalHeader() {
     }
 
     const handleNavigateProduct = () => {
-        if(dataItem?.getItemById) {
+        if(dataItem?.getItemById && !blocked) {
             navigation.navigate('ProductDescription', { ...dataItem?.getItemById , id: adId })
         }
     }
@@ -110,7 +110,7 @@ function ModalHeader() {
                                 source={typeof avatar === 'string' && avatar === 'false' || !avatar ? require('../../../assets/images/avatar.png') : { uri: avatar }}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { ...route.params, _id: uid, })} style={styles.infoContainer}>
+                        <TouchableOpacity onPress={() => !blocked && navigation.navigate('UserProfile', { ...route.params, _id: uid, })} style={styles.infoContainer}>
                             <TextDefault bold H5>
                                 {name} 
                             </TextDefault>

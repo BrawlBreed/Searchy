@@ -33,10 +33,10 @@ function Ads() {
                 <TextDefault H5 center light style={alignment.MTsmall}>
                     {"Излишни вещи или идея за продукт? Продавай чрез нас ги сега!"}
                 </TextDefault>
-                <EmptyButton
+                {/* <EmptyButton
                     title='Продай сега'
                     onPress={() => navigation.navigate('Sell', { screen: 'Home' })}
-                />
+                /> */}
             </View>
         )
     } 

@@ -7,7 +7,6 @@ import styles from './styles'
 import { GiftedChat } from 'react-native-gifted-chat';
 import { addMessage, dbFirestore, fetchBlockedUsers, fetchMessagesByChatId, getMessages, saveMessage } from '../../../firebase'
 import { useSelector } from 'react-redux'
-import { onSnapshot } from 'firebase/firestore'
 
 function LiveChat({ route }) {
     const navigation = useNavigation()
@@ -38,7 +37,7 @@ function LiveChat({ route }) {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            header: () => <LiveHeader />
+            header: () => <LiveHeader blocked={blocked} />
         })
         navigation.setParams({
             id, 
