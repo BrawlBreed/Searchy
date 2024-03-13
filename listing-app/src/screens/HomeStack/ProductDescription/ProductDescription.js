@@ -6,8 +6,6 @@ import { FlashMessage, LeftButton, ReportModal, RightButton, TextDefault } from 
 import { alignment, colors, scale } from '../../../utilities'
 import styles from './style'
 import { FontAwesome, MaterialIcons, Entypo, SimpleLineIcons } from '@expo/vector-icons'
-import Swiper from 'react-native-swiper'
-import { BorderlessButton } from 'react-native-gesture-handler'
 import * as Device from 'expo-device';
 import Slider from './Slider'
 import MapView, { Marker } from 'react-native-maps'
@@ -311,16 +309,6 @@ function ProductDescription({ route, preview }) {
                                 </View>
                                 <Entypo name='chevron-small-right' size={scale(20)} color={colors.buttonbackground} />
                             </TouchableOpacity>
-                            <View style={styles.profileContainer}>
-                                <TextDefault small>
-                                    {`ID на офертата:${id}`}
-                                </TextDefault>
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => toggleModal()}>
-                                    <TextDefault textColor={colors.spinnerColor} uppercase bold>
-                                        {'Докладвай обява'}
-                                    </TextDefault>
-                                </TouchableOpacity>
-                            </View>
                         </>
                     )
                     
@@ -332,9 +320,15 @@ function ProductDescription({ route, preview }) {
                     <TouchableOpacity activeOpacity={0.7}>
                         {LeftButton({ iconColor: colors.white, icon: 'back' })}
                     </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.7} onPress={share}>
-                        {RightButton({ iconColor: colors.white, icon: 'share' })}
+                    <TouchableOpacity style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} activeOpacity={0.7} onPress={() => toggleModal()}>
+                        <TextDefault textColor={colors.white} uppercase bold>
+                            {'Докладвай обява'}
+                        </TextDefault>
+                        <MaterialIcons style={{ paddingLeft: 5}} name="flag" size={24} color="white" />
                     </TouchableOpacity>
+                    {/* <TouchableOpacity activeOpacity={0.7} onPress={share}>
+                        {RightButton({ iconColor: colors.white, icon: 'share' })}
+                    </TouchableOpacity> */}
                 </View>
             </ScrollView>
             {/* Footer */}
