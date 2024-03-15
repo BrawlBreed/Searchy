@@ -15,6 +15,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { getRemainingCountOrTen } from '../../../utilities/methods';
 import { ActivityIndicator } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
+import EULAModal from '../../../components/Modal/EULAModal/EULAModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { AppOpenAd, InterstitialAd, RewardedAd, BannerAd, TestIds, BannerAdSize } from 'react-native-google-mobile-ads';
 
 const COLORS = [colors.searchy1, colors.searchy2]
@@ -24,12 +26,35 @@ function MainHome() {
   const [loadingFooter, setLoadingFooter] = useState(false)
   const [modalVisible, setModalVisible] = useState(true);
   const [searchVisible, setSerachVisible] = useState(false);
+  const [EULAModalVisible, setEULAModal] = useState(false);
   const { loading: loadingCategories, error: errorCategories, categories } = useCategories()
   const { zone } = useSelector(state => state.addItem)
   const dispatch = useDispatch()
   const { loading, items, refreshing, setRefreshing, fetchItems, setCurrentLimit, currentLimit, lastId, getItems } = useMainHome(refreshing);
   const adUnitId = Platform.OS === 'ios' ? 'ca-app-pub-6009235772551043~5795958407' : 'ca-app-pub-6009235772551043~3123878820';
 
+  const checkEULAAcceptance = async () => {
+    try {
+        const value = await AsyncStorage.getItem('EULA_KEY');
+        console.log(value)
+        if(value !== null) {
+            // EULA was already accepted
+            return
+        }else{
+            setEULAModal(true)
+        }
+    } catch(e) {
+    }
+  };
+
+  const onEULAModalToggle = () => {
+    setEULAModal(prev => !prev)
+  }
+
+  useEffect(() => {
+    checkEULAAcceptance();
+  }, []);
+  
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchItems().then(() => {
@@ -170,6 +195,7 @@ function MainHome() {
       // error ? <TextDefault center>Грешка!</TextDefault> :
       items.length === 0 ? emptyView() : 
         <View style={[styles.flex, styles.container]}>
+            <EULAModal onModalToggle={onEULAModalToggle} visible={EULAModalVisible} />
             <LocationModal visible={modalVisible} onModalToggle={toggleModal}/>
             <SearchModal categories={categories} visible={searchVisible} onModalToggle={toggleSearch} />              
             <FlatList
@@ -190,15 +216,6 @@ function MainHome() {
                 <Card {...item} /> 
               )}
             />
-            {/* <BannerAd
-              unitId={adUnitId}
-              size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-              requestOptions={{
-                networkExtras: {
-                  collapsible: 'bottom',
-                },
-              }}
-            /> */}
           </View>
     }
   </>
