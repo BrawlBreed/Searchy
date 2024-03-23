@@ -77,9 +77,11 @@ function EditProfile() {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: null,
-            headerLeft: () => <LeftButton icon='close' iconColor={colors.headerText} />,
-            headerRight: () => <RightButton iconColor={colors.headerText} icon='text' title='Запази' onPress={() => mutateFunction()}
-            />
+            headerLeft: () => <LeftButton icon='close' iconColor={colors.headerText}/>,
+            headerRight: () =>
+            <TouchableOpacity onPress={mutateFunction} style={{ marginRight: 20 }}>
+                  <TextDefault>Запази</TextDefault>          
+            </TouchableOpacity>
         })
     }, [navigation])
 
@@ -162,7 +164,7 @@ function EditProfile() {
                                             onChangeText={text => dispatch(changeName(text))}
                                             value={name}
                                             placeholderTextColor={colors.fontThirdColor}
-                                            placeholder={'Enter your name'}
+                                            placeholder={'Въведете името си'}
                                         />
                                     </View>
                                     {nameError &&

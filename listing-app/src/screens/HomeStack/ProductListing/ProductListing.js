@@ -3,7 +3,6 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { FlatList, TouchableOpacity, View } from 'react-native'
 import { FilterModal, TextDefault } from '../../../components'
-import SearchHeader from '../../../components/Header/SearchHeader/SearchHeader'
 import { alignment, colors, scale } from '../../../utilities'
 import ProductCard from './ProductCard/ProductCard'
 import styles from './styles'
@@ -36,13 +35,6 @@ function ProductListing() {
                 <TextDefault >
                     {items.length} оферти
                 </TextDefault>
-                {/* <TouchableOpacity style={styles.filterBtn}
-                    onPress={() => navigation.navigate('FilterModal', { visible: modalVisible, searchCategory: searchCategory })}>
-                    <MaterialIcons name='tune' size={scale(20)} color={colors.buttonbackground} />
-                    <TextDefault style={styles.fontText} right>
-                        Филтър
-                    </TextDefault>
-                </TouchableOpacity> */}
             </View>
         )
     }

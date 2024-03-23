@@ -12,7 +12,7 @@ export function validateEmailForm(fields, errors) {
     if (!fields.password) {
         errors.password = 'Полето е задължително';
     } else if (!passwordRegex.test(fields.password.trim())) {
-        errors.password = 'Невалидна парола';
+        errors.password = 'Паролата трябва да съдържа поне 8 символа, една главна буква, една малка буква, една цифра и един специален символ';
     } else {
         errors.password = '';
     }

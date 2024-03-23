@@ -19,13 +19,14 @@ import { FlashMessage } from '../../FlashMessage/FlashMessage'
 import { updateUserProperty } from '../../../firebase'
 import { setBlockedUsers } from '../../../store/reducers/User/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import { isDeviceTablet } from '../../../utilities/methods'
 
 function BackButton(props) {
   if (props.icon === 'leftArrow') {
     return (
       <Ionicons
         name="ios-arrow-back"
-        size={scale(30)}
+        size={scale(isDeviceTablet() ? 20 : 30)}
         style={styles.leftIconPadding}
         color={props.iconColor}
       />
@@ -34,7 +35,7 @@ function BackButton(props) {
     return (
       <MaterialIcons
         name="menu"
-        size={scale(30)}
+        size={scale(isDeviceTablet() ? 20 : 30)}
         style={styles.leftIconPadding}
         color={props.iconColor}
       />
@@ -43,7 +44,7 @@ function BackButton(props) {
     return (
       <EvilIcons
         name="share-google"
-        size={scale(30)}
+        size={scale(isDeviceTablet() ? 20 : 30)}
         style={styles.leftIconPadding}
         color={props.iconColor}
       />
@@ -52,7 +53,7 @@ function BackButton(props) {
     return (
       <MaterialCommunityIcons
         name="dots-vertical"
-        size={scale(30)}
+        size={scale(isDeviceTablet() ? 20 : 30)}
         style={styles.rightIconPadding}
         color={props.iconColor}
       />
@@ -61,7 +62,7 @@ function BackButton(props) {
     return (
       <Ionicons
         name="md-close"
-        size={scale(30)}
+        size={scale(isDeviceTablet() ? 20 : 30)}
         style={styles.leftIconPadding}
         color={props.iconColor}
       />
@@ -133,24 +134,24 @@ function RightButton(props) {
     async function share() {
       try {
         const result = await Share.share({
-            title: 'App link',
-            message:
-                'Изтегли приложението от тук: ',
+          title: 'App link',
+          message:
+            'Изтегли приложението от тук: ',
         });
         if (result.action === Share.sharedAction) {
-            if (result.activityType) {
-                // shared with activity type of result.activityType
-                FlashMessage({ message: 'Линка беше изпратен!', type: 'success' });
-            } else {
-                // shared
-            }
+          if (result.activityType) {
+            // shared with activity type of result.activityType
+            FlashMessage({ message: 'Линка беше изпратен!', type: 'success' });
+          } else {
+            // shared
+          }
         } else if (result.action === Share.dismissedAction) {
-            // dismissed
+          // dismissed
         }
       } catch (error) {
-          FlashMessage({ message: error.message, type: 'warning' });
+        FlashMessage({ message: error.message, type: 'warning' });
       } finally {
-          togglePassword()
+        togglePassword()
       }
     }
   }
@@ -165,30 +166,30 @@ export function UserButton(props) {
 
   async function handleUnblockUser() {
     try {
-        await updateUserProperty(uid, 'blockedUsers', props.blockedUsers)
+      await updateUserProperty(uid, 'blockedUsers', props.blockedUsers)
         .then((res) => {
-            if (!res) {
-                throw new Error('Failed to delete user profile');
-            }          
+          if (!res) {
+            throw new Error('Failed to delete user profile');
+          }
         })
         .then(() => {
-            dispatch(setBlockedUsers(props.blockedUsers))
-            console.log(props.blockedUsers)
-            FlashMessage({ message: 'Потребителя е успешно отблокиран.', type: 'success' })
+          dispatch(setBlockedUsers(props.blockedUsers))
+          console.log(props.blockedUsers)
+          FlashMessage({ message: 'Потребителя е успешно отблокиран.', type: 'success' })
         })
         .finally(() => {
-            navigation.goBack()
+          navigation.goBack()
         })
         .catch((error) => {
-            throw new Error('Failed to delete user profile');
+          throw new Error('Failed to delete user profile');
         })
     } catch (error) {
-        FlashMessage({ message: 'Нещо се обърка! Опитайте отново по-късно.', type: 'danger' })
-        console.error('Error during profile blocking process:', error);
+      FlashMessage({ message: 'Нещо се обърка! Опитайте отново по-късно.', type: 'danger' })
+      console.error('Error during profile blocking process:', error);
     }
   }
-  
-  function onModalToggle(){
+
+  function onModalToggle() {
     setPassword(false)
     setModalVisible(!modalVisible)
   }
@@ -208,16 +209,16 @@ export function UserButton(props) {
   } else if (props.icon === 'dots') {
     return (
       <View>
-        { modalVisible && <BlockModal blockedUsers={props.blockedUsers} onModalToggle={onModalToggle}/>}
+        {modalVisible && <BlockModal blockedUsers={props.blockedUsers} onModalToggle={onModalToggle} />}
         {password ? (
-            <Modal
-              animationType="fade"
-              transparent={true}
-              onRequestClose={togglePassword}  
-              visible={password}
-            >
-              {props.isBlocked ? (
-                <TouchableOpacity activeOpacity={1} onPress={handleUnblockUser} >
+          <Modal
+            animationType="fade"
+            transparent={true}
+            onRequestClose={togglePassword}
+            visible={password}
+          >
+            {props.isBlocked ? (
+              <TouchableOpacity activeOpacity={1} onPress={handleUnblockUser} >
                 <BorderlessButton
                   onPress={props.onPress}
                   borderless={false}
@@ -228,27 +229,27 @@ export function UserButton(props) {
                   </TextDefault>
                 </BorderlessButton>
               </TouchableOpacity>
-              ) : (<TouchableOpacity activeOpacity={1} onPress={onModalToggle} >
-                <BorderlessButton
-                  onPress={props.onPress}
-                  borderless={false}
-                  style={[styles.shareBtn, { top: inset.top }]}
-                >
-                  <TextDefault textColor={colors.headerText} H5 bold style={styles.flex}>
-                    {'Блокирай'}
-                  </TextDefault>
-                </BorderlessButton>
-              </TouchableOpacity>)}
-            </Modal>
+            ) : (<TouchableOpacity activeOpacity={1} onPress={onModalToggle} >
+              <BorderlessButton
+                onPress={props.onPress}
+                borderless={false}
+                style={[styles.shareBtn, { top: inset.top }]}
+              >
+                <TextDefault textColor={colors.headerText} H5 bold style={styles.flex}>
+                  {'Блокирай'}
+                </TextDefault>
+              </BorderlessButton>
+            </TouchableOpacity>)}
+          </Modal>
         ) : (
-            <HeaderBackButton
-              labelVisible={false}
-              backImage={
-                () => BackButton({ iconColor: props.iconColor, icon: 'dots' })
-              }
-              onPress={togglePassword}
-            />
-          )
+          <HeaderBackButton
+            labelVisible={false}
+            backImage={
+              () => BackButton({ iconColor: props.iconColor, icon: 'dots' })
+            }
+            onPress={togglePassword}
+          />
+        )
         }
       </View >
     )

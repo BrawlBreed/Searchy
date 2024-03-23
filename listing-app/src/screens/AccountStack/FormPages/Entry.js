@@ -1,6 +1,6 @@
-import { View, Text } from 'react-native'
+import { View, Text, Alert, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, TextInput, Button, Keyboard , KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, TextInput, Button, Keyboard, KeyboardAvoidingView } from 'react-native'
 import styles from '../Registration/styles'
 import { ModalHeader, TextDefault } from '../../../components'
 import { useNavigation } from '@react-navigation/native'
@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import RNPhoneCodeSelect from "react-native-phone-code-select";
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { validateEmailForm, validatePhoneForm } from './validate'
-import { colors } from '../../../utilities'
+import { colors, fontStyles } from '../../../utilities'
 import { createOrSignInWithEmail, createOrSignUpWithPhone } from '../../../firebase'
 import { gql, useMutation } from '@apollo/client'
 
@@ -24,6 +24,7 @@ const Entry = ({ route }) => {
     password: '',
     phone: ''
   })
+  const [isLoading, setisLoading] = useState(false)
   const [visible, setVisible] = useState(false);
   const navigation = useNavigation()
   const inset = useSafeAreaInsets()
@@ -63,7 +64,7 @@ const Entry = ({ route }) => {
       )
   }
 `, {
-  variables: {
+    variables: {
       name,
       phoneCode,
       description,
@@ -77,7 +78,8 @@ const Entry = ({ route }) => {
       favorites,
       notifications,
       userId
-  }})
+    }
+  })
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -101,52 +103,60 @@ const Entry = ({ route }) => {
 
   const handleSubmit = async () => {
     let valid = true
-    const error = route.params.email 
-    ? validateEmailForm({ email, password }, errors)
-    : validatePhoneForm({ phone, password }, errors)
+    const error = route.params.email
+      ? validateEmailForm({ email, password }, {})
+      : validatePhoneForm({ phone, password }, errors)
 
     setErrors(error)
     for (const key in errors) {
-        if(errors[key]) valid = false
+      if (errors[key]) valid = false
     }
-    if(valid) {
-      const response = route.params.email ? await createOrSignInWithEmail(email, password, dispatch, user
-      ) : await createOrSignUpWithPhone(phoneCode + phone, dispatch, mutateFunction)
-      
-      if(response === 'auth/invalid-login-credentials' || response === 'auth/invalid-credential') {
-        setErrors({ ...errors, password: 'Грешна парола!' })
-      }else if(response === 'auth/user-not-found') {
-        setErrors({ ...errors, email: 'Няма намерен потребител!' })
-      }
-      else if(response === 'auth/invalid-phone-number') {
-        setErrors({ ...errors, phone: 'Невалиден телефонен номер!' })
-      }
-      else if(response === 'auth/invalid-verification-code') {
-        setErrors({ ...errors, phone: 'Невалиден код!' })
-      }
-      else if(response === 'auth/too-many-requests') {
-        setErrors({ ...errors, phone: 'Твърде много опити за вход, опитайте по-късно!' })
-      }
-      else{
-        if(response.user){
-          dispatch(checkUserAuth())
-          navigation.navigate('Home')
-        }
-      }
+    if (valid) {
+      try {
+        setisLoading(true)
+        const response = route.params.email ?
+          await createOrSignInWithEmail(email, password, dispatch, user, navigation)
+          : await createOrSignUpWithPhone(phoneCode + phone, dispatch, mutateFunction)
 
+        setisLoading(false)
+
+        if (response === 'auth/invalid-login-credentials' || response === 'auth/invalid-credential') {
+          setErrors({ ...errors, password: 'Грешна парола!' })
+        } else if (response === 'auth/user-not-found') {
+          setErrors({ ...errors, email: 'Няма намерен потребител!' })
+        }
+        else if (response === 'auth/invalid-phone-number') {
+          setErrors({ ...errors, phone: 'Невалиден телефонен номер!' })
+        }
+        else if (response === 'auth/invalid-verification-code') {
+          setErrors({ ...errors, phone: 'Невалиден код!' })
+        }
+        else if (response === 'auth/too-many-requests') {
+          setErrors({ ...errors, phone: 'Твърде много опити за вход, опитайте по-късно!' })
+        }
+        else {
+          if (response.user) {
+            dispatch(checkUserAuth())
+            navigation.navigate('Home')
+          }
+        }
+
+      } catch (error) {
+        setisLoading(false)
+      }
     }
   }
 
   return (
     <>
-       <View style={[
+      <View style={[
         styles.safeAreaViewStyles,
         styles.flex,
         { paddingTop: inset.top, paddingBottom: inset.bottom }]}>
         <ModalHeader type='back' title="Вход" closeModal={() => navigation.goBack()} />
         <View style={styles.logoContainer}>
           <View style={styles.image}>
-            { !isKeyboardVisible && (
+            {!isKeyboardVisible && (
               <Image
                 source={icon}
                 style={styles.imgResponsive}
@@ -156,7 +166,7 @@ const Entry = ({ route }) => {
           </View>
         </View>
       </View>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : false}
         keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
@@ -169,14 +179,14 @@ const Entry = ({ route }) => {
               </TextDefault>
               <TextInput
                 style={formStyles.input}
-                placeholder='Имейл'
+                placeholder='Вашият имейл адрес'
                 autoCapitalize="none"
                 placeholderTextColor='#42A5F5'
                 value={email}
                 onChangeText={text => dispatch(changeEmail(text))}
               />
               {errors.email &&
-                <TextDefault textColor={colors.google} style={styles.width100}>
+                <TextDefault textColor={colors.google} style={fontStyles.Thin}>
                   {errors.email}
                 </TextDefault>
               }
@@ -197,13 +207,13 @@ const Entry = ({ route }) => {
               <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity onPress={() => setVisible(true)}>
                   <Text
-                    style={[formStyles.input, {width: 80, textAlign: 'center', paddingTop: 15, marginRight: 0, color: '#42A5F5' }]}
+                    style={[formStyles.input, { width: 80, textAlign: 'center', paddingTop: 15, marginRight: 0, color: '#42A5F5' }]}
                     autoCapitalize="none"
                     onPress={() => setVisible(true)}
                   >{phoneCode}</Text>
-                </TouchableOpacity>            
+                </TouchableOpacity>
                 <TextInput
-                  style={[formStyles.input, {width: 250}]}
+                  style={[formStyles.input, { width: 250 }]}
                   placeholder='Телефон'
                   autoCapitalize="none"
                   placeholderTextColor='#42A5F5'
@@ -220,11 +230,11 @@ const Entry = ({ route }) => {
               }
             </>
           )}
-          <TextDefault textColor={errors.password ? colors.google : colors.fontMainColor} H5 bold 
+          <TextDefault textColor={errors.password ? colors.google : colors.fontMainColor} H5 bold
           // style={[styles.width100, { marginTop: 15}]} 
           >
             {'Парола'}
-          </TextDefault>    
+          </TextDefault>
           <TextInput
             style={formStyles.input}
             placeholder='Парола'
@@ -238,26 +248,31 @@ const Entry = ({ route }) => {
               {errors.password}
             </TextDefault>
           }
-          <Button
-            title='Вход'
-            onPress={() => handleSubmit()}
-          />
-          <Text style={{color: 'gray'}}></Text> 
-          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={{ marginBottom: 30}}>
-            <Text 
-              style={{     
+          {
+            isLoading ?
+              <ActivityIndicator color={'#42A5F5'} />
+              :
+              <Button
+                title='Вход'
+                onPress={() => handleSubmit()} 
+              />
+          }
+          <Text style={{ color: 'gray' }}></Text>
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={{ marginBottom: 30 }}>
+            <Text
+              style={{
                 borderBottomRadius: 3,
                 borderBottomWidth: 2,
                 borderBottomColor: `#42A5F5`,
                 paddingBottom: 3.5
               }}>Забравена парола?</Text>
           </TouchableOpacity>
-          
+
         </View>
       </KeyboardAvoidingView>
     </>
   )
-} 
+}
 
 export default Entry
 

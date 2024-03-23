@@ -98,7 +98,7 @@ export const alignment = {
     paddingRight: scale(SMALL)
   },
   PLsmall: {
-    paddingLeft: scale(SMALL)
+    paddingLeft: scale(SMALL),
   },
 
   Pmedium: {

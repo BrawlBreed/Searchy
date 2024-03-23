@@ -2,8 +2,10 @@ import React from 'react'
 import { colors, scale, textStyles } from '../utilities'
 import { SimpleLineIcons, Fontisto, MaterialCommunityIcons, Ionicons, FontAwesome5, AntDesign } from '@expo/vector-icons'
 import { BackButton } from '../components'
-import { StyleSheet } from 'react-native'
+import { Dimensions, StyleSheet } from 'react-native'
 
+const WIDTH = Dimensions.get('screen').width
+const HEIGHT = Dimensions.get('screen').height
 
 function StackOptions() {
     return ({
@@ -13,13 +15,14 @@ function StackOptions() {
             backgroundColor: colors.headerbackground,
             borderBottomColor: colors.horizontalLine,
             borderBottomWidth: StyleSheet.hairlineWidth,
+            ...(isDeviceTablet() && { height: 110 })
         },
         headerTitleContainerStyle: {
             marginLeft: scale(45),
         },
         headerTitleStyle: {
             color: colors.headerText,
-            ...textStyles.H3,
+            fontSize: scale(isDeviceTablet() ? 15 : 20),
             ...textStyles.Bold
         },
         headerBackImage: () =>
@@ -30,7 +33,7 @@ function StackOptions() {
 function TopBarOptions() {
     return ({
         labelStyle: {
-            fontSize: 16,
+            fontSize: isDeviceTablet() ? 20 : 16,
             paddingTop: 8,
             fontWeight: 'bold',
             textShadowColor: 'black',
@@ -43,7 +46,7 @@ function TopBarOptions() {
         activeTintColor: colors.searchy1,
         inactiveTintColor: colors.white,
         style: {
-            height: scale(60),
+            height: isDeviceTablet() ? 80 : scale(60),
             backgroundColor: colors.searchy2,
             borderTopWidth: 0,
             borderTopColor: 'transparent',
@@ -66,7 +69,7 @@ function tabOptions() {
         keyboardHidesTabBar: true,
         tabStyle: {
             backgroundColor: colors.bottomTabColor,
-            padding: scale(5),
+            // padding: isDeviceTablet() ? 0 : scale(5),
             justifyContent: "center",
             alignItems: "center",
         },
@@ -77,6 +80,11 @@ function tabOptions() {
         },
         style: {
             backgroundColor: colors.bottomTabColor,
+            ...(isDeviceTablet() && { minHeight: 90 }),
+            borderWidth: 5,
+            borderColor: "red",
+            justifyContent: 'center',
+            alignItems: "center",
         },
     })
 }
@@ -104,6 +112,20 @@ function tabIcon(route) {
             return icon
         },
     })
+}
+
+
+const isDeviceTablet = () => {
+
+    let istab = false;
+    let ratio = HEIGHT / WIDTH
+
+    if (ratio > 1.6) {
+        istab = false
+    } else {
+        istab = true;
+    }
+    return istab
 }
 
 export { tabOptions, tabIcon, TopBarOptions, StackOptions }

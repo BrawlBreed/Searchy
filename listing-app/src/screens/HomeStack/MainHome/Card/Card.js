@@ -27,16 +27,16 @@ function Card(props) {
             <View style={styles.botCardContainer}>
                 <View>
                     <TextDefault textColor={colors.fontMainColor} H5 bolder>
-                        {props.price} лв.
+                        {props?.price} лв.
                     </TextDefault>
                     <TextDefault textColor={colors.fontSecondColor} numberOfLines={1}>
-                        {props.title}
+                        {props?.title}
                     </TextDefault>
                 </View>
                 <View style={styles.locationBottom}>
                     <SimpleLineIcons name="location-pin" size={scale(15)} color={colors.buttonbackground} />
                     <TextDefault textColor={colors.fontSecondColor} numberOfLines={1} light small style={styles.locationText}>
-                        {props.location}
+                        {props?.location}
                     </TextDefault>  
                 </View>
             </View>

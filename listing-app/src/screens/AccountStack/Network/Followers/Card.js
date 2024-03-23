@@ -21,10 +21,10 @@ function Card(props) {
             <View style={styles.userContainer}>
                 <TouchableOpacity activeOpacity={1}
                     onPress={() => navigation.navigate('UserProfile', { ...props, followers: props.followers  })} style={styles.avatar}>
-                    <Image style={styles.img} source={props.avatar ? { uri: props.avatar } : require('../../../../assets/images/avatar.png')} />
+                    <Image style={styles.img} source={props.avatar ? { uri: props?.avatar } : require('../../../../assets/images/avatar.png')} />
                 </TouchableOpacity >
                 <TextDefault textColor={colors.buttonbackground} bold style={[alignment.PLmedium, styles.flex]}>
-                    {props.name}
+                    {props?.name}
                 </TextDefault>
                 {/* <BorderlessButton
                     style={alignment.Psmall}

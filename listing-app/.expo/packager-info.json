@@ -1,9 +1,9 @@
 {
   "packagerPort": 19000,
   "packagerPid": null,
-  "expoServerPort": 19000,
-  "expoServerNgrokUrl": null,
-  "packagerNgrokUrl": null,
-  "ngrokPid": null,
+  "expoServerPort": null,
+  "expoServerNgrokUrl": "https://dy_f-ma.brawl-breed.listing-app.exp.direct",
+  "packagerNgrokUrl": "https://dy_f-ma.brawl-breed.listing-app.exp.direct",
+  "ngrokPid": 26440,
   "webpackServerPort": null
 }

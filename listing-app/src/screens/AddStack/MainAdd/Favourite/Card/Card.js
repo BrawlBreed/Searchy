@@ -11,7 +11,7 @@ function Card(props) {
     return (
         <TouchableOpacity activeOpacity={1}
             style={styles.productCardContainer}
-            onPress={() => navigation.navigate('ProductDescription', { ...props, id: props._id })}>
+            onPress={() => navigation.navigate('ProductDescription', { ...props, id: props?._id })}>
             <View style={styles.topCardContainer}>
                 <Image
                     source={{ uri: props.images[0] }}
@@ -25,10 +25,10 @@ function Card(props) {
             </View>
             <View style={styles.botCardContainer}>
                 <TextDefault numberOfLines={2} textColor={colors.fontMainColor}>
-                    {props.title}
+                    {props?.title}
                 </TextDefault>
                 <TextDefault style={{ fontWeight: 'bold' }} textColor={colors.fontMainColor}>
-                    {props.price} лв.
+                    {props?.price} лв.
                 </TextDefault>
             </View>
         </TouchableOpacity>

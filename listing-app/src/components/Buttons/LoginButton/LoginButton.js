@@ -5,6 +5,7 @@ import styles from './styles';
 import PropTypes from 'prop-types'
 import { TextDefault } from '../../Text';
 import { SimpleLineIcons } from '@expo/vector-icons';
+import { isDeviceTablet } from '../../../utilities/methods';
 
 function LoginButton(props) {
 
@@ -12,11 +13,11 @@ function LoginButton(props) {
         <TouchableOpacity
             disabled={props.disabled ?? false}
             activeOpacity={0.7}
-            style={StyleSheet.compose(styles.emptyButton, props.style )}
+            style={StyleSheet.compose(styles.emptyButton, props.style)}
             onPress={props.onPress}>
             {props.icon &&
                 <SimpleLineIcons name={props.icon} size={scale(30)} color={colors.white} />}
-            <TextDefault textColor={colors.white} H4 style={[styles.flex, alignment.PLmedium, { fontSize: Platform.OS === "ios" ? 20 : 25 }]}>
+            <TextDefault textColor={colors.white} H4 style={[styles.flex, alignment.PLmedium, { fontSize: Platform.OS === "ios" ? isDeviceTablet() ? 30 : 20 : 25 }]}>
                 {props.title}
             </TextDefault>
         </TouchableOpacity>

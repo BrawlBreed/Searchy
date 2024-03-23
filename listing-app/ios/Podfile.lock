@@ -16,6 +16,8 @@ PODS:
   - EXImageLoader (4.0.0):
     - ExpoModulesCore
     - React-Core
+  - EXLocation (15.0.1):
+    - ExpoModulesCore
   - Expo (47.0.14):
     - ExpoModulesCore
   - ExpoCrypto (12.0.0):
@@ -421,6 +423,7 @@ DEPENDENCIES:
   - EXFileSystem (from `../node_modules/expo-file-system/ios`)
   - EXFont (from `../node_modules/expo-font/ios`)
   - EXImageLoader (from `../node_modules/expo-image-loader/ios`)
+  - EXLocation (from `../node_modules/expo-location/ios`)
   - Expo (from `../node_modules/expo`)
   - ExpoCrypto (from `../node_modules/expo-crypto/ios`)
   - ExpoImagePicker (from `../node_modules/expo-image-picker/ios`)
@@ -504,6 +507,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-font/ios"
   EXImageLoader:
     :path: "../node_modules/expo-image-loader/ios"
+  EXLocation:
+    :path: "../node_modules/expo-location/ios"
   Expo:
     :path: "../node_modules/expo"
   ExpoCrypto:
@@ -617,6 +622,7 @@ SPEC CHECKSUMS:
   EXFileSystem: 60602b6eefa6873f97172c684b7537c9760b50d6
   EXFont: 319606bfe48c33b5b5063fb0994afdc496befe80
   EXImageLoader: 84b65e6bd9d3345d6fbb3ab936a546c54496a64d
+  EXLocation: 7d08926d931f4fb619bfa25e73669f1e19b102c6
   Expo: 5f4240506a147162542178989696e56e3dd72924
   ExpoCrypto: 51e7662c7f5bfeab25b7909b8a5d545ec15d4877
   ExpoImagePicker: ce37302446e70145bb413f0f74886441abdae022
@@ -676,6 +682,6 @@ SPEC CHECKSUMS:
   StripeUICore: 6a5bbea0164d63bd91000f001903e7901859e1a4
   Yoga: d6133108734e69e8c0becc6ba587294b94829687
 
-PODFILE CHECKSUM: 79e2e591284232005286ea4024eb2a408be9e61b
+PODFILE CHECKSUM: 9bc25e70f7d198a4786ca67cdd9f69e2a0584e3d
 
 COCOAPODS: 1.15.2

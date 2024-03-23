@@ -1,9 +1,11 @@
 import { StyleSheet } from 'react-native'
 import { alignment, colors, scale } from '../../../../utilities'
+import { isDeviceTablet } from '../../../../utilities/methods'
 
 const styles = StyleSheet.create({
     flex: {
-        flex: 1
+        flex: 1,
+        ...(isDeviceTablet() && { marginTop: 10 })
     },
     mainContainer: {
         backgroundColor: colors.themeBackground

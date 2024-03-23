@@ -1,30 +1,28 @@
 import { useNavigation } from '@react-navigation/native'
 import React, { useContext, useEffect, useLayoutEffect, useState } from 'react'
-import { View, TouchableOpacity, ScrollView, Image, Linking, Share } from 'react-native'
+import { View, TouchableOpacity, ScrollView, Image, Linking, Share, Dimensions } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { FlashMessage, LeftButton, ReportModal, RightButton, TextDefault } from '../../../components'
 import { alignment, colors, scale } from '../../../utilities'
 import styles from './style'
 import { FontAwesome, MaterialIcons, Entypo, SimpleLineIcons } from '@expo/vector-icons'
-import Swiper from 'react-native-swiper'
-import { BorderlessButton } from 'react-native-gesture-handler'
 import * as Device from 'expo-device';
 import Slider from './Slider'
 import MapView, { Marker } from 'react-native-maps'
 import { useDispatch, useSelector } from 'react-redux'
 import { ADD_TO_FAVORITES, GET_ITEM_BY_ID, GET_ZONES_QUERY, INCREMENT_VIEWS, LIKE_ITEM_MUTATION } from '../../../apollo/server'
 import { client } from '../../../apollo'
-import { dateStringToDDMMYYYY } from '../../../utilities/methods'
+import { dateStringToDDMMYYYY, isDeviceTablet } from '../../../utilities/methods'
 import { appendFavorites, removeFavorite, setFavorites } from '../../../store/reducers/User/userSlice'
 import { useLazyQuery } from '@apollo/client'
 import { fetchChatsByUserIDs, addChat } from '../../../firebase'
 import { generateRandomId } from '../../../store/reducers/Item/helpers'
 import { set } from 'react-native-reanimated'
- 
-function ProductDescription({ route, preview }) {  
+
+function ProductDescription({ route, preview }) {
     const { refetch, title, price, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address, views } = route ? route?.params : preview
     const [isLike, setIsLike] = useState(false);
-    const navigation = useNavigation() 
+    const navigation = useNavigation()
     const { isLoggedIn, uid } = useSelector(state => state.user)
     const [reportModal, setReportModal] = useState(false);
     const [fetched, setFetched] = useState(false);
@@ -37,10 +35,10 @@ function ProductDescription({ route, preview }) {
             query: GET_ZONES_QUERY,
             variables: { userId: uid }
         })
-        .then(({ data }) => {
-            const newFavoritesList = Array.from(new Set(data.getUserById.favorites))
-            dispatch(setFavorites(newFavoritesList))
-        }).then(() => setFetched(true)).then(() => refetch())
+            .then(({ data }) => {
+                const newFavoritesList = Array.from(new Set(data.getUserById.favorites))
+                dispatch(setFavorites(newFavoritesList))
+            }).then(() => setFetched(true)).then(() => refetch())
 
         client.query({
             query: GET_ITEM_BY_ID,
@@ -53,11 +51,11 @@ function ProductDescription({ route, preview }) {
 
     useEffect(() => {
         setIsLike(favorites?.includes(id));
-    }, [id, favorites]) 
+    }, [id, favorites])
 
     const handleLike = async () => {
-        if(!isLoggedIn) return navigation.navigate('Registration')
-        try{
+        if (!isLoggedIn) return navigation.navigate('Registration')
+        try {
             setIsLike(prev => !prev)
             const newFavorites = favorites?.includes(id) ? favorites?.filter(item => item !== id) : [...favorites, id];
             const newLikes = likesList?.includes(uid) ? likesList?.filter(item => item !== uid) : [...likesList, uid];
@@ -75,11 +73,11 @@ function ProductDescription({ route, preview }) {
                     refetch()
                 })
             })
-        }catch(err){
+        } catch (err) {
             console.log(err)
         }
     }
-    
+
     useEffect(() => {
         if (!isLoggedIn) {
             setIsLike(false);
@@ -88,7 +86,7 @@ function ProductDescription({ route, preview }) {
         }
 
     }, [isLike]);
-            
+
     useLayoutEffect(() => {
         navigation.setOptions({
             header: () => null
@@ -107,18 +105,18 @@ function ProductDescription({ route, preview }) {
             }).then(refetch);
         }
     }, [uid, user?._id, id, views, client, refetch]);
-    
-    async function chatCheck(){
-        if(user?._id === uid) navigation.navigate('Account')
+
+    async function chatCheck() {
+        if (user?._id === uid) navigation.navigate('Account')
         else if (!isLoggedIn) navigation.navigate('Registration')
-        else{
+        else {
             const chatObj = {
                 name: user.name, image: images[0], avatar: user.avatar, uid: user?._id, adId: id
             }
             const chats = await fetchChatsByUserIDs(uid, user?._id, id);
-            if(chats.length){ 
-                navigation.navigate('LiveChat', { id: chats[0].id, ...chatObj } ) 
-            } else{
+            if (chats.length) {
+                navigation.navigate('LiveChat', { id: chats[0].id, ...chatObj })
+            } else {
                 const chatObject = {
                     createdAt: new Date().toISOString(),
                     id: generateRandomId(28),
@@ -129,9 +127,9 @@ function ProductDescription({ route, preview }) {
                     adId: id,
                     image: images[0],
                     title: title,
-                };                  
+                };
                 const chatId = await addChat(chatObject)
-                navigation.navigate('LiveChat', { id: chatId, ...chatObj } )
+                navigation.navigate('LiveChat', { id: chatId, ...chatObj })
             }
 
         }
@@ -194,7 +192,7 @@ function ProductDescription({ route, preview }) {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Modal */}
-                { route && (
+                {route && (
                     <ReportModal adId={id} uid={user?._id} visible={reportModal} onModalToggle={toggleModal} />
                 )}
                 <View style={styles.swiperContainer}>
@@ -205,18 +203,18 @@ function ProductDescription({ route, preview }) {
                         <TextDefault H4 bold>
                             {price} лв.
                         </TextDefault>
-                        { route && (
-                        <TouchableOpacity activeOpacity={0} onPress={() => handleLike()}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            {isLike ? 
-                                <FontAwesome name="heart" size={scale(20)} color="black" /> :
-                                <FontAwesome name="heart-o" size={scale(20)} color="black" />
-                            }
-                            {/* <TextDefault style={{ marginLeft: 5 }}>{likesList?.length ? likesList.length : '0'}</TextDefault> */}
-                            </View>
-                        </TouchableOpacity>
+                        {route && (
+                            <TouchableOpacity activeOpacity={0} onPress={() => handleLike()}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    {isLike ?
+                                        <FontAwesome name="heart" size={scale(20)} color="black" /> :
+                                        <FontAwesome name="heart-o" size={scale(20)} color="black" />
+                                    }
+                                    {/* <TextDefault style={{ marginLeft: 5 }}>{likesList?.length ? likesList.length : '0'}</TextDefault> */}
+                                </View>
+                            </TouchableOpacity>
                         )}
-                        
+
                     </View>
                     <TextDefault style={{ fontSize: 20 }}>
                         {title}
@@ -231,24 +229,28 @@ function ProductDescription({ route, preview }) {
                                 от {dateStringToDDMMYYYY(createdAt)}
                             </TextDefault>
                         )}
-                        
+
                     </View>
                     <MapView initialRegion={{
-                            latitude: address.coordinates.latitude,
-                            longitude: address.coordinates.longitude,
-                            latitudeDelta: 0.005,
-                            longitudeDelta: 0.005
+                        latitude: address.coordinates.latitude,
+                        longitude: address.coordinates.longitude,
+                        latitudeDelta: 0.005,
+                        longitudeDelta: 0.005
+                    }}
+                        style={{
+                            width: '100%',
+                            height: Dimensions.get('screen').width * 0.5,
+                            flexGrow: 1
                         }}
-                            style={{width: '100%', height: 200, flexGrow: 1}}
-                        >
-                            {address.coordinates.latitude && address.coordinates.longitude &&
-                                <Marker
-                                    coordinate={{ latitude: address.coordinates.latitude, longitude: address.coordinates.longitude }}
-                                    title='Местоположение'
-                                    description={location}
-                                    identifier='местоположение'
-                                />}
-                        </MapView>
+                    >
+                        {address.coordinates.latitude && address.coordinates.longitude &&
+                            <Marker
+                                coordinate={{ latitude: address.coordinates.latitude, longitude: address.coordinates.longitude }}
+                                title='Местоположение'
+                                description={location}
+                                identifier='местоположение'
+                            />}
+                    </MapView>
 
                 </View>
                 <View style={styles.conditionContainer}>
@@ -280,23 +282,23 @@ function ProductDescription({ route, preview }) {
                         {description}
                     </TextDefault>
                 </View>
-                { route && (
+                {route && (
                     user && (
                         <>
                             <TouchableOpacity
                                 borderless={false}
                                 style={styles.profileContainer}
                                 onPress={() => {
-                                    if(user?._id === uid){
+                                    if (user?._id === uid) {
                                         navigation.navigate('Account')
-                                    }else{
-                                        navigation.navigate('UserProfile', { ...user })                                    
+                                    } else {
+                                        navigation.navigate('UserProfile', { ...user })
                                     }
                                 }}>
                                 <View style={styles.imageResponsive}>
                                     <Image
                                         style={styles.image}
-                                        source={user.avatar ? {uri:user.avatar} : require('../../../assets/images/avatar.png')}/>
+                                        source={user.avatar ? { uri: user.avatar } : require('../../../assets/images/avatar.png')} />
                                 </View>
                                 <View style={styles.profileInfo}>
                                     <TextDefault bold>
@@ -311,19 +313,9 @@ function ProductDescription({ route, preview }) {
                                 </View>
                                 <Entypo name='chevron-small-right' size={scale(20)} color={colors.buttonbackground} />
                             </TouchableOpacity>
-                            <View style={styles.profileContainer}>
-                                <TextDefault small>
-                                    {`ID на офертата:${id}`}
-                                </TextDefault>
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => toggleModal()}>
-                                    <TextDefault textColor={colors.spinnerColor} uppercase bold>
-                                        {'Докладвай обява'}
-                                    </TextDefault>
-                                </TouchableOpacity>
-                            </View>
                         </>
                     )
-                    
+
                 )}
 
 
@@ -332,33 +324,39 @@ function ProductDescription({ route, preview }) {
                     <TouchableOpacity activeOpacity={0.7}>
                         {LeftButton({ iconColor: colors.white, icon: 'back' })}
                     </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.7} onPress={share}>
-                        {RightButton({ iconColor: colors.white, icon: 'share' })}
+                    <TouchableOpacity style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} activeOpacity={0.7} onPress={() => toggleModal()}>
+                        <TextDefault textColor={colors.white} uppercase bold>
+                            {'Докладвай обява'}
+                        </TextDefault>
+                        <MaterialIcons style={{ paddingLeft: 5 }} name="flag" size={24} color="white" />
                     </TouchableOpacity>
+                    {/* <TouchableOpacity activeOpacity={0.7} onPress={share}>
+                        {RightButton({ iconColor: colors.white, icon: 'share' })}
+                    </TouchableOpacity> */}
                 </View>
             </ScrollView>
             {/* Footer */}
-            { route && (
+            {route && (
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
                         activeOpacity={0.7}
                         style={styles.button}
                         onPress={chatCheck}
                     >
-                        <SimpleLineIcons name='bubble' size={scale(20)} color={colors.white} />
-                        <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
+                        <SimpleLineIcons name='bubble' size={scale(isDeviceTablet() ? 15 : 20)} color={colors.white} />
+                        <TextDefault textColor={colors.buttonText} uppercase bold style={[alignment.PLsmall, { fontSize: scale(isDeviceTablet() ? 8 : 11) }]}>
                             {'Чат'}
                         </TextDefault>
                     </TouchableOpacity>
-                    { user?.phone && (
+                    {user?.phone && (
                         <>
                             <TouchableOpacity
                                 activeOpacity={0.7}
                                 style={styles.button}
                                 onPress={Sms}
                             >
-                                <SimpleLineIcons name='envelope' size={scale(20)} color={colors.white} />
-                                <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
+                                <SimpleLineIcons name='envelope' size={scale(isDeviceTablet() ? 15 : 20)} color={colors.white} />
+                                <TextDefault textColor={colors.buttonText} uppercase bold style={[alignment.PLsmall, { fontSize: scale(isDeviceTablet() ? 8 : 11) }]}>
                                     {'Съобщение'}
                                 </TextDefault>
                             </TouchableOpacity>
@@ -368,14 +366,14 @@ function ProductDescription({ route, preview }) {
                                 style={styles.button}
                                 onPress={dialCall}
                             >
-                                <SimpleLineIcons name='phone' size={scale(20)} color={colors.white} />
-                                <TextDefault textColor={colors.buttonText} uppercase bold style={alignment.PLsmall}>
+                                <SimpleLineIcons name='phone' size={scale(isDeviceTablet() ? 15 : 20)} color={colors.white} />
+                                <TextDefault textColor={colors.buttonText} uppercase bold style={[alignment.PLsmall, { fontSize: scale(isDeviceTablet() ? 8 : 11) }]}>
                                     {'Обади се'}
                                 </TextDefault>
                             </TouchableOpacity>
                         </>
                     )}
-                    
+
                 </View>
             )}
         </SafeAreaView >

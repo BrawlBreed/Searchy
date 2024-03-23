@@ -3,7 +3,7 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "fire
 import {
   GoogleAuthProvider,
   signInWithRedirect,
-  getAuth, 
+  getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -65,7 +65,7 @@ export async function uploadImages(images, path) {
   }
 }
 export async function uploadImage(image, path) {
-  try{
+  try {
     const response = await fetch(image);
     image = await response.blob();
     const reference = storageRef(storage, `${path}`);
@@ -77,7 +77,7 @@ export async function uploadImage(image, path) {
   }
 }
 
-export const createOrSignInWithEmail = async (email, password, dispatch, user) => {
+export const createOrSignInWithEmail = async (email, password, dispatch, user, navigation) => {
   dispatch(setLoading(true));
   try {
     const name = email.split('@')[0];
@@ -86,7 +86,7 @@ export const createOrSignInWithEmail = async (email, password, dispatch, user) =
     const signUpResponse = await createUserWithEmailAndPassword(auth, email, password);
     const { uid } = signUpResponse.user;
     dispatch(setUserId(uid));
-    user = {...user, _id: uid, createdAt: createdAt, name: name }
+    user = { ...user, _id: uid, createdAt: createdAt, name: name }
     createUserWithCustomKey(uid, user);
 
     return signUpResponse;
@@ -95,6 +95,8 @@ export const createOrSignInWithEmail = async (email, password, dispatch, user) =
       // If account creation fails because email is already in use, try to sign in
       try {
         const signInResponse = await signInWithEmailAndPassword(auth, email, password);
+        dispatch(checkUserAuth(navigation))
+        navigation.navigate('Home')
         return signInResponse;
       } catch (signInError) {
         // Handle sign-in error
@@ -122,12 +124,12 @@ export const logout = async (dispatch) => {
   }
 };
 
-export async function createUserWithCustomKey( childId, data ){
+export async function createUserWithCustomKey(childId, data) {
   const { password, isLoggedIn, loading, uid, userId, ...dataWithoutPassword } = data;
 
-  try{
+  try {
     const res = await set(ref(db, 'users/' + childId), dataWithoutPassword)
-  }catch(error){
+  } catch (error) {
     console.error('Error: ', error)
     return error
   }
@@ -172,22 +174,22 @@ export const updateAndVerifyEmail = async (newEmail, password) => {
 
     // Update the email.
     await updateEmailAuth(auth.currentUser, newEmail);
-    return { success: true, message: 'Email updated!' }; 
+    return { success: true, message: 'Email updated!' };
   } catch (error) {
-    if(error.code === 'auth/operation-not-allowed'){
-      try{
+    if (error.code === 'auth/operation-not-allowed') {
+      try {
         const res = await sendEmailVerification(auth.currentUser);
-        if(res === undefined){
+        if (res === undefined) {
           const res = await verifyBeforeUpdateEmail(auth.currentUser, newEmail);
 
           return 'Sent'
         }
 
         return res;
-      }catch(error){
+      } catch (error) {
         return res;
       }
-  
+
     }
     return error;
   }
@@ -199,7 +201,7 @@ export async function fetchObjectsByUids(uidArray) {
 
   for (const uid of uidArray) {
     const objectRef = ref(db, '/users/' + uid);
-    
+
     try {
       const snapshot = await get(objectRef);
       if (snapshot.exists()) {
@@ -219,7 +221,7 @@ export function fetchChatsByUserIDs(uid1, uid2, adId) {
   return new Promise((resolve, reject) => {
     const chatsRef = collection(dbFirestore, 'chats');
     const q = query(
-      chatsRef, 
+      chatsRef,
       where('members', 'array-contains-any', [uid1, uid2]),
       where('adId', '==', adId)
     );
@@ -323,15 +325,15 @@ export function fetchMessagesByChatId(chatId, setMessages) {
   const q = query(messagesRef, orderBy('createdAt', 'desc'));
 
   return onSnapshot(q, (querySnapshot) => {
-      const allMessages = querySnapshot.docs.map(doc => ({
-        _id: doc.id, // Assuming _id is the Firestore document ID
-        createdAt: doc.data().createdAt.toDate(),
-        text: doc.data().text,
-        user: doc.data().user
-      }));
-      setMessages(allMessages);
+    const allMessages = querySnapshot.docs.map(doc => ({
+      _id: doc.id, // Assuming _id is the Firestore document ID
+      createdAt: doc.data().createdAt.toDate(),
+      text: doc.data().text,
+      user: doc.data().user
+    }));
+    setMessages(allMessages);
   }, (error) => {
-      console.error("Error fetching messages: ", error);
+    console.error("Error fetching messages: ", error);
   });
 }
 
@@ -371,20 +373,20 @@ export function saveMessage({ id, createdAt, text, user }) {
 }
 
 export async function updateEmail(email) {
-  try{
+  try {
     const res = await updateEmailAuth(auth.currentUser, email);
     return res
-  }catch(error){
+  } catch (error) {
     return error
   };
 }
 
 export const sendForgotPasswordEmail = async (email) => {
   const auth = getAuth();
-  try{
+  try {
     await sendPasswordResetEmail(auth, email)
     return true
-  }catch(error){
+  } catch (error) {
     console.log(error)
     return false
   }
@@ -473,7 +475,7 @@ export const sendForgotPasswordEmail = async (email) => {
 //         const lastId = Object.keys(itemsObject)[Object.keys(itemsObject).length - 1]
 
 //         const itemsArray = Object.values(itemsObject);
-        
+
 //         const itemsList = itemsArray.map(item => ({
 //           id: item._id,
 //           title: item.title, 
@@ -499,140 +501,140 @@ export const sendForgotPasswordEmail = async (email) => {
 
 export async function fetchItems(zoneId, limit, startAfterId = null) {
   return new Promise((resolve, reject) => {
-      const db = getDatabase();
-      const itemsQuery = dbQuery(
-          ref(db, 'items'),
-          orderByChild('zoneId'),
-          equalTo(zoneId ? zoneId : '-NhHdj8_3gWA-DyjE3GH'),
-          limitToLast(limit)
-      );
+    const db = getDatabase();
+    const itemsQuery = dbQuery(
+      ref(db, 'items'),
+      orderByChild('zoneId'),
+      equalTo(zoneId ? zoneId : '-NhHdj8_3gWA-DyjE3GH'),
+      limitToLast(limit)
+    );
 
-        get(itemsQuery).then(async (snapshot) => {
-          if (snapshot.exists()) {
-            let items = [];
-            const itemPromises = [];
-          
-            snapshot.forEach((childSnapshot) => {
-              const itemData = childSnapshot.val();
-          
-              // Assuming user data is stored in a separate path, e.g., 'users'
-              const userPromise = get(ref(db, 'users/' + itemData.userId)).then(userSnapshot => {
-                itemData.user = userSnapshot.val();
-              });
+    get(itemsQuery).then(async (snapshot) => {
+      if (snapshot.exists()) {
+        let items = [];
+        const itemPromises = [];
 
-              const subCategoryPromise = get(ref(db, 'subcategories/' + itemData.subCategoryId)).then(subCatSnapshot => {
-                itemData.subCategory = subCatSnapshot.val();
-              });
-              
-              const zonePromise = get(ref(db, 'zones/' + itemData.zoneId)).then(zoneSnapshot => {
-                itemData.zone = zoneSnapshot.val();
-              })
-          
-              itemPromises.push(userPromise, subCategoryPromise, zonePromise);
-          
-              items.push(itemData);
-            });
-          
-            await Promise.all(itemPromises);
+        snapshot.forEach((childSnapshot) => {
+          const itemData = childSnapshot.val();
 
-          
-            let itemsArray = Object.values(items);
-            const lastId = Object.keys(items)[Object.keys(items).length - 1]
+          // Assuming user data is stored in a separate path, e.g., 'users'
+          const userPromise = get(ref(db, 'users/' + itemData.userId)).then(userSnapshot => {
+            itemData.user = userSnapshot.val();
+          });
 
-            // Sort itemsArray if needed, then filter by active status and user ID
-            itemsArray = itemsArray.filter((item => Boolean(item._id))).map(item => ({
-              id: item._id,
-              title: item.title, 
-              price: item.price,
-              location: item.address.address,
-              image: item.images[0],
-              ...item,
-            })).filter(item => item.status === 'active')
-            .sort((a, b) => {
-              return b.promotionScore - a.promotionScore;
-            }); 
+          const subCategoryPromise = get(ref(db, 'subcategories/' + itemData.subCategoryId)).then(subCatSnapshot => {
+            itemData.subCategory = subCatSnapshot.val();
+          });
 
-            // Implement client-side pagination
-            if (startAfterId) {
-                const startIndex = itemsArray?.findIndex(item => item._id === startAfterId);
-                if (startIndex >= 0) {
-                    itemsArray = itemsArray?.slice(startIndex + 1, startIndex + 1 + limit);
-                } else {
-                    itemsArray = [];
-                }
-            } else {
-                itemsArray = itemsArray?.slice(0, limit);
-            }
+          const zonePromise = get(ref(db, 'zones/' + itemData.zoneId)).then(zoneSnapshot => {
+            itemData.zone = zoneSnapshot.val();
+          })
 
-            resolve({ items: [...itemsArray], lastId });
+          itemPromises.push(userPromise, subCategoryPromise, zonePromise);
+
+          items.push(itemData);
+        });
+
+        await Promise.all(itemPromises);
+
+
+        let itemsArray = Object.values(items);
+        const lastId = Object.keys(items)[Object.keys(items).length - 1]
+
+        // Sort itemsArray if needed, then filter by active status and user ID
+        itemsArray = itemsArray.filter((item => Boolean(item._id))).map(item => ({
+          id: item._id,
+          title: item.title,
+          price: item.price,
+          location: item.address.address,
+          image: item.images[0],
+          ...item,
+        })).filter(item => item.status === 'active' && Boolean(item?.user))
+          .sort((a, b) => {
+            return b.promotionScore - a.promotionScore;
+          });
+
+        // Implement client-side pagination
+        if (startAfterId) {
+          const startIndex = itemsArray?.findIndex(item => item._id === startAfterId);
+          if (startIndex >= 0) {
+            itemsArray = itemsArray?.slice(startIndex + 1, startIndex + 1 + limit);
           } else {
-            console.log("No data available");
-            resolve({ items: [], lastId: null });
+            itemsArray = [];
           }
-      }).catch((error) => {
-          reject(error);
-      });
+        } else {
+          itemsArray = itemsArray?.slice(0, limit);
+        }
+
+        resolve({ items: [...itemsArray], lastId });
+      } else {
+        console.log("No data available");
+        resolve({ items: [], lastId: null });
+      }
+    }).catch((error) => {
+      reject(error);
+    });
   });
 }
 export function fetchSearch(searchInput = null, searchSubCategory = null, limit, uid = '', startAfterId = null) {
   return new Promise((resolve, reject) => {
-      const db = getDatabase();
-      let itemsQuery;
-      if (searchInput) {
-        const searchStr = searchInput.toLowerCase();
-        itemsQuery = dbQuery(
-          ref(db, 'items'),
-          orderByChild('title'),
-          startAt(searchStr),
-          endAt(searchStr + "\uf8ff"),
-          limitToLast(limit)
-        );
-      }else if(searchSubCategory){
-        itemsQuery = dbQuery(
-          ref(db, 'items'),
-          orderByChild('subCategoryId'),
-          equalTo(searchSubCategory),
-          limitToLast(limit)
-        );
-      }
+    const db = getDatabase();
+    let itemsQuery;
+    if (searchInput) {
+      const searchStr = searchInput.toLowerCase();
+      itemsQuery = dbQuery(
+        ref(db, 'items'),
+        orderByChild('title'),
+        startAt(searchStr),
+        endAt(searchStr + "\uf8ff"),
+        limitToLast(limit)
+      );
+    } else if (searchSubCategory) {
+      itemsQuery = dbQuery(
+        ref(db, 'items'),
+        orderByChild('subCategoryId'),
+        equalTo(searchSubCategory),
+        limitToLast(limit)
+      );
+    }
 
-      get(itemsQuery).then((snapshot) => {
-          if (snapshot.exists()) {
-              const itemsObject = snapshot.val();
-              let itemsArray = Object.values(itemsObject);
-              const lastId = Object.keys(itemsObject)[Object.keys(itemsObject).length - 1]
+    get(itemsQuery).then((snapshot) => {
+      if (snapshot.exists()) {
+        const itemsObject = snapshot.val();
+        let itemsArray = Object.values(itemsObject);
+        const lastId = Object.keys(itemsObject)[Object.keys(itemsObject).length - 1]
 
-              // Sort itemsArray if needed, then filter by active status and user ID
-              itemsArray = itemsArray.map(item => ({
-                id: item._id,
-                title: item.title, 
-                price: item.price,
-                location: item.address.address,
-                image: item.images[0],
-                ...item,
-              })).filter(item => item.status === 'active' && item.user?._id !== uid && Boolean(item.id) )
-              .sort((a, b) => {
-                return b.promotionScore - a.promotionScore;
-              }); 
+        // Sort itemsArray if needed, then filter by active status and user ID
+        itemsArray = itemsArray.map(item => ({
+          id: item._id,
+          title: item.title,
+          price: item.price,
+          location: item.address.address,
+          image: item.images[0],
+          ...item,
+        })).filter(item => item.status === 'active' && item.user?._id !== uid && Boolean(item.id))
+          .sort((a, b) => {
+            return b.promotionScore - a.promotionScore;
+          });
 
-              // Implement client-side pagination
-              if (startAfterId) {
-                  const startIndex = itemsArray?.findIndex(item => item._id === startAfterId);
-                  if (startIndex >= 0) {
-                      itemsArray = itemsArray?.slice(startIndex + 1, startIndex + 1 + limit);
-                  } else {
-                      itemsArray = [];
-                  }
-              } else {
-                  itemsArray = itemsArray?.slice(0, limit);
-              }
-
-              resolve({ items: [...itemsArray], lastId });
+        // Implement client-side pagination
+        if (startAfterId) {
+          const startIndex = itemsArray?.findIndex(item => item._id === startAfterId);
+          if (startIndex >= 0) {
+            itemsArray = itemsArray?.slice(startIndex + 1, startIndex + 1 + limit);
           } else {
-              resolve({ items: [], lastId: null });
+            itemsArray = [];
           }
-      }).catch((error) => {
-          reject(error);
-      });
+        } else {
+          itemsArray = itemsArray?.slice(0, limit);
+        }
+
+        resolve({ items: [...itemsArray], lastId });
+      } else {
+        resolve({ items: [], lastId: null });
+      }
+    }).catch((error) => {
+      reject(error);
+    });
   });
 }

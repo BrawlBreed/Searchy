@@ -15,7 +15,7 @@ function Card(props) {
     const [ newBlockedUsers, setNewBlockedUsers ] = useState(blockedUsers)
 
     useEffect(() => {
-        const newBlockedUsers = toggleStringInArray([...blockedUsers], props._id)
+        const newBlockedUsers = toggleStringInArray([...blockedUsers], props?._id)
         setNewBlockedUsers(newBlockedUsers)
     }, [])
     function onModalToggle(){
@@ -28,7 +28,7 @@ function Card(props) {
                 <Image style={[styles.img, { borderRadius: 1000 }]} source={props.avatar ? {uri: props.avatar} : require('../../../assets/images/avatar.png')} />
             </TouchableOpacity>
             <TextDefault textColor={colors.buttonbackground} bold style={[alignment.PLmedium, styles.flex]}>
-                {props.name}
+                {props?.name}
             </TextDefault>
             <BorderlessButton
                 style={alignment.Psmall}

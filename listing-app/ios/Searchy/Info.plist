@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.1</string>
+	<string>1.0.3</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -51,9 +51,9 @@
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>$(PRODUCT_NAME) requires Bluetooth access</string>
 	<key>NSCalendarsUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to access your calender</string>
+	<string>$(PRODUCT_NAME) would like to access your calender to recommend promotions</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow $(PRODUCT_NAME) to access your camera</string>
+	<string>Allow $(PRODUCT_NAME) to access your camera to capture images</string>
 	<key>NSContactsUsageDescription</key>
 	<string>$(PRODUCT_NAME) requires to access your contacts to share promotions</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -63,18 +63,18 @@
 	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
 	<dict>
 		<key>Personalization</key>
-		<string>Your Location is used to to show your nearby offers </string>
+		<string>Your Location is used to to show your nearby offers</string>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your Location is used to to show your nearby offers </string>
+	<string>Your Location is used to to show your nearby offers</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow $(PRODUCT_NAME) to access your microphone</string>
 	<key>NSMotionUsageDescription</key>
 	<string>$(PRODUCT_NAME) requires access your motion use</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires to access your photo library to show image on profile</string>
+	<string>$(PRODUCT_NAME) requires to access your photo library to show/change image on profile and listings</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow $(PRODUCT_NAME) to access your photos</string>
+	<string>Allow $(PRODUCT_NAME) to access your photos library to show/change image on profile and listings</string>
 	<key>NSSiriUsageDescription</key>
 	<string>$(PRODUCT_NAME) requires Siri access</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

@@ -14,13 +14,13 @@ function Profile() {
     const navigation = useNavigation()
     const [getZones, { loading, data, error, refetch }] = useLazyQuery(GET_ZONES_QUERY);
 
-    const followersCount = followers.reduce((acc, curr) => {
+    const followersCount = followers?.reduce((acc, curr) => {
         // Optimization with a query to check if the user is active
         curr = curr.length ? 1 : 0
         return curr + acc
     }, 0)
 
-    const followingCount = following.reduce((acc, curr) => {
+    const followingCount = following?.reduce((acc, curr) => {
         curr = curr.length ? 1 : 0
         return curr + acc
     }, 0)
