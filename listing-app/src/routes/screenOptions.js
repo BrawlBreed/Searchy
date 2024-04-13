@@ -77,15 +77,7 @@ function tabOptions() {
             ...textStyles.Bold,
             ...textStyles.UpperCase,
             justifyContent: "center",
-        },
-        style: {
-            backgroundColor: colors.bottomTabColor,
-            ...(isDeviceTablet() && { minHeight: 90 }),
-            borderWidth: 5,
-            borderColor: "red",
-            justifyContent: 'center',
-            alignItems: "center",
-        },
+        }    
     })
 }
 

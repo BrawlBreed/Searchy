@@ -49,7 +49,6 @@ export const initialState = {
   followers: [''],
   following: [''],
   likedItems: [''],
-  blockedUsers: [''],
   ownedItems: [''],
   notifications: {
     recommendations: false,
@@ -64,7 +63,7 @@ export const initialState = {
   emailChanged: false,
   uid: '', // Add uid to the state
   userId: '',
-  changed: false,
+  changed: false
 };
 
 const userSlice = createSlice({
@@ -138,9 +137,6 @@ const userSlice = createSlice({
     },
     setFollowers: (state, action) => {
       state.followers = action.payload;
-    },
-    setBlockedUsers: (state, action) => {
-      state.blockedUsers = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -177,8 +173,7 @@ export const {
   changeOwnedItems,
   setOwnedItems,
   setFollowing,
-  setFollowers,
-  setBlockedUsers
+  setFollowers
 } = userSlice.actions;
 
 export default userSlice.reducer;

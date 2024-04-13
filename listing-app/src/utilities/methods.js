@@ -3,6 +3,30 @@ import { Dimensions, Platform, StyleSheet } from 'react-native'
 const WIDTH = Dimensions.get('screen').width
 const HEIGHT = Dimensions.get('screen').height
 
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]]; // Swapping elements
+  }
+}
+
+export function interleaveAndShuffleArrays(arr1, arr2) {
+  const interleavedArray = [];
+  const maxLength = Math.max(arr1.length, arr2.length);
+
+  for (let i = 0; i < maxLength; i++) {
+      if (i < arr1.length) {
+          interleavedArray.push(arr1[i]);
+      }
+      if (i < arr2.length) {
+          interleavedArray.push(arr2[i]);
+      }
+  }
+
+  shuffleArray(interleavedArray); // Shuffle the interleaved array
+  return interleavedArray;
+}
+
 export function dateStringToDDMMYYYY(dateString) {
   // Parse the date string into a Date object
   const date = new Date(dateString);
@@ -20,6 +44,19 @@ export function dateStringToDDMMYYYY(dateString) {
   // Return the formatted string
   return `${day}.${month}.${year}г.`;
 }
+
+export function formatDateFromFirestore({ seconds, nanoseconds }) {
+  // Create a new Date object using the seconds (converted to milliseconds)
+  const date = new Date(seconds * 1000 + nanoseconds / 1000000);
+
+  // Format the date as dd.mm.yy
+  const formattedDate = date.getDate().toString().padStart(2, '0') + 
+                        '.' + (date.getMonth() + 1).toString().padStart(2, '0') + 
+                        '.' + date.getFullYear().toString().substr(-2);
+
+  return formattedDate;
+}
+
 
 export const isDeviceTablet = () => {
 

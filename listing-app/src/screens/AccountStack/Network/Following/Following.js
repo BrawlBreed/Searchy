@@ -58,7 +58,7 @@ function Following() {
             const result = await Share.share({
                 title: 'Покани приятели',
                 message:
-                    'Използвай този линк за да се присъединиш към Searchy!',
+                `Използвай този линк за да се присъединиш към Searchy! ${Platform.OS === 'ios' ? 'https://apps.apple.com/app/id6478391006' : 'https://play.google.com/store/apps/details?id=com.searchy&pcampaignid=web_share'}`
             });
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {

@@ -58,7 +58,7 @@ function ModalHeader({ blocked }) {
     };
 
     function Sms() {
-        let url = `sms:${phoneNumber}${Platform.OS === "ios" ? "&" : "?"}body=${"This is sample text"}`
+        let url = `sms:${phoneNumber}${Platform.OS === "ios" ? "&" : "?"}body=${"Имам интерес от обявата ви за"}`
 
         Linking.openURL(url);
     };

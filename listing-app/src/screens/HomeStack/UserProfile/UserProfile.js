@@ -13,8 +13,9 @@ import { FOLLOWING_USER, FOLLOW_USER, GET_ITEM_BY_ID, GET_ZONES_QUERY } from '..
 import { useLazyQuery } from '@apollo/client'
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler'
 import Card from '../MainHome/Card/Card'
-import BlockModal from '../../../components/Modal/BlockModal/BlockModal'
+import SearchyCard from '../MainHome/Card/SearchyCard'
 import { UserButton } from '../../../components/Header/HeaderIcons/HeaderIcons'
+import { fetchSearchy } from '../../../firebase'
 
 function UserProfile({ route }) {
     const navigation = useNavigation()
@@ -29,8 +30,19 @@ function UserProfile({ route }) {
             userId: _id
         }
     });
-    const [getItemById, { loading: loadingUser, error: errorUser, data: dataUser }] = useLazyQuery(GET_ITEM_BY_ID);
+    const [getItemById] = useLazyQuery(GET_ITEM_BY_ID);
     const { uid } = useSelector(state => state.user)
+    const [searchyItems, setSearchyItems] = useState([])
+
+    const getSearchyItems = async () => {	
+        const searchyItems = await fetchSearchy(null, 10);	
+        setSearchyItems(searchyItems)	
+    
+    }
+
+    useEffect(() => {
+        getSearchyItems()
+    }, [])
 
     useEffect(() => {
         refetch().then(() => getZones())
@@ -207,16 +219,17 @@ function UserProfile({ route }) {
                     Обяви
                 </TextDefault>
                 <FlatList
-                    data={items}
+                    data={[...items, ...searchyItems]}
                     style={[s.flex, s.flatList]}
                     contentContainerStyle={{ flexGrow: 1, ...alignment.PBlarge }}
                     keyExtractor={item => item.id}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={<TextDefault H4 bold center style={alignment.MTmedium}>Няма обяви</TextDefault>}
                     numColumns={3}
-                    renderItem={({ item }) => (
+                    renderItem={({ item }) => item.type === 'searchy' ? 
+                        <SearchyCard   {...item} /> :
                         <Card {...item} />
-                    )}
+                    }
                 />
             </View>
         </View >

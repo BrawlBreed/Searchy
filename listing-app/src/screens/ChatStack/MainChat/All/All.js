@@ -36,6 +36,8 @@ function ALL() {
                     const adId = chat.adId;
                     const userId = chat.members.filter((member) => member !== uid)[0];
                     const res = await getAvatarAndName({ variables: { userId: userId ?? '' } });
+
+                    console.log(userId)
     
                     return {
                         id,
@@ -54,8 +56,7 @@ function ALL() {
                         userId
                     };
                 });
-    
-                const chatList = await Promise.all(chatListPromises);
+                    const chatList = await Promise.all(chatListPromises);
                 setChats(chatList);
             } catch (error) {
                 console.error('Error fetching messages:', error);

@@ -101,7 +101,7 @@ function EditProfile() {
         });
       
         // Check if any images were picked and update the state
-        if (!result.cancelled && result.assets && result.assets.length > 0) {
+        if (!result.canceled && result.assets && result.assets.length > 0) {
           setImage(result.assets[0].uri);
         }
       }
@@ -142,7 +142,6 @@ function EditProfile() {
                                     <Image
                                         style={styles.imgResponsive}
                                         source={avatar ? { uri: avatar } : require('../../../assets/images/avatar.png')}
-
                                         resizeMode='cover'
                                     />
                                     <View style={{ position: 'absolute', bottom: 0, backgroundColor: 'rgba(30, 59, 250, 0.6)', width: "100%", height: scale(22), justifyContent: "center", alignItems: "center" }}>

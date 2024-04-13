@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
 import React from 'react'
-import { TouchableOpacity, View, Share } from 'react-native'
+import { TouchableOpacity, View, Share, Platform } from 'react-native'
 import { FlashMessage, TextDefault } from '../../../components'
 import { alignment, colors, scale } from '../../../utilities'
 import styles from './styles'
@@ -21,7 +21,7 @@ function Help() {
             const result = await Share.share({
                 title: 'App link',
                 message:
-                    'Install this app and enjoy your friend community',
+                    `Инсталирай приложението и се присъедини към отбора на Searchy! ${Platform.OS === 'ios' ? 'https://apps.apple.com/app/id6478391006' : 'https://play.google.com/store/apps/details?id=com.searchy&pcampaignid=web_share'}`
             });
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {

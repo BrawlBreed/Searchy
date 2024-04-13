@@ -30,27 +30,18 @@ function UploadImages() {
     }, [images])
 
     async function PickImage() {
-        // Request the permission to access the library
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-        if (status !== 'granted') {
-            FlashMessage({message: 'Съжаляваме, но не можете да продължите без разрешение за достъп до снимките Ви.', type: 'danger'})
-          return;
-        }
-      
-        // Permission is granted, continue to pick the image
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          quality: 1,
-          allowsMultipleSelection: true
-        });
-      
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 1,
+            allowsMultipleSelection: true
+            
+        })
         if (!result.canceled) {
-          const imagesArr = result.assets.map((item) => item.uri);
-          updateProperty('images', imagesArr);
+            const imagesArr = result.assets.map((item) => item.uri)
+            dispatch(changeImages(imagesArr))
         }
-      }
-          async function CaptureImage() {
+    }
+    async function CaptureImage() {
         if (!Device.isDevice) {
             FlashMessage({
                 message: 'Камерата не работи на симулатора',

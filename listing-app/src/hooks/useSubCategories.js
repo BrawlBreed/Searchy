@@ -38,7 +38,7 @@ const useSubCategories = () => {
 
     useEffect(() => {
         console.log(error)
-    }, [error])
+    }, [error, data])
 
   return ({ loading, error, subCategories })
 }

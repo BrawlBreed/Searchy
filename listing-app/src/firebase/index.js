@@ -21,7 +21,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { checkUserAuth, setCreatedAt, setLoading, setRegister, setUserId } from "../store/reducers/User/userSlice";
 import { getDatabase, ref, set, get, orderByChild, query as dbQuery, orderByValue, equalTo, limitToFirst, startAfter, orderByKey, limitToLast, startAt, endAt, update } from "firebase/database";
-import { collection, getFirestore, onSnapshot, where, query, getDocs, addDoc, doc, setDoc, orderBy, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, getFirestore, onSnapshot, where, query, getDocs, addDoc, doc, setDoc, orderBy, updateDoc, deleteDoc, limit as limitToLastFirestore, getDoc } from "firebase/firestore";
 import { nearByItems } from "../apollo/server";
 
 const firebaseConfig = {
@@ -392,6 +392,73 @@ export const sendForgotPasswordEmail = async (email) => {
   }
 };
 
+export async function uploadSearchy({image, ...searchy}) {
+  try {
+    const imageUrl = await uploadImage(image, `searchy/${searchy.userId}/${searchy.title}`)
+    const docRef = doc(dbFirestore, `searchy/${searchy.title}`);
+
+    await setDoc(docRef, {
+      ...searchy,
+      image: imageUrl,
+      createdAt: new Date()
+    });
+
+    return true
+  } catch (e) {
+    console.error('Error adding document: ', e);
+  }
+}
+
+export const fetchSearchy = async (uid = null, limit = 100) => {
+  const collectionRef = collection(dbFirestore, 'searchy');
+  let q = query(collectionRef, orderBy('createdAt', 'desc'), limitToLastFirestore(limit));
+
+  if (uid) {
+    q = query(collectionRef, where('userId', '==', uid), orderBy('createdAt', 'desc'), limitToLastFirestore(limit));
+  }
+
+  try {
+    const querySnapshot = await getDocs(q);
+    const userPromises = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      const userRef = ref(getDatabase(), 'users/' + data.userId);
+      return get(userRef).then(userSnapshot => {
+        return {
+          id: doc.id,
+          type: 'searchy',
+          user: userSnapshot.val(),
+          ...data
+        };
+      }).catch(error => {
+        console.error('Error fetching user data:', error);
+        // Handle the user fetch error, possibly returning partial data with an error indicator
+        return {
+          id: doc.id,
+          type: 'searchy',
+          user: null, // or some error indicator
+          ...data
+        };
+      });
+    });
+
+    return Promise.all(userPromises); // Wait for all user data to be fetched
+  } catch (e) {
+    console.error('Error fetching documents:', e);
+    return []; // Return an empty array on error to maintain consistent function output type
+  }
+};
+
+export async function deleteSearchy(id){
+  const docRef = doc(dbFirestore, 'searchy', id);
+
+  try{
+    await deleteDoc(docRef)
+    return true
+  }catch(err){
+    console.error('Error deleting document: ', err);
+    return false
+  }
+}
 // export const createOrSignUpWithPhone = async (phoneNumber, dispatch, mutateFunction) => {
 //   dispatch(setLoading(true));
 

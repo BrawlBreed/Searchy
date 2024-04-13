@@ -3,12 +3,12 @@ import { GET_ZONES_QUERY, nearByItems } from '../apollo/server';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setBlockedUsers, setFavorites, setLoading, setOwnedItems } from '../store/reducers/User/userSlice';
-import { calculatePromotionScore } from '../utilities/methods';
-import { fetchItems } from '../firebase';
+import { fetchItems, fetchSearchy } from '../firebase';
 
 const useMainHome = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [items, setItems] = useState([]);
+  const [searchyItems, setSearchyItems] = useState([]);
   const [lastId, setLastId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentLimit, setCurrentLimit] = useState(10);
@@ -24,6 +24,8 @@ const useMainHome = () => {
     if(loading) return;
     setLoading(loadingFlag);
     let { items, lastId } = await fetchItems(zoneId, currentLimit, lastId)
+    const searchyItems = await fetchSearchy(null, currentLimit);
+    setSearchyItems(searchyItems)
     items = items.filter(item => {
       return !blockedUsers?.includes(item?.user?._id) && !item?.user?.blockedUsers?.includes(uid);
     }) || [];
@@ -78,7 +80,7 @@ const useMainHome = () => {
   }, [uid]);
 
   // Expose the refetch function to allow manual refreshing of the query
-  return { loading, items, refreshing, setRefreshing, setCurrentLimit, currentLimit, fetchItems, lastId, getItems };
+  return { loading, searchyItems, items, refreshing, setRefreshing, setCurrentLimit, currentLimit, fetchItems, lastId, getItems };
 };
 
 export default useMainHome;

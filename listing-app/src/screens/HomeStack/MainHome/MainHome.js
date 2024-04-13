@@ -12,11 +12,12 @@ import { setZone } from '../../../store/reducers/Item/addItemSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkUserAuth, setCurrentUser } from '../../../store/reducers/User/userSlice';
 import { ScrollView } from 'react-native-gesture-handler';
-import { getRemainingCountOrTen } from '../../../utilities/methods';
+import { getRemainingCountOrTen, interleaveAndShuffleArrays } from '../../../utilities/methods';
 import { ActivityIndicator } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import EULAModal from '../../../components/Modal/EULAModal/EULAModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SearchyCard from './Card/SearchyCard';
 // import { AppOpenAd, InterstitialAd, RewardedAd, BannerAd, TestIds, BannerAdSize } from 'react-native-google-mobile-ads';
 
 const COLORS = [colors.searchy1, colors.searchy2]
@@ -30,7 +31,7 @@ function MainHome() {
   const { loading: loadingCategories, error: errorCategories, categories } = useCategories()
   const { zone } = useSelector(state => state.addItem)
   const dispatch = useDispatch()
-  const { loading, items, refreshing, setRefreshing, fetchItems, setCurrentLimit, currentLimit, lastId, getItems } = useMainHome(refreshing);
+  const { loading, items, refreshing, setRefreshing, fetchItems, setCurrentLimit, currentLimit, lastId, getItems, searchyItems } = useMainHome(refreshing);
   const adUnitId = Platform.OS === 'ios' ? 'ca-app-pub-6009235772551043~5795958407' : 'ca-app-pub-6009235772551043~3123878820';
 
   const checkEULAAcceptance = async () => {
@@ -193,13 +194,13 @@ function MainHome() {
         <ActivityIndicator color={colors.searchy2} />
       </View> :
       // error ? <TextDefault center>Грешка!</TextDefault> :
-      items.length === 0 ? emptyView() : 
+      items.length === 0 && searchyItems.length === 0 ? emptyView() : 
         <View style={[styles.flex, styles.container]}>
             <EULAModal onModalToggle={onEULAModalToggle} visible={EULAModalVisible} />
             <LocationModal visible={modalVisible} onModalToggle={toggleModal}/>
             <SearchModal categories={categories} visible={searchVisible} onModalToggle={toggleSearch} />              
             <FlatList
-              data={items}
+              data={interleaveAndShuffleArrays(items, searchyItems)}
               style={[styles.flex, styles.flatList]}
               contentContainerStyle={{ flexGrow: 1, backgroundColor: colors.containerBox, ...alignment.PBlarge }}
               keyExtractor={item => item.id}
@@ -212,9 +213,11 @@ function MainHome() {
               ListHeaderComponent={renderHeader}
               ListFooterComponent={<></>}
               numColumns={2}
-              renderItem={({ item }) => (
+              renderItem={({ item }) => item.type === 'searchy' ? 
+              <SearchyCard {...item} />
+              :
                 <Card {...item} /> 
-              )}
+              }
             />
           </View>
     }

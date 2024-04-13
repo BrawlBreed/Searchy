@@ -64,6 +64,7 @@ function Card(props) {
                                 variables: { id: props?.id }
                             });
                             await props.refetch();
+                            FlashMessage({ message: 'Обявата беше изтрита успешно!', type: 'success' });
                         } catch (error) {
                             console.error('Error in deleteItem:', error);
                         }
@@ -122,6 +123,7 @@ function Card(props) {
         <View
             style={[styles.adContainer, { borderLeftColor: props.status?.toLowerCase() === 'inactive' ? colors.horizontalLine : colors.activeLine }]}>
                 <View style={[styles.dateRow, { flexDirection: "row", alignItems: "center", ...alignment.PTxSmall, ...alignment.PBxSmall }]}>
+                    <TextDefault H3 bold style={[styles.flex, alignment.PLsmall]}>Продавам</TextDefault>
                     <TextDefault small textColor={colors.fontSecondColor} uppercase style={[styles.flex, alignment.PLsmall, {}]}>
                         {'От: '} <TextDefault small bold>{dateStringToDDMMYYYY(props?.createdAt)}</TextDefault>
                     </TextDefault>

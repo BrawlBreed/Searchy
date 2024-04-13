@@ -55,7 +55,7 @@ function Followers() {
             const result = await Share.share({
                 title: 'App link',
                 message:
-                    'Install this app and enjoy your friend community',
+                `Инсталирай приложението и се присъедини към отбора на Searchy! ${Platform.OS === 'ios' ? 'https://apps.apple.com/app/id6478391006' : 'https://play.google.com/store/apps/details?id=com.searchy&pcampaignid=web_share'}`
             });
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {

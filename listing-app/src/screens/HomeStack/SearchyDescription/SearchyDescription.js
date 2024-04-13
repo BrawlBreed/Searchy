@@ -8,84 +8,16 @@ import styles from './style'
 import { FontAwesome, MaterialIcons, Entypo, SimpleLineIcons } from '@expo/vector-icons'
 import * as Device from 'expo-device';
 import Slider from './Slider'
-import MapView, { Marker } from 'react-native-maps'
 import { useDispatch, useSelector } from 'react-redux'
-import { ADD_TO_FAVORITES, GET_ITEM_BY_ID, GET_ZONES_QUERY, INCREMENT_VIEWS, LIKE_ITEM_MUTATION } from '../../../apollo/server'
-import { client } from '../../../apollo'
-import { dateStringToDDMMYYYY, isDeviceTablet } from '../../../utilities/methods'
-import { appendFavorites, removeFavorite, setFavorites } from '../../../store/reducers/User/userSlice'
-import { useLazyQuery } from '@apollo/client'
+import { dateStringToDDMMYYYY, formatDateFromFirestore, isDeviceTablet } from '../../../utilities/methods'
 import { fetchChatsByUserIDs, addChat } from '../../../firebase'
 import { generateRandomId } from '../../../store/reducers/Item/helpers'
-import { set } from 'react-native-reanimated'
 
-function ProductDescription({ route, preview }) {
-    const { refetch, title, price, id, description, location, images, user, createdAt, condition, subCategory, subCategoryId, address, views } = route ? route?.params : preview
-    const [isLike, setIsLike] = useState(false);
+function SearchyDescription({ route, preview }) {
+    const { refetch, title, inquiry, id, description, image, user, createdAt, views } = route ? route?.params : preview
     const navigation = useNavigation()
     const { isLoggedIn, uid } = useSelector(state => state.user)
     const [reportModal, setReportModal] = useState(false);
-    const [fetched, setFetched] = useState(false);
-    const [likesList, setLikesList] = useState([]);
-    const dispatch = useDispatch();
-    const { favorites } = useSelector(state => state.user)
-
-    useEffect(() => {
-        client.query({
-            query: GET_ZONES_QUERY,
-            variables: { userId: uid }
-        })
-            .then(({ data }) => {
-                const newFavoritesList = Array.from(new Set(data.getUserById.favorites))
-                dispatch(setFavorites(newFavoritesList))
-            }).then(() => setFetched(true)).then(() => refetch())
-
-        client.query({
-            query: GET_ITEM_BY_ID,
-            variables: { id: id }
-        }).then(({ data }) => {
-            const newLikesList = Array.from(new Set(data.getItemById.likes))
-            setLikesList(newLikesList)
-        }).then(() => refetch())
-    }, [uid]);
-
-    useEffect(() => {
-        setIsLike(favorites?.includes(id));
-    }, [id, favorites])
-
-    const handleLike = async () => {
-        if (!isLoggedIn) return navigation.navigate('Registration')
-        try {
-            setIsLike(prev => !prev)
-            const newFavorites = favorites?.includes(id) ? favorites?.filter(item => item !== id) : [...favorites, id];
-            const newLikes = likesList?.includes(uid) ? likesList?.filter(item => item !== uid) : [...likesList, uid];
-            client.mutate({
-                mutation: ADD_TO_FAVORITES,
-                variables: { uid: uid, favorites: Array.from(new Set(newFavorites)) }
-            }).then(() => {
-                dispatch(setFavorites(Array.from(new Set(newFavorites))))
-            }).then(() => {
-                client.mutate({
-                    mutation: LIKE_ITEM_MUTATION,
-                    variables: { likes: Array.from(new Set(newLikes)), name: id }
-                }).then(() => {
-                    setLikesList(Array.from(new Set(newLikes)))
-                    refetch()
-                })
-            })
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
-    useEffect(() => {
-        if (!isLoggedIn) {
-            setIsLike(false);
-            navigation.navigate('Registration');
-            return;
-        }
-
-    }, [isLike]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -99,19 +31,16 @@ function ProductDescription({ route, preview }) {
 
     useEffect(() => {
         if (uid !== user?._id) {
-            client.mutate({
-                mutation: INCREMENT_VIEWS,
-                variables: { id: id, views: views + 1 }
-            }).then(refetch);
+            // To increment views query
         }
-    }, [uid, user?._id, id, views, client, refetch]);
+    }, [uid, user?._id, id, views, refetch]);
 
     async function chatCheck() {
         if (user?._id === uid) navigation.navigate('Account')
         else if (!isLoggedIn) navigation.navigate('Registration')
         else {
             const chatObj = {
-                name: user.name, image: images[0], avatar: user.avatar, uid: user?._id, adId: id
+                name: user.name, image: image, avatar: user.avatar, uid: user?._id, adId: id
             }
             const chats = await fetchChatsByUserIDs(uid, user?._id, id);
             if (chats.length) {
@@ -125,35 +54,13 @@ function ProductDescription({ route, preview }) {
                         user?._id
                     ],
                     adId: id,
-                    image: images[0],
+                    image: image,
                     title: title,
                 };
                 const chatId = await addChat(chatObject)
                 navigation.navigate('LiveChat', { id: chatId, ...chatObj })
             }
 
-        }
-    }
-
-    async function share() {
-        try {
-            const result = await Share.share({
-                title: 'App link',
-                message:
-                    'Изтегли приложението от тук: ',
-            });
-            if (result.action === Share.sharedAction) {
-                if (result.activityType) {
-                    // shared with activity type of result.activityType
-                    FlashMessage({ message: 'The invitation has been sent', type: 'success' });
-                } else {
-                    // shared
-                }
-            } else if (result.action === Share.dismissedAction) {
-                // dismissed
-            }
-        } catch (error) {
-            FlashMessage({ message: error.message, type: 'warning' });
         }
     }
 
@@ -196,87 +103,30 @@ function ProductDescription({ route, preview }) {
                     <ReportModal adId={id} uid={user?._id} visible={reportModal} onModalToggle={toggleModal} />
                 )}
                 <View style={styles.swiperContainer}>
-                    <Slider images={images} />
+                    <Slider images={[image]} />
                 </View>
                 <View style={styles.priceContainer}>
                     <View style={styles.priceRow}>
-                        <TextDefault H4 bold>
-                            {price} лв.
+                        <TextDefault H4>
+                            Търся си <TextDefault H4 bold>{title}</TextDefault>
                         </TextDefault>
-                        {route && (
-                            <TouchableOpacity activeOpacity={0} onPress={() => handleLike()}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    {isLike ?
-                                        <FontAwesome name="heart" size={scale(20)} color="black" /> :
-                                        <FontAwesome name="heart-o" size={scale(20)} color="black" />
-                                    }
-                                    {/* <TextDefault style={{ marginLeft: 5 }}>{likesList?.length ? likesList.length : '0'}</TextDefault> */}
-                                </View>
-                            </TouchableOpacity>
-                        )}
-
                     </View>
                     <TextDefault style={{ fontSize: 20 }}>
-                        {title}
+                        В замяна: {inquiry}
                     </TextDefault>
                     <View style={styles.locationRow}>
-                        <MaterialIcons name='location-on' size={scale(15)} color={colors.headerText} />
-                        <TextDefault numberOfLines={1} style={styles.locationText}>
-                            {address.address}
-                        </TextDefault>
                         {route && (
                             <TextDefault numberOfLines={1}>
-                                от {dateStringToDDMMYYYY(createdAt)}
+                                публикувано на {formatDateFromFirestore(createdAt)}
                             </TextDefault>
                         )}
 
                     </View>
-                    <MapView initialRegion={{
-                        latitude: address.coordinates.latitude,
-                        longitude: address.coordinates.longitude,
-                        latitudeDelta: 0.005,
-                        longitudeDelta: 0.005
-                    }}
-                        style={{
-                            width: '100%',
-                            height: Dimensions.get('screen').width * 0.5,
-                            flexGrow: 1
-                        }}
-                    >
-                        {address.coordinates.latitude && address.coordinates.longitude &&
-                            <Marker
-                                coordinate={{ latitude: address.coordinates.latitude, longitude: address.coordinates.longitude }}
-                                title='Местоположение'
-                                description={location}
-                                identifier='местоположение'
-                            />}
-                    </MapView>
 
                 </View>
                 <View style={styles.conditionContainer}>
                     <TextDefault bold H5 style={alignment.MBsmall}>
-                        {'Детайли'}
-                    </TextDefault>
-                    <View style={styles.row}>
-                        <TextDefault uppercase light style={{ ...alignment.MBsmall, width: '35%' }}>
-                            {'Състояние'}
-                        </TextDefault>
-                        <TextDefault bold style={alignment.MBsmall}>
-                            {condition?.toLowerCase() === 'new' ? 'Ново' : 'Използвано'}
-                        </TextDefault>
-                    </View>
-                    <View style={styles.row}>
-                        <TextDefault uppercase light style={{ ...alignment.MBsmall, width: '35%' }}>
-                            {'Вид'}
-                        </TextDefault>
-                        <TextDefault bold style={alignment.MBsmall}>
-                            {route ? subCategory.title : subCategoryId}
-                        </TextDefault>
-                    </View>
-                </View>
-                <View style={styles.conditionContainer}>
-                    <TextDefault bold H5 style={alignment.MBsmall}>
-                        {'Описание'}
+                        {'Доълнително пояснение'}
                     </TextDefault>
                     <TextDefault >
                         {description}
@@ -329,11 +179,7 @@ function ProductDescription({ route, preview }) {
                             {'Докладвай обява'}
                         </TextDefault>
                         <MaterialIcons style={{ paddingLeft: 5 }} name="flag" size={24} color="white" />
-                    </TouchableOpacity>}
-                    
-                    {/* <TouchableOpacity activeOpacity={0.7} onPress={share}>
-                        {RightButton({ iconColor: colors.white, icon: 'share' })}
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>}                    
                 </View>
             </ScrollView>
             {/* Footer */}
@@ -381,4 +227,4 @@ function ProductDescription({ route, preview }) {
     )
 }
 
-export default ProductDescription
+export default SearchyDescription

@@ -9,16 +9,31 @@ import useOwnedItems from '../../../../hooks/useOwnedItems';
 import Card from './Card';
 import { set } from 'firebase/database';
 import { RefreshControl } from 'react-native-gesture-handler';
+import { fetchSearchy } from '../../../../firebase';
+import { useSelector } from 'react-redux';
+import SearchyCard from './SearchyCard';
 
 function Ads() { 
     const navigation = useNavigation()
     const [visible, setVisible] = useState(false)    
     const [state, setState] = useState('Виж всички')
+    const [searchyItems, setSearchyItems] = useState([])
+    const { uid } = useSelector(state => state.user)
     const { initalItems, items, setItems, loading, error, onRefresh, refreshing, refetch } = useOwnedItems();
 
     function onModalToggle() {
         setVisible(prev => !prev)
     }
+
+    async function appendSearchyItems(){
+        const searchyList = await fetchSearchy(uid)
+
+        setSearchyItems(searchyList)
+    }
+
+    useEffect(() => {
+        appendSearchyItems()
+    }, [refreshing])
 
     function emptyView() {
         return (
@@ -57,7 +72,7 @@ function Ads() {
         <View onRefresh={onRefresh} style={[styles.flex, styles.mainContainer]}>
             <AddFilter visible={visible} onModalToggle={onModalToggle} setState={setState} setAds={setItems} items={initalItems} active={items?.length} />
                 <FlatList
-                    data={items}
+                    data={[...items, ...searchyItems]}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
                     style={styles.flex}
                     contentContainerStyle={{ flexGrow: 1 }}
@@ -66,9 +81,10 @@ function Ads() {
                     ListHeaderComponent={header}
                     keyExtractor={(item, index) => index.toString()}
                     stickyHeaderIndices={[0]}
-                    renderItem={({ item, index }) => (
+                    renderItem={({ item, index }) => item.type === 'searchy' ? 
+                    <SearchyCard refetch={appendSearchyItems} setAds={setItems} navigation={navigation} {...item} /> :
                         <Card refetch={refetch} setAds={setItems} navigation={navigation} {...item} />
-                    )}
+                    }
                 />
         </View>
     )
